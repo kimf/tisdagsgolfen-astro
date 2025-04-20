@@ -1,0 +1,20 @@
+---
+import db from 'src/db';
+import { courses } from 'src/db/schema';
+
+const dbCourses = await db.query.courses.findMany({
+  orderBy: courses.eventsCount
+});
+---
+
+<h3>Välj Bana</h3>
+<div class="chips">
+  {
+    dbCourses.map((course) => (
+      <label>
+        <input type="radio" name="course" value={course.id} x-model="course" />
+        {course.club} - {course.name}
+      </label>
+    ))
+  }
+</div>

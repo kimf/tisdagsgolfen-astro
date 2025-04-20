@@ -14,7 +14,7 @@ interface ImportMeta {
 
 interface Window {
   Alpine: import('alpinejs').Alpine;
-  teamForm: () => void;
+  teamForm: (courseId: number, specialWeek: number, teamEvent: number, strokes: number) => void;
 }
 
 declare namespace App {

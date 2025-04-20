@@ -1,0 +1,12 @@
+<h3>Inställningar</h3>
+<div class="chips">
+  <label>
+    <input type="checkbox" name="specialweek" x-model="specialWeek" />Specialvecka
+  </label>
+  <label x-show="specialWeek" x-cloak>
+    <input type="checkbox" name="teamevent" x-model="teamEvent" />Lagtävling
+  </label>
+  <label x-show="specialWeek" x-cloak>
+    <input type="checkbox" name="strokes" x-model="strokes" />Slaggolf
+  </label>
+</div>

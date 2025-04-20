@@ -1,0 +1,35 @@
+---
+import type { ScorecardWithPlayers } from 'src/db/schema/scorecard';
+import { shortName } from 'src/utils/formatters';
+import ToPar from '../shared/ToPar.astro';
+
+interface Props {
+  scorecards: ScorecardWithPlayers[];
+}
+
+const { scorecards } = Astro.props;
+---
+
+<thead>
+  <tr>
+    <th></th>
+    {
+      scorecards.map((scorecard) => (
+        <th>
+          {scorecard.players.map((player) => shortName(player.player.fullName))}
+          <small>{scorecard.givenStrokes} SLAG</small>
+        </th>
+      ))
+    }
+  </tr>
+  <tr>
+    <th></th>
+    {
+      scorecards.map((scorecard) => (
+        <th>
+          <ToPar toPar={scorecard.toPar || 0} />
+        </th>
+      ))
+    }
+  </tr>
+</thead>

@@ -1,0 +1,39 @@
+---
+import type { Profile } from 'src/db/schema/profile';
+import { shortName } from 'src/utils/formatters';
+
+export interface Props {
+  allPlayers: Profile[];
+}
+const { allPlayers } = Astro.props;
+---
+
+<div x-show="!(specialWeek && teamEvent)">
+  <h3>Välj Spelare & sätt slag</h3>
+  <div class="chips">
+    {
+      allPlayers.map((player, index) => (
+        <div class="player">
+          <label>
+            <input
+              type="checkbox"
+              name={`players[${index}][id]`}
+              value={player.id}
+              x-model="selectedPlayers"
+            />
+            {shortName(player.fullName)}
+          </label>
+          <template x-if={`!teamEvent && hasSelectedPlayer(${player.id})`}>
+            <input
+              inputmode="numeric"
+              type="text"
+              pattern="[0-9]*"
+              value="10"
+              name={`players[${index}]['strokes']`}
+            />
+          </template>
+        </div>
+      ))
+    }
+  </div>
+</div>

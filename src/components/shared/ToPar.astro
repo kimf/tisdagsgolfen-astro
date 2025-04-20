@@ -1,0 +1,37 @@
+---
+interface Props {
+  toPar: number;
+  color?: string;
+  height?: number;
+  width?: number;
+  modifiedPoints?: boolean;
+}
+const { toPar, height, color, width, modifiedPoints } = Astro.props;
+
+const textColor = color || '$text';
+
+const toParColor = modifiedPoints
+  ? toPar === 0
+    ? textColor
+    : toPar > 0
+      ? 'green'
+      : 'red'
+  : toPar === 0
+    ? textColor
+    : toPar > 0
+      ? textColor
+      : 'red';
+---
+
+<span
+  style={{
+    color: toParColor,
+    height: height || 'auto',
+    fontSize: 24,
+    textAlign: 'center',
+    width: width || 'auto',
+    marginTop: -1
+  }}
+>
+  {toPar === 0 ? 'E' : toPar > 0 ? `+${toPar}` : toPar}
+</span>

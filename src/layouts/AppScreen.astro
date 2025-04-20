@@ -1,0 +1,36 @@
+---
+import { pwaInfo } from 'virtual:pwa-info';
+import { pwaAssetsHead } from 'virtual:pwa-assets/head';
+import { Font } from 'astro:assets';
+import { Head } from 'astro-capo';
+// import { AstroFont } from 'astro-font';
+export interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+import 'src/styles/globals.css';
+---
+
+<!doctype html>
+<html lang="sv">
+  <Head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <Font cssVariable="--font-mono" preload />
+    <title>{title || 'Tisdagsgolfen'}</title>
+    {
+      pwaAssetsHead.themeColor && (
+        <meta name="theme-color" content={pwaAssetsHead.themeColor.content} />
+      )
+    }
+    {pwaAssetsHead.links.map((link: any) => <link {...link} />)}
+    {pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
+  </Head>
+  <body id="main">
+    <div class="container">
+      <slot />
+    </div>
+  </body>
+</html>

@@ -1,129 +1,109 @@
 ---
 export const prerender = false;
-import db from 'src/db';
+import 'src/styles/scoring.css';
+
 import { asc, eq } from 'drizzle-orm';
-import HoleInputWithPad from 'src/components/HoleInputWithPad.astro';
-import HoleInput from 'src/components/HoleInput.astro';
-import { scorecards, scoringSessions } from 'src/db/schema';
-import Layout from 'src/layouts/Layout.astro';
+import db from 'src/db';
+import AppScreen from 'src/layouts/AppScreen.astro';
+import { scorecards, scoringSessions, holes } from 'src/db/schema';
+import { shortName } from 'src/utils/formatters';
+import TableHead from 'src/components/scoring/TableHead.astro';
+import type { ScorecardWithPlayers } from 'src/db/schema/scorecard';
 
 const { id } = Astro.params;
 const userId = await Astro.session?.get('userId');
 
-if (!userId) {
-  throw new Error('Logga in för att föra score');
-}
-if (!id) {
-  throw new Error('Id saknas för runda');
-}
+if (!userId) throw new Error('Logga in för att föra score');
+if (!id) throw new Error('Id saknas för runda');
+
+// // Handle POST from htmx for updating a score
 // if (Astro.request.method === 'POST') {
 //   const formData = await Astro.request.formData();
-//   const sessionId = formData.get('sessionId');
-//   const strokesEntries = [...formData.entries()]
-//     .filter(([key]) => key.startsWith('strokes['))
-//     .map(([key, value]) => {
-//       const playerId = key.match(/strokes\[(.*?)\]/)?.[1];
-//       return { playerId, strokes: Number(value), sessionId };
+//   const playerId = Number(formData.get('playerId'));
+//   const hole = Number(formData.get('hole'));
+//   const strokesValue = Number(formData.get('strokes'));
+//   const sessionId = Number(id);
+
+//   // Upsert logic for strokes (adjust to your schema)
+//   await db
+//     .insert(strokes)
+//     .values({ playerId, hole, strokes: strokesValue, sessionId })
+//     .onConflictDoUpdate({
+//       target: [strokes.playerId, strokes.hole, strokes.sessionId],
+//       set: { strokes: strokesValue }
 //     });
 
-//   // Upsert or insert scores
-//   for (const entry of strokesEntries) {
-//     await db.insert(strokes).values(entry);
-//   }
+//   // Fetch updated total and cell value
+//   const total = await db.query.strokes
+//     .findMany({
+//       where: eq(strokes.playerId, playerId),
+//       columns: { strokes: true }
+//     })
+//     .then((rows) => rows.reduce((sum, r) => sum + r.strokes, 0));
 
-//   return redirect(`/score/${sessionId}`);
+//   // Return the updated cell and total for htmx swap
+//   return new Response(`<span>${strokesValue}</span>|<span>${total}</span>`, {
+//     headers: { 'HX-Trigger': 'score-updated' }
+//   });
 // }
 
+// Fetch session, players, holes, and scores
 const scoringSession = await db.query.scoringSessions.findFirst({
   where: eq(scoringSessions.id, Number(id)),
   with: {
-    course: true,
-    scorecards: {
-      orderBy: [asc(scorecards.strokes)],
+    course: {
       with: {
-        players: {
-          with: {
-            player: true
-          }
+        holes: {
+          orderBy: [asc(holes.number)]
         }
+      }
+    },
+    scorecards: {
+      orderBy: [asc(scorecards.id)],
+      with: {
+        players: { with: { player: true } }
       }
     }
   }
 });
 
-// // Group players by team
-// const teams = teamData.reduce((acc, tm) => {
-//   const player = allPlayers.find((p) => p.id === tm.playerId);
-//   if (!acc[tm.teamIndex]) acc[tm.teamIndex] = [];
-//   if (player) acc[tm.teamIndex].push({ id: player.id, name: player.name });
-//   return acc;
-// }, {});
+if (!scoringSession) {
+  throw new Error('Hittade ingen scoring session');
+}
+
+// Build players and holes arrays
+
+const course = scoringSession.course;
+const holesCount = course.holes.length;
+const currentHole = course.holes.find((hole) => hole.number === scoringSession.currentHole);
 ---
 
-<Layout title="För score">
-  <pre>{JSON.stringify(scoringSession, null, 2)}</pre>
-  <form method="POST" x-data="scoringForm()">
-    <template x-for="(players, teamIndex) in teams" :key="teamIndex">
-      <div style="margin-bottom: 1.5rem;">
-        <h3>Team <span x-text="parseInt(teamIndex) + 1"></span></h3>
-        <template x-for="player in players" :key="player.id">
-          <div style="margin-bottom: 0.5rem;">
-            <label x-text="player.name"></label>
-            <input
-              type="number"
-              :name="`strokes[${player.id}]`"
-              x-model.number="scores[player.id]"
-              min="0"
-            />
-
-            <!-- <HoleInputWithPad player={player} hole={hole} sessionId={id} /> -->
-            <!-- <HoleInput /> -->
-          </div>
-        </template>
-      </div>
-    </template>
-
-    <input type="hidden" name="sessionId" value={id} />
-    <button type="submit">Save Scores</button>
-  </form>
-</Layout>
-<style>
-  body {
-    background: #2e3440;
-    color: #d8dee9;
-    font-family: monospace;
-    padding: 1rem;
-  }
-  h3,
-  h4 {
-    color: #81a1c1;
-  }
-  input[type='number'] {
-    background: #3b4252;
-    color: #d8dee9;
-    border: 1px solid #4c566a;
-    border-radius: 4px;
-    padding: 0.3rem;
-    width: 4rem;
-    text-align: center;
-  }
-  button {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    background: none;
-    border: 1px solid #4c566a;
-    color: #d8dee9;
-    border-radius: 4px;
-  }
-  button:hover {
-    background: #434c5e;
-  }
-</style>
-<script>
-  function scoringForm() {
-    return {
-      teams: {},
-      scores: {}
-    };
-  }
-</script>
+<AppScreen title="För score">
+  <div x-data="scorecardApp()" x-init="init()">
+    <table class="scorecard">
+      <TableHead scorecards={scoringSession.scorecards as ScorecardWithPlayers[]} />
+      <tbody>
+        {
+          course.holes.map((hole) => (
+            <tr>
+              <td>{hole.number}</td>
+              {scoringSession.scorecards.map((scorecard) => (
+                <td>
+                  <button
+                    class="score-cell"
+                    x-on:click="openDrawer({playerId: {player.id}, playerName: '{player.name}', hole: {hole}, value: '{getScore(player.id, hole)}'})"
+                    x-bind="scoreCellAttrs({playerId: {player.id}, hole: {hole}})"
+                    hx-get="#"
+                  >
+                    <span x-text="getCell({playerId: {player.id}, hole: {hole}})">TBD</span>
+                  </button>
+                </td>
+              ))}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+</AppScreen>
+<script src="src/controllers/ScoringController.ts"></script>
