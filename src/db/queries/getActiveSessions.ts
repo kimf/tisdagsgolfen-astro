@@ -1,17 +1,14 @@
 import db from 'src/db';
-import { scoringSessions } from '../schema';
-import { eq } from 'drizzle-orm';
 
-export async function userActiveSession(userId: number | string) {
-  const activeSessions = await db
-    .select()
-    .from(scoringSessions)
-    .where(eq(scoringSessions.ownerId, Number(userId)))
-    .limit(1);
+export async function getaActiveSessions() {
+  const activeSessions = await db.query.scoringSessions.findMany({
+    where: (sessions, { ne }) => ne(sessions.state, 'CLOSED') && ne(sessions.state, 'FINALPENDING'),
+    with: {
+      course: true
+    }
+  });
 
-  if (!activeSessions || activeSessions.length === 0) {
-    return null;
-  }
-
-  return activeSessions[0];
+  return activeSessions;
 }
+
+export type ActiveSession = Awaited<ReturnType<typeof getaActiveSessions>>[number];

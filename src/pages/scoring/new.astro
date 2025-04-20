@@ -2,9 +2,8 @@
 export const prerender = false;
 
 import Layout from 'src/layouts/Layout.astro';
-import { eq } from 'drizzle-orm';
 import db from 'src/db';
-import { scoringSessions, profiles, scorecardPlayers, courses, scorecards } from 'src/db/schema';
+import { scoringSessions, scorecardPlayers, courses, scorecards } from 'src/db/schema';
 import { shortName } from 'src/utils/formatters';
 import { extractPlayers, extractTeams } from 'src/utils/formDataExtractors';
 
@@ -98,16 +97,27 @@ if (Astro.request.method === 'POST') {
   }
 }
 
-const allPlayers = await db
-  .select()
-  .from(profiles)
-  .orderBy(profiles.guest)
-  .where(eq(profiles.active, 1));
-const dbCourses = await db.select().from(courses).orderBy(courses.eventsCount);
+const allPlayers = await db.query.profiles.findMany({
+  where: (players, { eq }) => eq(players.active, 1)
+});
+const dbCourses = await db.query.courses.findMany({
+  orderBy: courses.eventsCount
+});
+
+const joinId = Astro.url.searchParams.get('joinId') || '';
+let joinSession = null;
+if (joinId) {
+  joinSession = await db.query.scoringSessions.findFirst({
+    where: (sessions, { eq }) => eq(sessions.id, Number(joinId))
+  });
+}
 ---
 
 <Layout title="Ny Runda">
-  <form method="POST" x-data="teamForm()">
+  <form
+    method="POST"
+    x-data={`teamForm(${joinSession?.courseId}, ${joinSession?.special}, ${joinSession?.teamEvent}, ${joinSession?.strokes})`}
+  >
     <h3>Inställningar</h3>
     <div class="chips">
       <label>
@@ -225,12 +235,12 @@ const dbCourses = await db.select().from(courses).orderBy(courses.eventsCount);
       players: string[];
     };
 
-    function teamForm() {
+    function teamForm(courseId: number, specialWeek: number, teamEvent: number, strokes: number) {
       return {
-        course: null,
-        strokes: false,
-        teamEvent: false,
-        specialWeek: false,
+        course: courseId,
+        specialWeek: specialWeek === 1,
+        strokes: strokes === 1,
+        teamEvent: teamEvent === 1,
         players: JSON.parse(
           (document.querySelector('[data-players]') as HTMLElement).dataset.players!
         ) as Profile[],
@@ -250,7 +260,6 @@ const dbCourses = await db.select().from(courses).orderBy(courses.eventsCount);
             return true;
           }
           if (this.teamEvent) {
-            console.log(this.teams.length);
             if (this.teams.length === 0) {
               return true;
             }
