@@ -43,4 +43,6 @@ export const calculateEarnings = cacheable((putts: number, strokes: number, par:
   } else if (strokesOverPar < 0) {
     earnings += STROKES_MONEY[strokesOverPar as -4 | -3 | -2 | -1];
   }
+
+  return earnings;
 });

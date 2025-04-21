@@ -5,10 +5,10 @@ import scorecardPlayers from './scorecard_player';
 
 const profiles = sqliteTable('profiles', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-  fullName: text('full_name').notNull(),
+  fullName: text('full_name').notNull().unique(),
   avatarUrl: text('avatar_url'),
-  guest: integer('guest').notNull().default(0),
-  active: integer('active').notNull().default(1)
+  guest: integer('guest', { mode: 'boolean' }).notNull().default(false),
+  active: integer('active', { mode: 'boolean' }).notNull().default(true)
 });
 
 export const profilesRelations = relations(profiles, ({ many }) => ({

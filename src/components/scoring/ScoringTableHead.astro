@@ -1,10 +1,10 @@
 ---
-import type { ScorecardWithPlayers } from 'src/db/schema/scorecard';
 import { shortName } from 'src/utils/formatters';
 import ToPar from '../shared/ToPar.astro';
+import type { ScoringSessionWithAllData } from 'src/db/queries/getScoringSession';
 
 interface Props {
-  scorecards: ScorecardWithPlayers[];
+  scorecards: ScoringSessionWithAllData['scorecards'];
 }
 
 const { scorecards } = Astro.props;
@@ -27,7 +27,9 @@ const { scorecards } = Astro.props;
     {
       scorecards.map((scorecard) => (
         <th>
-          <ToPar toPar={scorecard.toPar || 0} />
+          <div id={`toPar-${scorecard.id}`} hx-swap-oob="true">
+            <ToPar toPar={scorecard.toPar || 0} />
+          </div>
         </th>
       ))
     }

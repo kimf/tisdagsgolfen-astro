@@ -23,15 +23,6 @@ const toParColor = modifiedPoints
       : 'red';
 ---
 
-<span
-  style={{
-    color: toParColor,
-    height: height || 'auto',
-    fontSize: 24,
-    textAlign: 'center',
-    width: width || 'auto',
-    marginTop: -1
-  }}
->
+<span style={{ color: toParColor }}>
   {toPar === 0 ? 'E' : toPar > 0 ? `+${toPar}` : toPar}
 </span>

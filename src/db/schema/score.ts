@@ -6,18 +6,18 @@ const scores = sqliteTable(
   'scores',
   {
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-    scorecardId: integer('scorecard_id')
+    scorecardId: integer('scorecard_id', { mode: 'number' })
       .references(() => scorecards.id, { onDelete: 'cascade' })
       .notNull(),
-    strokes: integer('strokes').notNull().default(0),
-    hole: integer('hole').notNull(),
-    putts: integer('putts').notNull().default(0),
-    beers: integer('beers').notNull().default(0),
-    extraStrokes: integer('extra_strokes').notNull().default(0),
-    points: integer('points').notNull().default(0),
-    toPar: integer('to_par').notNull().default(0),
-    fines: integer('fines').notNull().default(0),
-    ciders: integer('ciders').notNull().default(0),
+    strokes: integer('strokes', { mode: 'number' }).notNull().default(0),
+    hole: integer('hole', { mode: 'number' }).notNull(),
+    putts: integer('putts', { mode: 'number' }).notNull().default(0),
+    beers: integer('beers', { mode: 'number' }).notNull().default(0),
+    extraStrokes: integer('extra_strokes', { mode: 'number' }).notNull().default(0),
+    points: integer('points', { mode: 'number' }).notNull().default(0),
+    toPar: integer('to_par', { mode: 'number' }).notNull().default(0),
+    fines: integer('fines', { mode: 'number' }).notNull().default(0),
+    ciders: integer('ciders', { mode: 'number' }).notNull().default(0),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`)
   },
   (t) => [unique('scores_scorecard_id_hole').on(t.scorecardId, t.hole)]

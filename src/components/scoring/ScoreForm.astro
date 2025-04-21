@@ -1,0 +1,48 @@
+---
+interface Props {
+  special: boolean;
+  id: number;
+}
+
+const { special, id } = Astro.props;
+---
+
+<form
+  hx-post={`/scoring/${id}/postscore`}
+  hx-indicator="body"
+  hx-swap="none"
+  @htmx:after-request="hideForm()"
+  x-cloak
+  x-transition
+  x-show="isScoring"
+  class="score-form"
+>
+  <h2 x-text="playerName"></h2>
+  hcp:<small x-text="givenStrokes"></small>
+  par:<small x-text="par"></small>
+  index:<small x-text="index"></small>
+
+  <input type="hidden" name="special" value={special ? '1' : '0'} />
+  <input type="hidden" name="par" x-model="par" />
+  <input type="hidden" name="hole" x-model="number" />
+  <input type="hidden" name="scorecard_id" x-model="scorecardId" />
+  <input type="hidden" name="extra_strokes" x-model="givenStrokes" />
+
+  <label>
+    Slag
+    <input type="number" name="strokes" min="1" x-model="strokes" required class="input" />
+  </label>
+  <label>
+    Puttar
+    <input type="number" name="putts" min="0" x-model="putts" required class="input" />
+  </label>
+  <label>
+    Öl
+    <input type="number" name="beers" min="0" x-model="beers" class="input" />
+  </label>
+  <label>
+    Cider
+    <input type="number" name="ciders" min="0" x-model="ciders" class="input" />
+  </label>
+  <button type="submit" class="btn">Spara</button>
+</form>

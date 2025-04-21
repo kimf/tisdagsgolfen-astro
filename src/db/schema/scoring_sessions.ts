@@ -6,16 +6,16 @@ import profiles from './profile';
 
 const scoringSessions = sqliteTable('scoring_sessions', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-  ownerId: integer('owner_id').notNull(),
-  courseId: integer('course_id')
+  ownerId: integer('owner_id', { mode: 'number' }).notNull(),
+  courseId: integer('course_id', { mode: 'number' })
     .references(() => courses.id)
     .notNull(),
-  special: integer('special').default(0),
-  strokes: integer('strokes').default(0),
-  teamEvent: integer('team_event').default(0),
+  special: integer('special', { mode: 'boolean' }).default(false),
+  strokes: integer('strokes', { mode: 'boolean' }).default(false),
+  teamEvent: integer('team_event', { mode: 'boolean' }).default(false),
   state: text('state').default('STARTED'),
-  currentHole: integer('current_hole').default(1),
-  partOfFinal: integer('part_of_final').default(0),
+  currentHole: integer('current_hole', { mode: 'number' }).default(1),
+  partOfFinal: integer('part_of_final', { mode: 'boolean' }).default(false),
   createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`)
 });
 
