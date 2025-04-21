@@ -1,0 +1,38 @@
+---
+import type { Hole } from 'src/db/schema/hole';
+import StrokeDots from '../shared/StrokeDots.astro';
+import type { ScoringSessionWithAllData } from 'src/db/queries/getScoringSession';
+import ScoringScore from './ScoringScore.astro';
+
+interface Props {
+  scorecards: ScoringSessionWithAllData['scorecards'];
+  hole: Hole;
+  currentHoleNumber: number | null;
+  holesCount: number;
+}
+
+const { scorecards, hole, currentHoleNumber, holesCount } = Astro.props;
+---
+
+<tr class={currentHoleNumber === hole.number ? 'current-hole' : ''}>
+  <td>{hole.number}</td>
+  {
+    scorecards.map((scorecard) => (
+      <td>
+        <ScoringScore
+          score={scorecard.scores.find((s) => s.hole === hole.number)}
+          hole={hole}
+          scorecardId={scorecard.id}
+          givenStrokes={scorecard.givenStrokes || 0}
+          players={scorecard.players}
+          holesCount={holesCount}
+        />
+        <StrokeDots
+          holeIndex={hole.index}
+          givenStrokes={scorecard.givenStrokes || 0}
+          holesCount={holesCount}
+        />
+      </td>
+    ))
+  }
+</tr>

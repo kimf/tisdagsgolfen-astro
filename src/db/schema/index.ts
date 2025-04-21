@@ -5,6 +5,7 @@ import profiles, { profilesRelations } from './profile';
 import holes, { holesRelations } from './hole';
 import scorecards, { scorecardsRelations } from './scorecard';
 import scorecardPlayers, { scorecardPlayersRelations } from './scorecard_player';
+import scores, { scoresRelations } from './score';
 
 export {
   courses,
@@ -13,6 +14,8 @@ export {
   holesRelations,
   profiles,
   profilesRelations,
+  scores,
+  scoresRelations,
   scorecardPlayers,
   scorecardPlayersRelations,
   scorecards,

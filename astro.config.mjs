@@ -96,7 +96,8 @@ export default defineConfig({
   },
   output: 'static',
   adapter: vercel({
-    output: 'hybrid'
+    output: 'hybrid',
+    webAnalytics: { enabled: true }
   }),
   session: {
     driver: isProd ? 'redis' : 'fs-lite',
@@ -120,7 +121,10 @@ export default defineConfig({
   env: {
     schema: {
       DATABASE_URL: envField.string({ context: 'server', access: 'secret' }),
-      TURSO_AUTH_TOKEN: envField.string({ context: 'server', access: 'secret' }),
+      TURSO_AUTH_TOKEN: envField.string({
+        context: 'server',
+        access: 'secret'
+      }),
       USER_PASSWORD: envField.string({ context: 'server', access: 'secret' }),
       REDIS_URL: envField.string({ context: 'server', access: 'secret' })
     }

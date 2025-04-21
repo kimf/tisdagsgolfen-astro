@@ -5,50 +5,22 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1728940225329,
-      "tag": "0000_luxuriant_scourge",
+      "when": 1745241794686,
+      "tag": "0000_real_ultimo",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "6",
-      "when": 1730400681323,
-      "tag": "0001_living_korath",
+      "when": 1745242160927,
+      "tag": "0001_score-triggers",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "6",
-      "when": 1730401509970,
-      "tag": "0002_flippant_sue_storm",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1730402963234,
-      "tag": "0003_known_talon",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1744914460723,
-      "tag": "0004_whole_beyonder",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1744914937004,
-      "tag": "0005_talented_expediter",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1744920385277,
-      "tag": "0006_chubby_ulik",
+      "when": 1745242195754,
+      "tag": "0002_seed-data",
       "breakpoints": true
     }
   ]

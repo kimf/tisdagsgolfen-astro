@@ -1,0 +1,39 @@
+---
+import { shortName } from 'src/utils/formatters';
+import ToPar from '../shared/ToPar.astro';
+import type { ScoringSessionWithAllData } from 'src/db/queries/getScoringSession';
+
+interface Props {
+  scorecards: ScoringSessionWithAllData['scorecards'];
+}
+
+const { scorecards } = Astro.props;
+---
+
+<thead>
+  <tr>
+    <th></th>
+    {
+      scorecards.map((scorecard) => (
+        <th>
+          <div>
+            {scorecard.players.map((player) => shortName(player.player.fullName))}
+            <small>{scorecard.givenStrokes} SLAG</small>
+          </div>
+        </th>
+      ))
+    }
+  </tr>
+  <tr>
+    <th></th>
+    {
+      scorecards.map((scorecard) => (
+        <th>
+          <div id={`toPar-${scorecard.id}`} hx-swap-oob="true">
+            <ToPar toPar={scorecard.toPar || 0} />
+          </div>
+        </th>
+      ))
+    }
+  </tr>
+</thead>

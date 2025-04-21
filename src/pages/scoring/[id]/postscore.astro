@@ -1,0 +1,85 @@
+---
+export const prerender = false;
+export const partial = true;
+
+import ScoreForm from 'src/components/scoring/ScoreForm.astro';
+import ScoringScore from 'src/components/scoring/ScoringScore.astro';
+import ScoringScoreNumbers from 'src/components/scoring/ScoringScoreNumbers.astro';
+import ToPar from 'src/components/shared/ToPar.astro';
+import db from 'src/db';
+import { scores } from 'src/db/schema';
+import { calculateEarnings } from 'src/utils/calculateEarnings';
+import { calculatePoints } from 'src/utils/calculatePoints';
+
+const { id } = Astro.params;
+const userId = await Astro.session?.get('userId');
+
+if (!userId) throw new Error('Logga in för att föra score');
+if (!id) throw new Error('Id saknas för runda');
+
+const formData = await Astro.request.formData();
+const scorecardId = Number(formData.get('scorecard_id'));
+
+const special = formData.get('special');
+const hole = Number(formData.get('hole'));
+const par = Number(formData.get('par'));
+const extraStrokes = Number(formData.get('extra_strokes'));
+
+const strokes = Number(formData.get('strokes'));
+const putts = Number(formData.get('putts'));
+const beers = Number(formData.get('beers'));
+const ciders = Number(formData.get('ciders'));
+
+const points = calculatePoints(strokes, extraStrokes, par);
+const fines = Number(special) === 1 ? 0 : calculateEarnings(putts, strokes, par);
+console.log(fines);
+const adjustedStrokes = strokes - extraStrokes;
+const toPar = adjustedStrokes - par;
+
+const scoreResult = await db
+  .insert(scores)
+  .values({
+    scorecardId,
+    hole,
+    strokes,
+    putts,
+    beers,
+    extraStrokes,
+    points,
+    toPar,
+    fines,
+    ciders
+  })
+  .onConflictDoUpdate({
+    target: [scores.hole, scores.scorecardId],
+    set: { strokes, putts, beers, extraStrokes, points, toPar, fines, ciders }
+  })
+  .returning();
+
+const score = scoreResult[0];
+
+const scorecard = await db.query.scorecards.findFirst({
+  where: (s, { eq }) => eq(s.id, score.scorecardId),
+  with: { scoringSession: true, players: { with: { player: true } }, course: true }
+});
+if (!scorecard) throw new Error('Scorekort kunde inte hittas');
+
+const holeData = await db.query.holes.findFirst({
+  where: (h, { and, eq }) =>
+    and(eq(h.number, hole), eq(h.courseId, scorecard.scoringSession.courseId))
+});
+
+// Astro.response.headers.set('HX-Trigger', 'score-updated');
+---
+
+<ScoringScore
+  score={score}
+  hole={holeData!}
+  scorecardId={scorecard.id}
+  givenStrokes={scorecard.givenStrokes || 0}
+  players={scorecard.players}
+  holesCount={scorecard.course.holesCount || 0}
+/>
+<div id={`toPar-${scorecard.id}`} hx-swap-oob="true">
+  <ToPar toPar={scorecard.toPar || 0} />
+</div>

@@ -1,0 +1,54 @@
+---
+import type { Profile } from 'src/db/schema/profile';
+import { shortName } from 'src/utils/formatters';
+
+export interface Props {
+  allPlayers: Profile[];
+}
+const { allPlayers } = Astro.props;
+---
+
+<div x-show="specialWeek && teamEvent" x-cloak>
+  <h3>Sätt ihop lagen + sätt slag</h3>
+  <template x-for="(team, index) in teams" :key="index">
+    <div class="team-box">
+      <div class="team-header">
+        <h4>
+          Lag <span x-text="index + 1"></span>
+          <button type="button" @click="removeTeam(index)" x-show="index>0">-</button>
+        </h4>
+
+        <template x-if="teamEvent">
+          <span>
+            <input
+              inputmode="numeric"
+              type="text"
+              pattern="[0-9]*"
+              value="10"
+              :name="`teams[${index}][strokes]`"
+            />
+            Slag
+          </span>
+        </template>
+      </div>
+
+      <div class="chips">
+        {
+          allPlayers.map((player, index) => (
+            <label
+              x-data={`{playerId: ${player.id}}`}
+              x-show="!playerIsInAnotherTeam(playerId, index)"
+            >
+              <input type="checkbox" value={player.id} x-model="teams[index].players" value="yes" />
+              {shortName(player.fullName)}
+            </label>
+          ))
+        }
+      </div>
+      <template x-if="teamEvent">
+        <input type="hidden" x-model="team.players" :name="`teams[${index}][players]`" />
+      </template>
+    </div>
+  </template>
+  <button type="button" @click="addTeam()">+ Nytt lag</button>
+</div>

@@ -1,0 +1,53 @@
+---
+export const prerender = false;
+import Loader from 'src/images/grid.svg';
+import 'src/styles/scoring.css';
+
+import AppScreen from 'src/layouts/AppScreen.astro';
+import ScoringTableHead from 'src/components/scoring/ScoringTableHead.astro';
+import ScoreRow from 'src/components/scoring/ScoreRow.astro';
+import { getScoringSession } from 'src/db/queries/getScoringSession';
+import ScoreForm from 'src/components/scoring/ScoreForm.astro';
+
+const { id } = Astro.params;
+const userId = await Astro.session?.get('userId');
+
+if (!userId) throw new Error('Logga in för att föra score');
+if (!id) throw new Error('Id saknas för runda');
+
+const scoringSession = await getScoringSession(Number(id));
+
+if (!scoringSession) {
+  throw new Error('Hittade ingen scoring session');
+}
+---
+
+<AppScreen title="För score">
+  <Loader class="htmx-indicator" width="20" height="20" />
+  <div class="wrapper">
+    <div x-data="scoring">
+      <table>
+        <ScoringTableHead scorecards={scoringSession.scorecards} />
+        <tbody>
+          {
+            scoringSession.course.holes.map((hole) => (
+              <ScoreRow
+                hole={hole}
+                scorecards={scoringSession.scorecards}
+                currentHoleNumber={scoringSession.currentHole}
+                holesCount={scoringSession.course.holesCount}
+              />
+            ))
+          }
+        </tbody>
+      </table>
+      <ScoreForm special={!!scoringSession.special} id={scoringSession.id} />
+    </div>
+  </div>
+  <footer id="menu">
+    <a href={`/scoring/${id}/menu`}>MENY</a>
+    <a href={`/scoring/${id}/leaderboard`}>LEDARTAVLA</a>
+  </footer>
+</AppScreen>
+
+<script src="src/controllers/ScoringController.ts"></script>

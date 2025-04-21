@@ -1,0 +1,40 @@
+---
+import type { ScoringSessionWithAllData } from 'src/db/queries/getScoringSession';
+import type { Hole } from 'src/db/schema/hole';
+import type { Score } from 'src/db/schema/score';
+import { calculateExtraStrokes } from 'src/utils/calculateExtraStrokes';
+import { shortName } from 'src/utils/formatters';
+
+interface Props {
+  score: Score | undefined;
+  hole: Hole;
+  scorecardId: number;
+  givenStrokes: number;
+  players: ScoringSessionWithAllData['scorecards'][number]['players'];
+  holesCount: number;
+}
+const { score, hole, scorecardId, givenStrokes, players, holesCount } = Astro.props;
+
+const name = players.map((player) => shortName(player.player.fullName)).join(', ');
+const extraStrokes = calculateExtraStrokes(hole.index, givenStrokes || 0, holesCount);
+
+const beers = score && score.beers > 0 ? Array.from({ length: score.beers }, (_, i) => i + 1) : [];
+const ciders =
+  score && score.ciders > 0 ? Array.from({ length: score.ciders }, (_, i) => i + 1) : [];
+---
+
+<div
+  id={`scorebutton-${hole.number}-${scorecardId}`}
+  class="scoreinfo"
+  hx-swap-oob="true"
+  x-on:click={`openScoring(${hole.par}, ${hole.index}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecardId}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
+>
+  <div class="strokes_points">
+    {score?.strokes}
+    {score && <small>{score.points}</small>}
+  </div>
+  <div>
+    {beers.map((i) => <small>🍺</small>)}
+    {ciders.map((i) => <small>🥤</small>)}
+  </div>
+</div>

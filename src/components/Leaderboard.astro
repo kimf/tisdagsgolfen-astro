@@ -1,4 +1,7 @@
 ---
+export interface Props {
+  sessionId: number;
+}
 const { sessionId } = Astro.props;
 // Query strokes and players here
 const leaderboardData = await getLeaderboard(sessionId);

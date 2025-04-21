@@ -3,7 +3,7 @@ import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 const seasons = sqliteTable('seasons', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-  name: text('name').notNull(),
+  name: text('name').unique().notNull(),
   state: text('state').default('REGULAR'),
   winnersArray: text('winners_array'),
   closedAt: text('closed_at'),

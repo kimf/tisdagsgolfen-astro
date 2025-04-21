@@ -1,0 +1,97 @@
+---
+interface Props {
+  special: boolean;
+  id: number;
+}
+
+const { special, id } = Astro.props;
+---
+
+<form
+  hx-post={`/scoring/${id}/postscore`}
+  hx-indicator="body"
+  hx-swap="none"
+  @htmx:after-request="hideForm()"
+  x-cloak
+  x-transition
+  x-transition:enter.duration.500ms
+  x-transition:leave.duration.250ms
+  x-show="isScoring"
+  class="score-form"
+  x-on:click.outside="hideForm()"
+>
+  <div class="scoringformheader">
+    <div>
+      <strong x-text="playerName"></strong>
+      <a x-on:click="hideForm()">X</a>
+    </div>
+    <div>
+      <span class="holeInfo">Hål: <span x-text="number"></span></span>
+      <span>Par:<span x-text="par"></span></span>
+      <span>Index:<span x-text="index"></span></span>
+    </div>
+  </div>
+
+  <input type="hidden" name="special" value={special ? '1' : '0'} />
+  <input type="hidden" name="par" x-model="par" />
+  <input type="hidden" name="hole" x-model="number" />
+  <input type="hidden" name="scorecard_id" x-model="scorecardId" />
+  <input type="hidden" name="extra_strokes" x-model="givenStrokes" />
+
+  <div>
+    <label>
+      <div>Slag</div>
+      <input
+        inputmode="numeric"
+        type="text"
+        pattern="[0-9]*"
+        name="strokes"
+        min="1"
+        x-model="strokes"
+        required
+        class="input"
+      />
+    </label>
+    <label>
+      <div>Puttar</div>
+      <input
+        inputmode="numeric"
+        type="text"
+        pattern="[0-9]*"
+        name="putts"
+        min="0"
+        x-model="putts"
+        required
+        class="input"
+      />
+    </label>
+  </div>
+  <div>
+    <label>
+      <div>Öl</div>
+      <input
+        inputmode="numeric"
+        type="text"
+        pattern="[0-9]*"
+        name="beers"
+        min="0"
+        x-model="beers"
+        class="input"
+      />
+    </label>
+    <label>
+      <div>Cider</div>
+      <input
+        inputmode="numeric"
+        type="text"
+        pattern="[0-9]*"
+        name="ciders"
+        min="0"
+        x-model="ciders"
+        class="input"
+      />
+    </label>
+  </div>
+  <button type="submit" class="btn">Spara</button>
+</form>
+<div class="overlay" x-show="isScoring"></div>

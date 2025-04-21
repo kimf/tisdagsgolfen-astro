@@ -1,5 +1,5 @@
 import { relations, sql, type InferSelectModel } from 'drizzle-orm';
-import { text, integer, sqliteTable, index } from 'drizzle-orm/sqlite-core';
+import { text, integer, sqliteTable, index, unique } from 'drizzle-orm/sqlite-core';
 
 import courses from './course';
 
@@ -7,17 +7,17 @@ const holes = sqliteTable(
   'holes',
   {
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-    index: integer('index').notNull(),
-    courseId: integer('course_id')
+    index: integer('index', { mode: 'number' }).notNull(),
+    courseId: integer('course_id', { mode: 'number' })
       .references(() => courses.id, { onDelete: 'cascade' })
       .notNull(),
-    number: integer('number').notNull(),
-    par: integer('par').notNull(),
+    number: integer('number', { mode: 'number' }).notNull(),
+    par: integer('par', { mode: 'number' }).notNull(),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`)
   },
   (t) => [
-    index('hole_course_number').on(t.courseId, t.number),
-    index('hole_course_index').on(t.courseId, t.index)
+    unique('hole_course_number').on(t.courseId, t.number),
+    unique('hole_course_index').on(t.courseId, t.index)
   ]
 );
 

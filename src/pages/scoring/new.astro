@@ -1,12 +1,14 @@
 ---
 export const prerender = false;
-
+import 'src/styles/newscoringsession.css';
 import Layout from 'src/layouts/Layout.astro';
-import { eq } from 'drizzle-orm';
 import db from 'src/db';
-import { scoringSessions, profiles, scorecardPlayers, courses, scorecards } from 'src/db/schema';
-import { shortName } from 'src/utils/formatters';
-import { extractPlayers, extractTeams } from 'src/utils/formDataExtractors';
+
+import Settings from 'src/components/newscoringsession/Settings.astro';
+import CourseSelector from 'src/components/newscoringsession/CourseSelector.astro';
+import TeamSetup from 'src/components/newscoringsession/TeamSetup.astro';
+import PlayerSetup from 'src/components/newscoringsession/PlayerSetup.astro';
+import { createScoringSession } from 'src/db/mutations/createScoringSession';
 
 if (Astro.request.method === 'POST') {
   try {
@@ -17,342 +19,38 @@ if (Astro.request.method === 'POST') {
       throw new Error('Logga in för att skapa scoringSession');
     }
 
-    const isSpecial = formData.get('specialweek') === 'on';
-    const isTeamEvent = isSpecial && formData.get('teamevent') === 'on';
-    const isStrokes = formData.get('strokes') === 'on';
-    const courseId = Number(formData.get('course'));
+    const createdId = await createScoringSession(Number(userId), formData);
 
-    let createdScoringSessionId: number;
-    await db.transaction(async (tx) => {
-      const scoringSesh = await tx
-        .insert(scoringSessions)
-        .values({
-          ownerId: Number(userId),
-          courseId,
-          special: isSpecial ? 1 : 0,
-          strokes: isStrokes ? 1 : 0,
-          teamEvent: isTeamEvent ? 1 : 0
-        })
-        .returning({ id: scoringSessions.id });
-
-      createdScoringSessionId = scoringSesh[0].id;
-
-      // Prepare all scorecards
-      let scorecardValues: {
-        courseId: number;
-        scoringSessionId: number;
-        givenStrokes: number;
-        playerIds: string[];
-        teamIndex?: number;
-      }[];
-
-      if (isTeamEvent) {
-        const teams = extractTeams(formData);
-        if (!teams) {
-          tx.rollback();
-          throw new Error('No teams');
-        }
-        scorecardValues = teams.map((team, index) => ({
-          courseId: courseId,
-          scoringSessionId: createdScoringSessionId,
-          givenStrokes: Number(team.strokes) || 0,
-          teamIndex: index,
-          playerIds: team.players
-        }));
-      } else {
-        const players = extractPlayers(formData);
-        if (!players) {
-          tx.rollback();
-          throw new Error('No players posted');
-        }
-        scorecardValues = players.map((player) => ({
-          courseId: courseId,
-          scoringSessionId: createdScoringSessionId,
-          givenStrokes: Number(player.strokes) || 0,
-          playerIds: [player.id]
-        }));
-      }
-
-      // Batch insert scorecards
-      const scorecardsInserted = await tx
-        .insert(scorecards)
-        .values(scorecardValues)
-        .returning({ id: scorecards.id });
-
-      const scorecardPlayerValues: { scorecardId: number; playerId: number }[] = [];
-      scorecardValues.forEach((scorecard, idx) => {
-        for (const playerId of scorecard.playerIds) {
-          scorecardPlayerValues.push({
-            scorecardId: scorecardsInserted[idx].id,
-            playerId: Number(playerId)
-          });
-        }
-      });
-
-      await tx.insert(scorecardPlayers).values(scorecardPlayerValues);
-    });
-
-    return Astro.redirect(`/scoring/${createdScoringSessionId}`);
+    return Astro.redirect(`/scoring/${createdId}`);
   } catch (e) {
     console.warn(e);
   }
 }
 
-const allPlayers = await db
-  .select()
-  .from(profiles)
-  .orderBy(profiles.guest)
-  .where(eq(profiles.active, 1));
-const dbCourses = await db.select().from(courses).orderBy(courses.eventsCount);
+const allPlayers = await db.query.profiles.findMany({
+  where: (players, { eq }) => eq(players.active, true),
+  orderBy: (players, { asc }) => [asc(players.fullName)]
+});
+
+const joinId = Astro.url.searchParams.get('joinId') || '';
+let joinSession = null;
+if (joinId) {
+  joinSession = await db.query.scoringSessions.findFirst({
+    where: (sessions, { eq }) => eq(sessions.id, Number(joinId))
+  });
+}
 ---
 
 <Layout title="Ny Runda">
-  <form method="POST" x-data="teamForm()">
-    <h3>Inställningar</h3>
-    <div class="chips">
-      <label>
-        <input type="checkbox" name="specialweek" x-model="specialWeek" />Specialvecka
-      </label>
-      <label x-show="specialWeek" x-cloak>
-        <input type="checkbox" name="teamevent" x-model="teamEvent" />Lagtävling
-      </label>
-      <label x-show="specialWeek" x-cloak>
-        <input type="checkbox" name="strokes" x-model="strokes" />Slaggolf
-      </label>
-    </div>
-
-    <h3>Välj Bana</h3>
-    <div class="chips">
-      {
-        dbCourses.map((course) => (
-          <label>
-            <input type="radio" name="course" value={course.id} x-model="course" />
-            {course.club} - {course.name}
-          </label>
-        ))
-      }
-    </div>
-
-    <div x-show="specialWeek && teamEvent" x-cloak>
-      <h3>Sätt ihop lagen + sätt slag</h3>
-      <template x-for="(team, index) in teams" :key="index">
-        <div class="team-box">
-          <div class="team-header">
-            <h4>
-              Lag <span x-text="index + 1"></span>
-              <button type="button" @click="removeTeam(index)" x-show="index>0">-</button>
-            </h4>
-
-            <template x-if="teamEvent">
-              <span>
-                <input
-                  inputmode="numeric"
-                  type="text"
-                  pattern="[0-9]*"
-                  value="10"
-                  :name="`teams[${index}][strokes]`"
-                />
-                Slag
-              </span>
-            </template>
-          </div>
-
-          <div class="chips">
-            {
-              allPlayers.map((player, index) => (
-                <label
-                  x-data={`{playerId: ${player.id}}`}
-                  x-show="!playerIsInAnotherTeam(playerId, index)"
-                >
-                  <input
-                    type="checkbox"
-                    value={player.id}
-                    x-model="teams[index].players"
-                    value="yes"
-                  />
-
-                  {shortName(player.fullName)}
-                </label>
-              ))
-            }
-          </div>
-          <template x-if="teamEvent">
-            <input type="hidden" x-model="team.players" :name="`teams[${index}][players]`" />
-          </template>
-        </div>
-      </template>
-      <button type="button" @click="addTeam()">+ Nytt lag</button>
-    </div>
-
-    <div x-show="!(specialWeek && teamEvent)">
-      <h3>Välj Spelare & sätt slag</h3>
-      <div class="chips">
-        {
-          allPlayers.map((player, index) => (
-            <div class="player">
-              <label>
-                <input
-                  type="checkbox"
-                  name={`players[${index}][id]`}
-                  value={player.id}
-                  x-model="selectedPlayers"
-                />
-                {shortName(player.fullName)}
-              </label>
-              <template x-if={`!teamEvent && hasSelectedPlayer(${player.id})`}>
-                <input
-                  inputmode="numeric"
-                  type="text"
-                  pattern="[0-9]*"
-                  value="10"
-                  name={`players[${index}]['strokes']`}
-                />
-              </template>
-            </div>
-          ))
-        }
-      </div>
-    </div>
-
+  <form
+    method="POST"
+    x-data={`teamForm(${joinSession?.courseId}, ${joinSession?.special}, ${joinSession?.teamEvent}, ${joinSession?.strokes})`}
+  >
+    <Settings />
+    <CourseSelector />
+    <TeamSetup allPlayers={allPlayers} />
+    <PlayerSetup allPlayers={allPlayers} />
     <button type="submit" style="margin-top: 2rem;" :disabled="disableSave">SPELA GOLF</button>
   </form>
-
-  <div data-players={JSON.stringify(allPlayers)} hidden></div>
-
-  <script>
-    import type { Profile } from 'src/db/schema/profile';
-    type Team = {
-      players: string[];
-    };
-
-    function teamForm() {
-      return {
-        course: null,
-        strokes: false,
-        teamEvent: false,
-        specialWeek: false,
-        players: JSON.parse(
-          (document.querySelector('[data-players]') as HTMLElement).dataset.players!
-        ) as Profile[],
-        selectedPlayers: [] as string[],
-        teams: [{ players: [] }, { players: [] }] as Team[],
-
-        addTeam() {
-          this.teams.push({ players: [] });
-        },
-
-        removeTeam(index: number) {
-          this.teams.splice(index, 1);
-        },
-
-        disableSave() {
-          if (this.course === null) {
-            return true;
-          }
-          if (this.teamEvent) {
-            console.log(this.teams.length);
-            if (this.teams.length === 0) {
-              return true;
-            }
-            return !this.teams.some((t) => t.players.length > 0);
-          }
-          return this.selectedPlayers.length === 0;
-        },
-
-        playerIsInAnotherTeam(playerId: number, currentTeamIndex: number) {
-          return this.teams.some(
-            (team, index) =>
-              index !== currentTeamIndex && team.players.includes(playerId.toString())
-          );
-        },
-
-        hasSelectedPlayer(id: number) {
-          return this.selectedPlayers.includes(id.toString());
-        },
-
-        getPlayerName(id: number) {
-          return this.players.find((p) => p.id === id)?.fullName || '';
-        }
-      };
-    }
-
-    // Expose the teamForm function to the global scope
-    window.teamForm = teamForm;
-  </script>
 </Layout>
-
-<style>
-  form > div {
-    border-bottom: 1px solid #4c566a;
-    padding-bottom: 1rem;
-    margin: 0 0 1rem 0;
-  }
-  label:has(input) {
-    cursor: pointer;
-  }
-
-  label input[type='checkbox'],
-  label input[type='radio'] {
-    display: none;
-  }
-
-  label:has(input:checked) {
-    background: rgb(19, 175, 94);
-    color: #fff;
-    transition: all 150ms ease-in-out;
-  }
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .chips label {
-    display: flex;
-    border: 1px solid #88c0d0;
-    padding: 0.25rem 0.5rem;
-    border-radius: 3px;
-    height: 24px;
-    align-items: center;
-  }
-
-  .chips input[type='number'] {
-    width: 40px;
-    height: 20px;
-    padding: 0 4px;
-  }
-
-  .player {
-    display: flex;
-    padding: 4px;
-    width: 40%;
-    background: #444;
-    justify-content: space-between;
-    border: 1px solid #88c0d0;
-    padding: 0.5rem 0.5rem;
-    border-radius: 3px;
-  }
-  .player label {
-    border: 0;
-    width: 100%;
-    padding: 0;
-  }
-
-  .player:has(input:checked) {
-    background: rgb(19, 175, 94);
-  }
-
-  .team-box {
-    border: 1px solid #88c0d0;
-    padding: 8px;
-    margin-bottom: 20px;
-  }
-
-  .team-header {
-    display: flex;
-    justify-content: space-between;
-
-    h4 {
-      margin: 0;
-    }
-  }
-</style>
+<script src="src/controllers/NewScoringSessionController.ts"></script>

@@ -1,0 +1,15 @@
+---
+interface Props {
+  beers: number;
+}
+
+const { beers } = Astro.props;
+
+if (beers === 0) {
+  return null;
+}
+---
+
+<div>
+  {beers > 1 ? `${beers}x🍺` : '🍺'}
+</div>

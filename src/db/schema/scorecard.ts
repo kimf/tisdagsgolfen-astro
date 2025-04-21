@@ -2,31 +2,34 @@ import { relations, sql, type InferSelectModel } from 'drizzle-orm';
 import { text, integer, sqliteTable } from 'drizzle-orm/sqlite-core';
 import courses from './course';
 import scoringSessions from './scoring_sessions';
-import scorecardPlayers from './scorecard_player';
+import scorecardPlayers, { type ScorecardPlayer } from './scorecard_player';
+import type { Profile } from './profile';
+import scores from './score';
 
 const scorecards = sqliteTable('scorecards', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-  scoringSessionId: integer('scoring_session_id')
+  scoringSessionId: integer('scoring_session_id', { mode: 'number' })
     .references(() => scoringSessions.id, { onDelete: 'cascade' })
     .notNull(),
-  courseId: integer('course_id')
+  courseId: integer('course_id', { mode: 'number' })
     .references(() => courses.id)
     .notNull(),
-  points: integer('points').default(0),
-  strokes: integer('strokes').default(0),
-  putts: integer('putts').default(0),
-  weekPoints: integer('week_points').default(0),
-  givenStrokes: integer('given_strokes').default(0),
-  teamIndex: integer('team_index').default(0),
-  through: integer('through').default(0),
-  toPar: integer('to_par').default(0),
-  currentHole: integer('current_hole').default(1),
-  partOfFinal: integer('part_of_final').default(0),
+  points: integer('points', { mode: 'number' }).default(0),
+  strokes: integer('strokes', { mode: 'number' }).default(0),
+  putts: integer('putts', { mode: 'number' }).default(0),
+  weekPoints: integer('week_points', { mode: 'number' }).default(0),
+  givenStrokes: integer('given_strokes', { mode: 'number' }).default(0),
+  teamIndex: integer('team_index', { mode: 'number' }).default(0),
+  through: integer('through', { mode: 'number' }).default(0),
+  toPar: integer('to_par', { mode: 'number' }).default(0),
+  currentHole: integer('current_hole', { mode: 'number' }).default(1),
+  partOfFinal: integer('part_of_final', { mode: 'boolean' }).default(false),
   createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`)
 });
 
 export const scorecardsRelations = relations(scorecards, ({ one, many }) => ({
   players: many(scorecardPlayers),
+  scores: many(scores),
   course: one(courses, {
     fields: [scorecards.courseId],
     references: [courses.id]

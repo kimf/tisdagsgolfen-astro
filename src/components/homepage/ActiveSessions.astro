@@ -1,0 +1,69 @@
+---
+import { getaActiveSessions } from 'src/db/queries/getActiveSessions';
+import type { ActiveSession } from 'src/db/queries/getActiveSessions';
+import type { ScoringSession } from 'src/db/schema/scoring_sessions';
+import EventPillRow from '../shared/EventPillRow.astro';
+
+const userId = await Astro.session?.get('userId');
+const scoringSessions = await getaActiveSessions();
+
+type SessionGroupKey = string;
+const groupedSessionsObj: Record<SessionGroupKey, ActiveSession[]> = {};
+for (const sesh of scoringSessions) {
+  const key: SessionGroupKey = `${sesh.strokes}|${sesh.special}|${sesh.teamEvent}|${sesh.courseId}`;
+  if (!groupedSessionsObj[key]) {
+    groupedSessionsObj[key] = [];
+  }
+  groupedSessionsObj[key].push(sesh);
+}
+const groupedSessions: ActiveSession[][] = Object.values(groupedSessionsObj);
+
+const ownedScoringSession = userId
+  ? scoringSessions.find((sesh) => sesh.ownerId === Number(userId))
+  : null;
+---
+
+{
+  groupedSessions.map((seshGroup) => (
+    <div>
+      <EventPillRow
+        special={!!seshGroup[0].special}
+        strokes={!!seshGroup[0].strokes}
+        teamEvent={!!seshGroup[0].teamEvent}
+      />
+      {seshGroup[0].course.club} - {seshGroup[0].course.name}
+      {seshGroup.map((sesh) => (
+        <div id={`sesh.${sesh.id}`}>
+          <a href={`/scoring/${sesh.id}/leaderboard`} class="button">
+            LEDARTAVLA
+          </a>
+          {userId && sesh.ownerId === Number(userId) && (
+            <a href={`/scoring/${sesh.id}`} class="button">
+              {sesh.state === 'PENDING' ? 'REDIGERA' : 'FORTSÄTT'}
+            </a>
+          )}
+          {userId && sesh.ownerId !== Number(userId) && (
+            <a href={`/scoring/new?joinId=${sesh.id}`} class="button">
+              FÖR SCORE
+            </a>
+          )}
+        </div>
+      ))}
+    </div>
+  ))
+}
+
+{
+  !userId && (
+    <a href="/login" class="button">
+      LOGGA IN
+    </a>
+  )
+}
+{
+  userId && !ownedScoringSession && groupedSessions.length === 0 && (
+    <a href="/scoring/new" class="button">
+      NY RUNDA
+    </a>
+  )
+}

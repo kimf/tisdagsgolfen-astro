@@ -1,0 +1,22 @@
+---
+interface Props {
+  live?: boolean;
+  special: boolean;
+  teamEvent: boolean;
+  strokes: boolean;
+}
+const { live, special, teamEvent, strokes } = Astro.props;
+---
+
+<div>
+  {live && <span class="pill live">LIVE</span>}
+  {
+    special && (
+      <div>
+        <span class="pill special">SPECIAL</span>
+        {teamEvent && <span class="pill teamevent">LAG</span>}
+      </div>
+    )
+  }
+  <span class="pill scoringtype">{strokes ? 'SLAG' : 'POÄNG'}</span>
+</div>
