@@ -1,0 +1,15 @@
+---
+interface Props {
+  ciders: number;
+}
+
+const { ciders } = Astro.props;
+
+if (ciders === 0) {
+  return null;
+}
+---
+
+<div>
+  {ciders > 1 ? `${ciders}x🥤` : '🥤'}
+</div>

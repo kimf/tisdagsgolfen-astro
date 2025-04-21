@@ -23,13 +23,18 @@ const ciders =
   score && score.ciders > 0 ? Array.from({ length: score.ciders }, (_, i) => i + 1) : [];
 ---
 
-<div id={`scorebutton-${hole.number}-${scorecardId}`} hx-swap-oob="true">
-  <button
-    x-on:click={`openScoring(${hole.par}, ${hole.index}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecardId}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
-  >
-    <span>{score?.strokes}</span>
-    <span>{score && <small>{score.points}</small>}</span>
-    <span>{beers.map((i) => <small>🍺</small>)}</span>
-    <span>{ciders.map((i) => <small>🥤</small>)}</span>
-  </button>
+<div
+  id={`scorebutton-${hole.number}-${scorecardId}`}
+  class="scoreinfo"
+  hx-swap-oob="true"
+  x-on:click={`openScoring(${hole.par}, ${hole.index}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecardId}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
+>
+  <div class="strokes_points">
+    {score?.strokes}
+    {score && <small>{score.points}</small>}
+  </div>
+  <div>
+    {beers.map((i) => <small>🍺</small>)}
+    {ciders.map((i) => <small>🥤</small>)}
+  </div>
 </div>

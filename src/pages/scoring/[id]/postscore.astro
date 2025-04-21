@@ -31,7 +31,8 @@ const beers = Number(formData.get('beers'));
 const ciders = Number(formData.get('ciders'));
 
 const points = calculatePoints(strokes, extraStrokes, par);
-const fines = special ? 0 : calculateEarnings(putts, strokes, par);
+const fines = Number(special) === 1 ? 0 : calculateEarnings(putts, strokes, par);
+console.log(fines);
 const adjustedStrokes = strokes - extraStrokes;
 const toPar = adjustedStrokes - par;
 

@@ -14,7 +14,7 @@ interface Props {
 const { scorecards, hole, currentHoleNumber, holesCount } = Astro.props;
 ---
 
-<tr class={currentHoleNumber ? 'current-hole' : ''}>
+<tr class={currentHoleNumber === hole.number ? 'current-hole' : ''}>
   <td>{hole.number}</td>
   {
     scorecards.map((scorecard) => (

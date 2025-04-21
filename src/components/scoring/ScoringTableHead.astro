@@ -16,8 +16,10 @@ const { scorecards } = Astro.props;
     {
       scorecards.map((scorecard) => (
         <th>
-          {scorecard.players.map((player) => shortName(player.player.fullName))}
-          <small>{scorecard.givenStrokes} SLAG</small>
+          <div>
+            {scorecard.players.map((player) => shortName(player.player.fullName))}
+            <small>{scorecard.givenStrokes} SLAG</small>
+          </div>
         </th>
       ))
     }

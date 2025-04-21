@@ -14,13 +14,23 @@ const { special, id } = Astro.props;
   @htmx:after-request="hideForm()"
   x-cloak
   x-transition
+  x-transition:enter.duration.500ms
+  x-transition:leave.duration.250ms
   x-show="isScoring"
   class="score-form"
+  x-on:click.outside="hideForm()"
 >
-  <h2 x-text="playerName"></h2>
-  hcp:<small x-text="givenStrokes"></small>
-  par:<small x-text="par"></small>
-  index:<small x-text="index"></small>
+  <div class="scoringformheader">
+    <div>
+      <strong x-text="playerName"></strong>
+      <a x-on:click="hideForm()">X</a>
+    </div>
+    <div>
+      <span class="holeInfo">Hål: <span x-text="number"></span></span>
+      <span>Par:<span x-text="par"></span></span>
+      <span>Index:<span x-text="index"></span></span>
+    </div>
+  </div>
 
   <input type="hidden" name="special" value={special ? '1' : '0'} />
   <input type="hidden" name="par" x-model="par" />
@@ -28,21 +38,60 @@ const { special, id } = Astro.props;
   <input type="hidden" name="scorecard_id" x-model="scorecardId" />
   <input type="hidden" name="extra_strokes" x-model="givenStrokes" />
 
-  <label>
-    Slag
-    <input type="number" name="strokes" min="1" x-model="strokes" required class="input" />
-  </label>
-  <label>
-    Puttar
-    <input type="number" name="putts" min="0" x-model="putts" required class="input" />
-  </label>
-  <label>
-    Öl
-    <input type="number" name="beers" min="0" x-model="beers" class="input" />
-  </label>
-  <label>
-    Cider
-    <input type="number" name="ciders" min="0" x-model="ciders" class="input" />
-  </label>
+  <div>
+    <label>
+      <div>Slag</div>
+      <input
+        inputmode="numeric"
+        type="text"
+        pattern="[0-9]*"
+        name="strokes"
+        min="1"
+        x-model="strokes"
+        required
+        class="input"
+      />
+    </label>
+    <label>
+      <div>Puttar</div>
+      <input
+        inputmode="numeric"
+        type="text"
+        pattern="[0-9]*"
+        name="putts"
+        min="0"
+        x-model="putts"
+        required
+        class="input"
+      />
+    </label>
+  </div>
+  <div>
+    <label>
+      <div>Öl</div>
+      <input
+        inputmode="numeric"
+        type="text"
+        pattern="[0-9]*"
+        name="beers"
+        min="0"
+        x-model="beers"
+        class="input"
+      />
+    </label>
+    <label>
+      <div>Cider</div>
+      <input
+        inputmode="numeric"
+        type="text"
+        pattern="[0-9]*"
+        name="ciders"
+        min="0"
+        x-model="ciders"
+        class="input"
+      />
+    </label>
+  </div>
   <button type="submit" class="btn">Spara</button>
 </form>
+<div class="overlay" x-show="isScoring"></div>

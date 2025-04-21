@@ -1,0 +1,109 @@
+---
+export const prerender = false;
+// export const partial = true;
+
+import 'src/styles/scoring.css';
+import {
+  getMinimalScoringSession,
+  getLeaderboardForScoringSession
+} from 'src/db/queries/getScoringSession';
+import AppScreen from 'src/layouts/AppScreen.astro';
+import Loader from 'src/images/grid.svg';
+import EventPillRow from 'src/components/shared/EventPillRow.astro';
+import standardCompRank from 'src/utils/standardCompRank';
+import { shortName } from 'src/utils/formatters';
+import Beers from 'src/components/shared/Beers.astro';
+import Ciders from 'src/components/shared/Ciders.astro';
+import ToPar from 'src/components/shared/ToPar.astro';
+
+const { id } = Astro.params;
+const userId = await Astro.session?.get('userId');
+
+if (!userId) throw new Error('Logga in för att föra score');
+if (!id) throw new Error('Id saknas för runda');
+
+const scoringSession = await getMinimalScoringSession(Number(id));
+
+if (!scoringSession) {
+  throw new Error('Hittade ingen scoring session');
+}
+
+const leaderboards = await getLeaderboardForScoringSession(scoringSession);
+
+if (leaderboards.length === 0) {
+  throw new Error('Hittade ingen data att visa');
+}
+
+const scorecards = leaderboards.flatMap((session) => session.scorecards);
+
+const rankedScorecards = scoringSession.strokes
+  ? standardCompRank(scorecards, 'toPar', false, null)
+  : standardCompRank(
+      scorecards.map((s) => ({ ...s, toPar: (s.through ?? 0) * 2 - (s.points ?? 0) })),
+      'toPar',
+      true,
+      null
+    );
+
+// Astro.response.headers.set('HX-Trigger', 'score-updated');
+---
+
+<AppScreen title="Ledartavla">
+  <Loader class="htmx-indicator" width="20" height="20" />
+  <div class="wrapper">
+    <h2>{scoringSession.course.club} - {scoringSession.course.name}</h2>
+
+    <div hx-get={`/scoring/${id}/leaderboard`} hx-trigger="every 300000s">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Spelare</th>
+            {!scoringSession.special && <th>💸</th>}
+            <th>Hål</th>
+            <th>Slag</th>
+            <th>Poäng</th>
+            <th>+/-</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rankedScorecards.map((scorecard) => (
+              <tr>
+                <td>{scorecard.rank}</td>
+                <td>
+                  {scorecard.players.map((p) => (
+                    <div>
+                      {shortName(p.player.fullName)}
+                      <Beers beers={p.beers || 0} />
+                      <Ciders ciders={p.ciders || 0} />
+                    </div>
+                  ))}
+                  <div>SHCP {scorecard.givenStrokes}</div>
+                </td>
+                {!scoringSession.special && (
+                  <td>{scorecard.players.reduce((a, b) => a + (b.fines ?? 0), 0)}</td>
+                )}
+                <td>{scorecard.through}</td>
+                <td>{scorecard.strokes}</td>
+                <td>{scorecard.points}</td>
+                <td>
+                  <ToPar toPar={scorecard.toPar || 0} />
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+      <hr />
+      <EventPillRow
+        special={!!scoringSession.special}
+        strokes={!!scoringSession.strokes}
+        teamEvent={!!scoringSession.teamEvent}
+      />
+    </div>
+  </div>
+  <footer id="menu">
+    <a href={`/scoring/${id}`}>&larr; TILLBAKA</a>
+  </footer>
+</AppScreen>
