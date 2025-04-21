@@ -25,6 +25,8 @@
     "@conform-to/zod": "^1.4.0",
     "@libsql/client": "^0.15.4",
     "@playform/compress": "^0.1.9",
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
     "alpinejs": "^3.14.9",
     "astro": "^5.7.2",
     "astro-capo": "^0.0.1",

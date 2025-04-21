@@ -1,6 +1,9 @@
 ---
 import { pwaInfo } from 'virtual:pwa-info';
 import { pwaAssetsHead } from 'virtual:pwa-assets/head';
+import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
+
 import { Font } from 'astro:assets';
 import { Head } from 'astro-capo';
 // import { AstroFont } from 'astro-font';
@@ -27,6 +30,8 @@ import 'src/styles/globals.css';
     }
     {pwaAssetsHead.links.map((link: any) => <link {...link} />)}
     {pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
+    <Analytics />
+    <SpeedInsights />
   </Head>
   <body id="main">
     <div class="container">

@@ -96,7 +96,8 @@ export default defineConfig({
   },
   output: 'static',
   adapter: vercel({
-    output: 'hybrid'
+    output: 'hybrid',
+    webAnalytics: { enabled: true }
   }),
   session: {
     driver: isProd ? 'redis' : 'fs-lite',
