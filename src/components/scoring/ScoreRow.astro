@@ -1,0 +1,30 @@
+---
+import type { Hole } from 'src/db/schema/hole';
+import type { ScorecardWithPlayers } from 'src/db/schema/scorecard';
+import { calculateExtraStrokes } from 'src/utils/calculateExtraStrokes';
+import StrokeDots from '../shared/StrokeDots.astro';
+
+interface Props {
+  scorecards: ScorecardWithPlayers[];
+  hole: Hole;
+  currentHoleNumber: number | null;
+  holesCount: number;
+}
+
+const { scorecards, hole, currentHoleNumber, holesCount } = Astro.props;
+---
+
+<tr class={currentHoleNumber ? 'current-hole' : ''}>
+  <td>{hole.number}</td>
+  {
+    scorecards.map((scorecard) => (
+      <td>
+        <StrokeDots
+          holeIndex={hole.index}
+          givenStrokes={scorecard.givenStrokes || 0}
+          holesCount={holesCount}
+        />
+      </td>
+    ))
+  }
+</tr>

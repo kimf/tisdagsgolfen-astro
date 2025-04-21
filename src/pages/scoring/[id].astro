@@ -6,9 +6,9 @@ import { asc, eq } from 'drizzle-orm';
 import db from 'src/db';
 import AppScreen from 'src/layouts/AppScreen.astro';
 import { scorecards, scoringSessions, holes } from 'src/db/schema';
-import { shortName } from 'src/utils/formatters';
 import TableHead from 'src/components/scoring/TableHead.astro';
 import type { ScorecardWithPlayers } from 'src/db/schema/scorecard';
+import ScoreRow from 'src/components/scoring/ScoreRow.astro';
 
 const { id } = Astro.params;
 const userId = await Astro.session?.get('userId');
@@ -70,36 +70,21 @@ const scoringSession = await db.query.scoringSessions.findFirst({
 if (!scoringSession) {
   throw new Error('Hittade ingen scoring session');
 }
-
-// Build players and holes arrays
-
-const course = scoringSession.course;
-const holesCount = course.holes.length;
-const currentHole = course.holes.find((hole) => hole.number === scoringSession.currentHole);
 ---
 
 <AppScreen title="För score">
   <div x-data="scorecardApp()" x-init="init()">
-    <table class="scorecard">
+    <table>
       <TableHead scorecards={scoringSession.scorecards as ScorecardWithPlayers[]} />
       <tbody>
         {
-          course.holes.map((hole) => (
-            <tr>
-              <td>{hole.number}</td>
-              {scoringSession.scorecards.map((scorecard) => (
-                <td>
-                  <button
-                    class="score-cell"
-                    x-on:click="openDrawer({playerId: {player.id}, playerName: '{player.name}', hole: {hole}, value: '{getScore(player.id, hole)}'})"
-                    x-bind="scoreCellAttrs({playerId: {player.id}, hole: {hole}})"
-                    hx-get="#"
-                  >
-                    <span x-text="getCell({playerId: {player.id}, hole: {hole}})">TBD</span>
-                  </button>
-                </td>
-              ))}
-            </tr>
+          scoringSession.course.holes.map((hole) => (
+            <ScoreRow
+              hole={hole}
+              scorecards={scoringSession.scorecards}
+              currentHoleNumber={scoringSession.currentHole}
+              holesCount={scoringSession.course.holesCount}
+            />
           ))
         }
       </tbody>

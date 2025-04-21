@@ -1,0 +1,25 @@
+---
+import { calculateExtraStrokes } from 'src/utils/calculateExtraStrokes';
+
+interface Props {
+  holeIndex: number;
+  givenStrokes: number;
+  holesCount: number;
+}
+
+const { holeIndex, givenStrokes, holesCount } = Astro.props;
+
+const length = calculateExtraStrokes(holeIndex, givenStrokes, holesCount);
+const dots = Array.from({ length }, (_, i) => i + 1);
+---
+
+<div class="stroke-dots">
+  {dots.map((dot) => <small>•</small>)}
+</div>
+
+<style>
+  .stroke-dots {
+    display: flex;
+    flex-direction: column;
+  }
+</style>
