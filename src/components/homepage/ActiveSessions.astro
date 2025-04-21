@@ -34,7 +34,7 @@ const ownedScoringSession = userId
       {seshGroup[0].course.club} - {seshGroup[0].course.name}
       {seshGroup.map((sesh) => (
         <div id={`sesh.${sesh.id}`}>
-          <a href={`/live/${sesh.id}/`} class="button">
+          <a href={`/scoring/${sesh.id}/leaderboard`} class="button">
             LEDARTAVLA
           </a>
           {userId && sesh.ownerId === Number(userId) && (
