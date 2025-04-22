@@ -2,13 +2,13 @@
 export const prerender = false;
 // export const partial = true;
 
-import 'src/styles/scoring.css';
+import 'src/assets/styles/scoring.css';
 import {
   getMinimalScoringSession,
   getLeaderboardForScoringSession
 } from 'src/db/queries/getScoringSession';
 import AppScreen from 'src/layouts/AppScreen.astro';
-import Loader from 'src/images/grid.svg';
+import Loader from 'src/assets/images/grid.svg';
 import EventPillRow from 'src/components/shared/EventPillRow.astro';
 import standardCompRank from 'src/utils/standardCompRank';
 import { shortName } from 'src/utils/formatters';
@@ -51,7 +51,7 @@ const rankedScorecards = scoringSession.strokes
 <AppScreen title="Ledartavla">
   <Loader class="htmx-indicator" width="20" height="20" />
   <div class="wrapper">
-    <h2>{scoringSession.course.club} - {scoringSession.course.name}</h2>
+    <h3>{scoringSession.course.club} - {scoringSession.course.name}</h3>
 
     <div hx-get={`/scoring/${id}/leaderboard`} hx-trigger="every 300000s">
       <table>

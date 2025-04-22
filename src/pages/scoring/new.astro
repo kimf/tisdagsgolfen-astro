@@ -1,6 +1,6 @@
 ---
 export const prerender = false;
-import 'src/styles/newscoringsession.css';
+import 'src/assets/styles/newscoringsession.css';
 import Layout from 'src/layouts/Layout.astro';
 import db from 'src/db';
 
@@ -50,7 +50,9 @@ if (joinId) {
     <CourseSelector />
     <TeamSetup allPlayers={allPlayers} />
     <PlayerSetup allPlayers={allPlayers} />
-    <button type="submit" style="margin-top: 2rem;" :disabled="disableSave">SPELA GOLF</button>
+    <button class="btn" type="submit" style="margin-top: 2rem;" :disabled="disableSave"
+      >SPELA GOLF</button
+    >
   </form>
 </Layout>
 <script src="src/controllers/NewScoringSessionController.ts"></script>

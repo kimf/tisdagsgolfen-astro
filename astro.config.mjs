@@ -70,7 +70,7 @@ export default defineConfig({
         orientation: 'portrait-primary',
         icons: [
           {
-            src: './src/images/logo.png',
+            src: './src/assets/images/logo.png',
             sizes: '192x192',
             type: 'image/png'
           }
@@ -111,10 +111,21 @@ export default defineConfig({
     clientPrerender: true,
     fonts: [
       {
+        provider: 'local',
+        name: 'VCR_OSD_MONO',
+        cssVariable: '--font-vcr',
+        variants: [
+          {
+            weight: 400,
+            style: 'normal',
+            src: ['./src/assets/fonts/VCR_OSD_MONO_1.001.ttf']
+          }
+        ]
+      },
+      {
         provider: fontProviders.google(),
-        name: 'JetBrains Mono',
-        cssVariable: '--font-mono',
-        weights: [200, 400, 700]
+        name: 'Share Tech Mono',
+        cssVariable: '--font-mono'
       }
     ]
   },
