@@ -1,8 +1,10 @@
 ---
 export const prerender = false; // Render at request time
 
-import 'src/styles/globals.css';
+import 'src/assets/styles/globals.css';
 import db from 'src/db';
+import AppScreen from 'src/layouts/AppScreen.astro';
+import { shortName } from 'src/utils/formatters';
 
 const errors = { password: '' };
 
@@ -33,33 +35,102 @@ if (Astro.request.method === 'POST') {
   }
 }
 
-const players = await db.query.profiles.findMany();
+const players = await db.query.profiles.findMany({
+  orderBy: (p, { desc }) => [desc(p.avatarUrl)]
+});
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Logga in</title>
-  </head>
-  <body>
-    <section>
-      <h1>Logga in</h1>
-      {errors.password && <p style="color: red;">{errors.password}</p>}
-      <form method="post">
-        <label
-          >Användare:
-          <select id="userId" name="userId" required>
-            {players.map((player) => <option value={player.id}>{player.fullName}</option>)}
-          </select>
-        </label>
-        <label
-          >Lösenord:
-          <input type="password" id="password" name="password" required minlength="3" /></label
-        >
-        <button>LOGGA IN</button>
-      </form>
-    </section>
-  </body>
-</html>
+<AppScreen title="Logga in">
+  <h1>Logga in</h1>
+  {errors.password && <p style="color: red;">{errors.password}</p>}
+  <form method="post" class="login" x-data="login">
+    <div class="row">
+      <h3>Vem är du?</h3>
+      <input type="hidden" name="userId" x-model="userId" required />
+      <div class="players">
+        {
+          players.map((player) => (
+            <div class="usercard" x-on:click={`setUserId(${player.id})`}
+            :class={`[isUser(${player.id}) ? 'selected' : '']`}
+            >
+              {player.avatarUrl === '1' ? <img src={`/images/avatars/${player.id}.png`} /> : <img src="/images/avatars/default.png" />}
+              {shortName(player.fullName)}
+            </div>
+          ))
+        }
+      </div>
+    </div>
+    <div class="row">
+      <h3>Access kod (Superhemlig)</h3>
+      <input type="password" id="password" name="password" required minlength="3" />
+    </div>
+    <div class="row">
+      <button class="btn" :disabled="!canLogin()">LOGGA IN</button>
+    </div>
+  </form>
+</AppScreen>
+<script src="src/controllers/LoginController.ts"></script>
+<style>
+
+.login {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 600px;
+  padding-bottom: 100px;
+
+  .row {
+    display: flex;
+    flex-direction: column;
+  }
+
+  input {
+    padding: 12px;
+    font-size: 20px;
+  }
+
+  button {
+    padding: 12px;
+    color: black;
+    width: 100%;
+  }
+
+  .players {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: space-around;
+
+    .usercard {
+      width: 80px;
+      max-height: 100px;
+      overflow: hidden;
+      padding: 8px;
+      background: rgba(112, 192, 209, 0.2);
+      border: 1px solid black;
+      box-shadow: 0 0 5px rgba(18, 26, 28, 0.2);
+      text-transform: uppercase;
+      font-size: 12px;
+
+      img {
+        max-width: 100%;
+      }
+
+      &:hover {
+        background: rgba(112, 192, 209, 0.4);
+      }
+
+      &.selected {
+        background: greenyellow;
+        color: black;
+    }
+
+    h3 {
+      color: white;
+      font-size: 14px;
+      text-align: center;
+    }
+  }
+}
+
+</style>

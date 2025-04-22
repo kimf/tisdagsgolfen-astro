@@ -34,16 +34,16 @@ const ownedScoringSession = userId
       {seshGroup[0].course.club} - {seshGroup[0].course.name}
       {seshGroup.map((sesh) => (
         <div id={`sesh.${sesh.id}`}>
-          <a href={`/scoring/${sesh.id}/leaderboard`} class="button">
+          <a href={`/scoring/${sesh.id}/leaderboard`} class="btn">
             LEDARTAVLA
           </a>
           {userId && sesh.ownerId === Number(userId) && (
-            <a href={`/scoring/${sesh.id}`} class="button">
+            <a href={`/scoring/${sesh.id}`} class="btn">
               {sesh.state === 'PENDING' ? 'REDIGERA' : 'FORTSÄTT'}
             </a>
           )}
           {userId && sesh.ownerId !== Number(userId) && (
-            <a href={`/scoring/new?joinId=${sesh.id}`} class="button">
+            <a href={`/scoring/new?joinId=${sesh.id}`} class="btn">
               FÖR SCORE
             </a>
           )}
@@ -55,14 +55,14 @@ const ownedScoringSession = userId
 
 {
   !userId && (
-    <a href="/login" class="button">
+    <a href="/login" class="btn">
       LOGGA IN
     </a>
   )
 }
 {
   userId && !ownedScoringSession && groupedSessions.length === 0 && (
-    <a href="/scoring/new" class="button">
+    <a href="/scoring/new" class="btn">
       NY RUNDA
     </a>
   )

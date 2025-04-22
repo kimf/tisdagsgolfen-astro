@@ -38,60 +38,114 @@ const { special, id } = Astro.props;
   <input type="hidden" name="scorecard_id" x-model="scorecardId" />
   <input type="hidden" name="extra_strokes" x-model="givenStrokes" />
 
-  <div>
-    <label>
-      <div>Slag</div>
-      <input
-        inputmode="numeric"
-        type="text"
-        pattern="[0-9]*"
-        name="strokes"
-        min="1"
-        x-model="strokes"
-        required
-        class="input"
-      />
-    </label>
-    <label>
-      <div>Puttar</div>
-      <input
-        inputmode="numeric"
-        type="text"
-        pattern="[0-9]*"
-        name="putts"
-        min="0"
-        x-model="putts"
-        required
-        class="input"
-      />
-    </label>
-  </div>
-  <div>
-    <label>
-      <div>Öl</div>
-      <input
-        inputmode="numeric"
-        type="text"
-        pattern="[0-9]*"
-        name="beers"
-        min="0"
-        x-model="beers"
-        class="input"
-      />
-    </label>
-    <label>
-      <div>Cider</div>
-      <input
-        inputmode="numeric"
-        type="text"
-        pattern="[0-9]*"
-        name="ciders"
-        min="0"
-        x-model="ciders"
-        class="input"
-      />
-    </label>
+  <div
+    class="picker-row"
+    x-data="{
+      strokes: $store.strokes ?? 1,
+      putts: $store.putts ?? 0,
+      beers: $store.beers ?? 0,
+      ciders: $store.ciders ?? 0,
+      setValue(field, value) {
+        this[field] = value;
+        $store[field] = value;
+      }
+    }"
+  >
+    <template
+      x-for="(picker, idx) in [{label: 'Slag', name: 'strokes', min: 1, max: 15}, {label: 'Puttar', name: 'putts', min: 0, max: 8}]"
+      :key="picker.name"
+    >
+      <div class="picker-col">
+        <div class="picker-label" x-text="picker.label"></div>
+        <div
+          class="picker-list"
+          :id="picker.name + '-picker'"
+          tabindex="0"
+          x-ref="picker.name"
+          @scroll.debounce.100ms="() => {
+            const el = $event.target;
+            const snapIndex = Math.round(el.scrollTop / 40);
+            setValue(picker.name, picker.min + snapIndex+1);
+          }"
+        >
+          <template x-for="n in (picker.max - picker.min + 1)">
+            <div
+              class="picker-item"
+              :class="(picker.min + n - 1) === $data[picker.name] ? 'active' : ''"
+              @click="setValue(picker.name, picker.min + n - 1); $refs[picker.name].scrollTo({top: (n-1)*40, behavior: 'smooth'})"
+              x-text="picker.min + n - 1"
+            >
+            </div>
+          </template>
+        </div>
+        <input
+          type="hidden"
+          :name="picker.name"
+          :value="$data[picker.name]"
+          x-model="$data[picker.name]"
+        />
+      </div>
+    </template>
   </div>
   <button type="submit" class="btn">Spara</button>
 </form>
 <div class="overlay" x-show="isScoring"></div>
+
+<style>
+  .picker-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    justify-content: center;
+    margin: 1.5rem 0;
+  }
+  .picker-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 120px;
+  }
+  .picker-label {
+    font-size: 0.95em;
+    color: #888;
+    margin-bottom: 0.5em;
+  }
+  .picker-list {
+    height: 120px;
+    width: 100px;
+    overflow-y: auto;
+    scroll-snap-type: y mandatory;
+    border-radius: 8px;
+    background: #faf7f7;
+    border: 1px solid #eee;
+    box-shadow: 0 1px 4px #0001;
+    margin-bottom: 0.5em;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc #faf7f7;
+  }
+  .picker-item {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    scroll-snap-align: center;
+    font-size: 1.2em;
+    color: #888;
+    cursor: pointer;
+    transition:
+      color 0.2s,
+      font-weight 0.2s;
+  }
+  .picker-item.active {
+    color: #d32f2f;
+    font-weight: bold;
+    font-size: 2em;
+  }
+  .picker-list::-webkit-scrollbar {
+    width: 6px;
+  }
+  .picker-list::-webkit-scrollbar-thumb {
+    background: #eee;
+    border-radius: 4px;
+  }
+</style>
