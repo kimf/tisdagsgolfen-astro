@@ -1,0 +1,10 @@
+---
+export const prerender = false;
+const userId = await Astro.session?.get('userId');
+---
+
+<div class="userbtn">
+  {!userId && <a href="/login">LOGGA IN</a>}
+
+  {userId && <a href="/logout">LOGGA UT</a>}
+</div>

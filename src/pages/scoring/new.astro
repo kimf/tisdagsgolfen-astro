@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import 'src/assets/styles/newscoringsession.css';
-import Layout from 'src/layouts/Layout.astro';
+import AppScreen from 'src/layouts/AppScreen.astro';
 import db from 'src/db';
 
 import Settings from 'src/components/newscoringsession/Settings.astro';
@@ -41,7 +41,7 @@ if (joinId) {
 }
 ---
 
-<Layout title="Ny Runda">
+<AppScreen title="Ny Runda">
   <form
     method="POST"
     x-data={`teamForm(${joinSession?.courseId}, ${joinSession?.special}, ${joinSession?.teamEvent}, ${joinSession?.strokes})`}
@@ -54,5 +54,5 @@ if (joinId) {
       >SPELA GOLF</button
     >
   </form>
-</Layout>
+</AppScreen>
 <script src="src/controllers/NewScoringSessionController.ts"></script>

@@ -1,6 +1,5 @@
 ---
-export const prerender = false; // Render at request time
-
-await Astro.session?.delete('userId');
+export const prerender = false; // Not needed with 'server' output
+Astro.session?.destroy();
 return Astro.redirect('/');
 ---

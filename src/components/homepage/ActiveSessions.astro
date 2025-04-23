@@ -1,7 +1,6 @@
 ---
 import { getaActiveSessions } from 'src/db/queries/getActiveSessions';
 import type { ActiveSession } from 'src/db/queries/getActiveSessions';
-import type { ScoringSession } from 'src/db/schema/scoring_sessions';
 import EventPillRow from '../shared/EventPillRow.astro';
 
 const userId = await Astro.session?.get('userId');
@@ -25,13 +24,15 @@ const ownedScoringSession = userId
 
 {
   groupedSessions.map((seshGroup) => (
-    <div>
+    <div class="activessioncard">
       <EventPillRow
         special={!!seshGroup[0].special}
         strokes={!!seshGroup[0].strokes}
         teamEvent={!!seshGroup[0].teamEvent}
       />
-      {seshGroup[0].course.club} - {seshGroup[0].course.name}
+      <h3>
+        {seshGroup[0].course.club} - {seshGroup[0].course.name}
+      </h3>
       {seshGroup.map((sesh) => (
         <div id={`sesh.${sesh.id}`}>
           <a href={`/scoring/${sesh.id}/leaderboard`} class="btn">
@@ -53,13 +54,6 @@ const ownedScoringSession = userId
   ))
 }
 
-{
-  !userId && (
-    <a href="/login" class="btn">
-      LOGGA IN
-    </a>
-  )
-}
 {
   userId && !ownedScoringSession && groupedSessions.length === 0 && (
     <a href="/scoring/new" class="btn">

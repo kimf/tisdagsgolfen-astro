@@ -1,34 +1,47 @@
 ---
+import 'src/assets/styles/globals.css';
+import SharedHead from 'src/components/layouts/SharedHead.astro';
 import ActiveSessions from 'src/components/homepage/ActiveSessions.astro';
-import Layout from 'src/layouts/Layout.astro';
+import DropDown from 'src/components/shared/DropDown.astro';
+import UserButton from 'src/components/homepage/UserButton.astro';
 ---
 
-<Layout title="Tisdagsgolfen">
-  <ActiveSessions server:defer>
-    <a href="#" class="button"> Laddar... </a>
-  </ActiveSessions>
+<!doctype html>
+<html lang="sv">
+  <SharedHead title="Tisdagsgolfen" />
+  <body>
+    <div class="wrapper">
+      <header id="header">
+        <h1>
+          <a href="/">Tisdagsgolfen 2025</a>
+        </h1>
+        <UserButton server:defer />
+      </header>
 
-  <!-- <section>
-      <h2>Ledartavla kommer här...</h2>
-    </section> -->
-  <div slot="footer">
-    <nav>
-      <a href="/">2025</a>
-      <a href="/2024" target="_blank">2024</a>
-      <a href="/2023" target="_blank">2023</a>
-      <a href="/2022" target="_blank">2022</a>
-      <a href="/2021" target="_blank">2021</a>
-      <a href="/2020" target="_blank">2020</a>
-      <a href="/2019" target="_blank">2019</a>
-      <a href="/2018" target="_blank">2018</a>
-      <a href="/2017" target="_blank">2017</a>
-      <a href="/2016" target="_blank">2016</a>
-      <a href="/2015" target="_blank">2015</a>
-      <a href="/2014" target="_blank">2014</a>
-      <a href="/2013" target="_blank">2013</a>
-      <a href="/2012" target="_blank">2012</a>
-      |
-      <a href="/logout">LOGGA UT</a>
-    </nav>
-  </div>
-</Layout>
+      <main id="main">
+        <ActiveSessions server:defer>
+          <div slot="fallback" class="activessioncard"></div>
+        </ActiveSessions>
+      </main>
+
+      <footer id="footer">
+        <nav>
+          <a href="/">2025</a>
+          <a href="/2024" target="_blank">2024</a>
+          <a href="/2023" target="_blank">2023</a>
+          <a href="/2022" target="_blank">2022</a>
+          <a href="/2021" target="_blank">2021</a>
+          <a href="/2020" target="_blank">2020</a>
+          <a href="/2019" target="_blank">2019</a>
+          <a href="/2018" target="_blank">2018</a>
+          <a href="/2017" target="_blank">2017</a>
+          <a href="/2016" target="_blank">2016</a>
+          <a href="/2015" target="_blank">2015</a>
+          <a href="/2014" target="_blank">2014</a>
+          <a href="/2013" target="_blank">2013</a>
+          <a href="/2012" target="_blank">2012</a>
+        </nav>
+      </footer>
+    </div>
+  </body>
+</html>
