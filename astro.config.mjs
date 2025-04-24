@@ -102,7 +102,7 @@ export default defineConfig({
   // adapter: node({
   //   mode: 'standalone'
   // }),
-  output: 'static',
+  output: 'server',
   adapter: vercel({
     output: 'hybrid'
   }),
