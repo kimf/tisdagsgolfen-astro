@@ -1,7 +1,8 @@
 ---
 import { getaActiveSessions } from 'src/db/queries/getActiveSessions';
 import type { ActiveSession } from 'src/db/queries/getActiveSessions';
-import EventPillRow from '../shared/EventPillRow.astro';
+import EventPillRow from 'src/components/shared/EventPillRow.astro';
+import Button from '../ui/button.astro';
 
 const userId = await Astro.session?.get('userId');
 const scoringSessions = await getaActiveSessions();
@@ -57,7 +58,7 @@ const ownedScoringSession = userId
 {
   userId && !ownedScoringSession && groupedSessions.length === 0 && (
     <a href="/scoring/new" class="btn">
-      NY RUNDA
+      <Button>NY RUNDA</Button>
     </a>
   )
 }

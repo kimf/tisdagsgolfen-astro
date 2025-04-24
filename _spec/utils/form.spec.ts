@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createForm } from '../../src/utils/form';
+import { createForm } from 'src/lib/form';
 
 describe('createForm', () => {
   const schema = z.object({

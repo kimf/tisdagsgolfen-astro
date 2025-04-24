@@ -5,13 +5,13 @@ export interface Props {
 
 const { title } = Astro.props;
 import SharedHead from 'src/components/layouts/SharedHead.astro';
-import 'src/assets/styles/globals.css';
+import 'src/styles/global.css';
 ---
 
 <!doctype html>
 <html lang="sv">
   <SharedHead title={title} />
-  <body id="main">
+  <body id="main" class="antialiased">
     <div class="container">
       <slot />
     </div>

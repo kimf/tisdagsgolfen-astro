@@ -1,10 +1,9 @@
 ---
-export const prerender = false;
+import Button from '../ui/button.astro';
 const userId = await Astro.session?.get('userId');
 ---
 
-<div class="userbtn">
+<Button variant="link">
   {!userId && <a href="/login">LOGGA IN</a>}
-
   {userId && <a href="/logout">LOGGA UT</a>}
-</div>
+</Button>

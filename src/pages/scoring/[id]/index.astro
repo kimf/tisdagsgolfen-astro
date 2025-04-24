@@ -1,7 +1,6 @@
 ---
-export const prerender = false;
 import Loader from 'src/assets/images/grid.svg';
-import 'src/assets/styles/scoring.css';
+import 'src/styles/scoring.css';
 
 import AppScreen from 'src/layouts/AppScreen.astro';
 import ScoringTableHead from 'src/components/scoring/ScoringTableHead.astro';
@@ -46,7 +45,7 @@ if (!scoringSession) {
   </div>
   <footer id="menu">
     <a href={`/`}>START</a>
-    <a href={`/scoring/${id}/menu`}>MENY</a>
+    <!-- <a href={`/scoring/${id}/menu`}>MENY</a> -->
     <a href={`/scoring/${id}/leaderboard`}>LEDARTAVLA</a>
   </footer>
 </AppScreen>

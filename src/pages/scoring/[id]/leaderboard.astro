@@ -1,8 +1,7 @@
 ---
-export const prerender = false;
 // export const partial = true;
 
-import 'src/assets/styles/scoring.css';
+import 'src/styles/scoring.css';
 import {
   getMinimalScoringSession,
   getLeaderboardForScoringSession
@@ -10,8 +9,8 @@ import {
 import AppScreen from 'src/layouts/AppScreen.astro';
 import Loader from 'src/assets/images/grid.svg';
 import EventPillRow from 'src/components/shared/EventPillRow.astro';
-import standardCompRank from 'src/utils/standardCompRank';
-import { shortName } from 'src/utils/formatters';
+import standardCompRank from 'src/lib/standardCompRank';
+import { shortName } from 'src/lib/formatters';
 import Beers from 'src/components/shared/Beers.astro';
 import Ciders from 'src/components/shared/Ciders.astro';
 import ToPar from 'src/components/shared/ToPar.astro';

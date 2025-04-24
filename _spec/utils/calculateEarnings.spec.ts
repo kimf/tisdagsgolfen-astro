@@ -1,4 +1,4 @@
-import calculateEarnings from 'src/utils/calculateEarnings';
+import calculateEarnings from 'src/lib/calculateEarnings';
 
 describe('calculateEarnings', () => {
   it('returns 0 for par with 2 putts', () => {

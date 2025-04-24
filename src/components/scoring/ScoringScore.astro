@@ -2,8 +2,8 @@
 import type { ScoringSessionWithAllData } from 'src/db/queries/getScoringSession';
 import type { Hole } from 'src/db/schema/hole';
 import type { Score } from 'src/db/schema/score';
-import { calculateExtraStrokes } from 'src/utils/calculateExtraStrokes';
-import { shortName } from 'src/utils/formatters';
+import { calculateExtraStrokes } from 'src/lib/calculateExtraStrokes';
+import { shortName } from 'src/lib/formatters';
 
 interface Props {
   score: Score | undefined;

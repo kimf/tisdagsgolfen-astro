@@ -4,7 +4,9 @@
   "exclude": ["dist", "_legacy"],
   "compilerOptions": {
     "types": ["vite-plugin-pwa/client", "vitest/globals"],
-    "baseUrl": "."
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   },
   "plugins": [
     {

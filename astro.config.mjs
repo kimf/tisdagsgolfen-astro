@@ -6,7 +6,8 @@ import path from 'path';
 import fsExtra from 'fs-extra';
 import htmx from 'astro-htmx';
 import alpinejs from '@astrojs/alpinejs';
-import vercel from '@astrojs/vercel';
+import tailwindcss from '@tailwindcss/vite';
+import node from '@astrojs/node';
 
 const COLORS = {
   reset: '\x1b[0m',
@@ -46,13 +47,12 @@ const copyLegacyContent = () => ({
 });
 
 const isProd = import.meta.env.PROD;
-const redisUrl = process.env.REDIS_URL;
-if (!redisUrl && isProd) {
-  console.error('redisUrl is not set');
-  throw new Error('redisUrl is not set');
-}
-
+const redisUrl = process.env.REDIS_URL || '';
 export default defineConfig({
+  vite: {
+    plugins: [tailwindcss()]
+  },
+
   integrations: [
     alpinejs(),
     htmx(),
@@ -91,22 +91,27 @@ export default defineConfig({
     compressor({ gzip: false, brotli: true }),
     copyLegacyContent()
   ],
+
   image: {
     domains: []
   },
-  output: 'static',
-  adapter: vercel({
-    output: 'hybrid',
-    webAnalytics: { enabled: true }
+
+  output: 'server',
+
+  adapter: node({
+    mode: 'standalone'
   }),
+
   session: {
     driver: isProd ? 'redis' : 'fs-lite',
     options: { url: redisUrl }
   },
+
   prefetch: {
     prefetchAll: true,
     defaultStrategy: 'hover'
   },
+
   experimental: {
     clientPrerender: true,
     fonts: [
@@ -129,6 +134,7 @@ export default defineConfig({
       }
     ]
   },
+
   env: {
     schema: {
       DATABASE_URL: envField.string({ context: 'server', access: 'secret' }),
@@ -139,39 +145,5 @@ export default defineConfig({
       USER_PASSWORD: envField.string({ context: 'server', access: 'secret' }),
       REDIS_URL: envField.string({ context: 'server', access: 'secret' })
     }
-  },
-  vite: {
-    // This is a workaround to allow serving HTML files without extensions
-    // it only affects the development server, so don't forget to fix this in production as well
-    // plugins: [
-    //   {
-    //     name: 'serve-html-without-extension',
-    //     configureServer(server) {
-    //       server.middlewares.use((req, res, next) => {
-    //         const publicDir = path.join(process.cwd(), 'public');
-    //         let filePath = path.join(publicDir, req.url);
-    //         // Remove query parameters and hash from the URL
-    //         filePath = filePath.split('?')[0].split('#')[0];
-    //         // Check for index.html
-    //         if (fs.existsSync(path.join(filePath, 'index.html'))) {
-    //           req.url = path.join(req.url, 'index.html');
-    //         }
-    //         // Check for .html file
-    //         else if (fs.existsSync(`${filePath}.html`)) {
-    //           req.url = `${req.url}.html`;
-    //         }
-    //         // Check for file without extension
-    //         else if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-    //           // Do nothing, serve the file as-is
-    //         }
-    //         // If none of the above, let Astro handle it
-    //         else {
-    //           // Do nothing, let Astro's routing handle it
-    //         }
-    //         next();
-    //       });
-    //     }
-    //   }
-    // ]
   }
 });

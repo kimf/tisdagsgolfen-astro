@@ -1,0 +1,24 @@
+---
+import Button from 'src/components/ui/button.astro';
+import Moon from 'src/assets/icons/moon.svg';
+import Sun from 'src/assets/icons/sun.svg';
+---
+
+<Button data-theme-toggle size="icon" variant="link">
+  <Sun name="sun" class="size-5 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+  <Moon
+    name="moon"
+    class="absolute size-5 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
+  />
+  <span class="sr-only">Toggle theme</span>
+</Button>
+
+<script>
+  import { THEME_MAP, themeStore } from 'src/lib/theme';
+
+  document
+    .querySelector('[data-theme-toggle]')
+    ?.addEventListener('click', () =>
+      themeStore.set(themeStore.get() === THEME_MAP.dark ? THEME_MAP.light : THEME_MAP.dark)
+    );
+</script>

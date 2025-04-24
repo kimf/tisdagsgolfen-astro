@@ -1,0 +1,125 @@
+---
+import AppScreen from 'src/layouts/AppScreen.astro';
+import Link from 'src/assets/icons/link.svg';
+import Button from 'src/components/ui/button.astro';
+
+type HistoryItem = {
+  year: string;
+  winner: string;
+  image?: string;
+  description?: string;
+};
+const historyItems: HistoryItem[] = [
+  {
+    year: '2024',
+    winner: 'Tobias',
+    description: 'Nyköping igen... Dominanten och giganten Tobias var oslagbar'
+  },
+  {
+    year: '2023',
+    winner: 'Khalex',
+    description: 'Nyköping. Första seger-försvararen. Var han fortfarande på väg ner i hcp?'
+  },
+  {
+    year: '2022',
+    winner: 'Khalex',
+    description: '10 år! Lanna Lodge. Khalex var på väg ner i hcp'
+  },
+  {
+    year: '2021',
+    winner: 'Patrik',
+    description:
+      'Packe totaldominerade. Täby Gk (kallt satan) + Sala GK med den intressanta restaurangen',
+    image: ''
+  },
+  { year: '2020', winner: 'Tobias', description: 'Åda + Finspång' },
+  {
+    year: '2019',
+    winner: 'Niklas',
+    description: 'Åda + Nyköping. Straffgolf och mycket whiskey',
+    image: 'https://tisdagsgolfen.fransman.se/2014-2022/photos/snigel_vinnare_2019.jpeg'
+  },
+  {
+    year: '2018',
+    winner: 'Patrik',
+    description: 'Ombergs, och delad seger troddes det ett tag',
+    image: 'https://tisdagsgolfen.fransman.se/2014-2022/photos/tobbe_packe_vinnare.jpg'
+  },
+  {
+    year: '2017',
+    winner: 'Tobias',
+    description: '5-års jubileum och final i Spanien!',
+    image: 'https://tisdagsgolfen.fransman.se/2014-2022/photos/tobbe_vinnare.jpg'
+  },
+  {
+    year: '2016',
+    winner: 'Niklas',
+    description: 'Lindö?',
+    image: 'https://tisdagsgolfen.fransman.se/2014-2022/photos/niklas.jpg'
+  },
+  {
+    year: '2015',
+    winner: 'Patrik',
+    description: 'Lindö igen?',
+    image: 'https://tisdagsgolfen.fransman.se/2014-2022/photos/patrik.jpg'
+  },
+  {
+    year: '2014',
+    winner: 'Daniel',
+    description: 'Vart var vi? Matchspel A & B finaler',
+    image: 'https://tisdagsgolfen.fransman.se/2014-2022/photos/daggen_vinnare.png'
+  },
+  {
+    year: '2013',
+    winner: 'Håkan',
+    description: 'Spelade vi finalen på Körunda och åt på thaien?',
+    image: '/images/photos/hakiz-winner.png'
+  },
+  {
+    year: '2012',
+    winner: 'Kim (typ)',
+    description: 'Detta var innan det blev tisdagsgolfen, så det räknas ej som en officiel seger.'
+  }
+];
+---
+
+<AppScreen title="Historik">
+  <main class="max-w-[600px] mx-auto p-12">
+    <div class="flex flex-col gap-8">
+      <a href="/" class="flex hover:bg-accent hover:text-muted-foreground"> &larr; TILLBAKA </a>
+
+      <h1 class="text-2xl font-bold">HISTORIK</h1>
+    </div>
+    <hr class="my-8" />
+
+    <ol class="relative border-s border-gray-400 dark:border-gray-700 mt-8">
+      {
+        historyItems.map((item) => (
+          <li class="mb-6 pb-6 ms-4 w-full border-t-1 border-dashed border-gray-400">
+            <div class="absolute w-3 h-3 bg-gray-400 rounded-full mt-[-4px] -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700" />
+
+            <time class="text-lg font-semibold text-gray-900 dark:text-white mb-1 mt-4 block">
+              {item.year} - {item.winner}
+            </time>
+
+            {item.image && (
+              <img
+                class="object-cover w-full min-h-48 max-h-72 mt-4 border-4 border-gray-200"
+                src={item.image}
+              />
+            )}
+
+            {item.description && (
+              <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">
+                {item.description}
+              </p>
+            )}
+            <a href={`/${item.year}`} class="inline-flex gap-2 py-2 text-sm" target="_blank">
+              Ledartavla och rundor <Link class="size-5" />
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </main>
+</AppScreen>

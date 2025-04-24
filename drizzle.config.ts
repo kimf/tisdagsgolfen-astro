@@ -1,15 +1,15 @@
 import { defineConfig } from 'drizzle-kit';
 
-const isVercel = process.env.VERCEL;
+const isProd = process.env.NODE_ENV && process.env.NODE_ENV === 'production';
 
 export default defineConfig({
-  dialect: isVercel ? 'turso' : 'sqlite',
+  dialect: isProd ? 'turso' : 'sqlite',
   schema: './src/db/schema/*',
   out: './drizzle',
   verbose: true,
   strict: true,
   dbCredentials: {
     url: process.env.DATABASE_URL!,
-    authToken: isVercel ? process.env.TURSO_AUTH_TOKEN : ''
+    authToken: isProd ? process.env.TURSO_AUTH_TOKEN : ''
   }
 });

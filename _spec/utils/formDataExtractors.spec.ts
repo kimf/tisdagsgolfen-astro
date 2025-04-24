@@ -1,4 +1,4 @@
-import { extractPlayers, extractTeams } from '../../src/utils/formDataExtractors';
+import { extractPlayers, extractTeams } from 'src/lib/formDataExtractors';
 
 describe('extractPlayers', () => {
   it('returns null for null input', () => {

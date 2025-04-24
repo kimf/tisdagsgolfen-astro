@@ -1,4 +1,4 @@
-import { shortName } from '../../src/utils/formatters';
+import { shortName } from 'src/lib/formatters';
 
 describe('shortName', () => {
   it('returns first name and initial of last name', () => {

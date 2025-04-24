@@ -1,10 +1,8 @@
 ---
-export const prerender = false; // Render at request time
-
-import 'src/assets/styles/globals.css';
+import { Button } from 'src/components/ui/button';
 import db from 'src/db';
 import AppScreen from 'src/layouts/AppScreen.astro';
-import { shortName } from 'src/utils/formatters';
+import { shortName } from 'src/lib/formatters';
 
 const errors = { password: '' };
 
@@ -41,6 +39,10 @@ const players = await db.query.profiles.findMany({
 ---
 
 <AppScreen title="Logga in">
+   <div class="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div class="w-full max-w-sm">
+
+        <div class"flex flex-col gap-6">
   <h1>Logga in</h1>
   {errors.password && <p style="color: red;">{errors.password}</p>}
   <form method="post" class="login" x-data="login">
@@ -65,72 +67,46 @@ const players = await db.query.profiles.findMany({
       <input type="password" id="password" name="password" required minlength="3" />
     </div>
     <div class="row">
-      <button class="btn" :disabled="!canLogin()">LOGGA IN</button>
+      <Button :disabled="!canLogin()">LOGGA IN</Button>
     </div>
   </form>
+  </div></div>
+    </div>
 </AppScreen>
 <script src="src/controllers/LoginController.ts"></script>
 <style>
 
-.login {
+
+
+
+.players {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 12px;
-  max-width: 600px;
-  padding-bottom: 100px;
+  align-items: space-around;
 
-  .row {
-    display: flex;
-    flex-direction: column;
-  }
+  .usercard {
+    width: 80px;
+    max-height: 100px;
+    overflow: hidden;
+    padding: 8px;
+    background: rgba(112, 192, 209, 0.2);
+    border: 1px solid black;
+    box-shadow: 0 0 5px rgba(18, 26, 28, 0.2);
+    text-transform: uppercase;
+    font-size: 12px;
 
-  input {
-    padding: 12px;
-    font-size: 20px;
-  }
-
-  button {
-    padding: 12px;
-    color: black;
-    width: 100%;
-  }
-
-  .players {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: space-around;
-
-    .usercard {
-      width: 80px;
-      max-height: 100px;
-      overflow: hidden;
-      padding: 8px;
-      background: rgba(112, 192, 209, 0.2);
-      border: 1px solid black;
-      box-shadow: 0 0 5px rgba(18, 26, 28, 0.2);
-      text-transform: uppercase;
-      font-size: 12px;
-
-      img {
-        max-width: 100%;
-      }
-
-      &:hover {
-        background: rgba(112, 192, 209, 0.4);
-      }
-
-      &.selected {
-        background: greenyellow;
-        color: black;
+    img {
+      max-width: 100%;
     }
 
-    h3 {
-      color: white;
-      font-size: 14px;
-      text-align: center;
+    &:hover {
+      background: rgba(112, 192, 209, 0.4);
     }
+
+    &.selected {
+      background: greenyellow;
+      color: black;
   }
 }
-
 </style>

@@ -1,6 +1,6 @@
 import db from 'src/db';
 import { scorecardPlayers, scorecards, scoringSessions } from 'src/db/schema';
-import { extractPlayers, extractTeams } from 'src/utils/formDataExtractors';
+import { extractPlayers, extractTeams } from 'src/lib/formDataExtractors';
 
 export async function createScoringSession(userId: number, formData: FormData) {
   const isSpecial = formData.get('specialweek') === 'on';

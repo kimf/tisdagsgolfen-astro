@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculatePoints } from 'src/utils/calculatePoints';
+import { calculatePoints } from 'src/lib/calculatePoints';
 
 describe('calculatePoints', () => {
   it('calculates standard points correctly', () => {
