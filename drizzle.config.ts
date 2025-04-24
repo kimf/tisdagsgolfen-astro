@@ -1,6 +1,7 @@
 import { defineConfig } from 'drizzle-kit';
 
-const isProd = process.env.NODE_ENV && process.env.NODE_ENV === 'production';
+const isProd = process.env.VERCEL;
+//const isProd = process.env.NODE_ENV && process.env.NODE_ENV === 'production';
 
 export default defineConfig({
   dialect: isProd ? 'turso' : 'sqlite',

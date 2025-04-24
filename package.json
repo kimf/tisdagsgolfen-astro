@@ -22,6 +22,7 @@
   "dependencies": {
     "@astrojs/alpinejs": "^0.4.6",
     "@astrojs/node": "^9.2.1",
+    "@astrojs/vercel": "^8.1.4",
     "@conform-to/zod": "^1.4.0",
     "@libsql/client": "^0.15.4",
     "@nanostores/persistent": "^1.0.0",
