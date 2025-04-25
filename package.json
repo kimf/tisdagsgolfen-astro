@@ -16,7 +16,6 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test",
     "knip": "knip"
   },
   "dependencies": {
@@ -47,7 +46,6 @@
   },
   "devDependencies": {
     "@astrojs/ts-plugin": "^1.10.4",
-    "@playwright/test": "^1.52.0",
     "@types/alpinejs": "^3.13.11",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.15.2",

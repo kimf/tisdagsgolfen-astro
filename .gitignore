@@ -25,9 +25,3 @@ local.db*
 # windsurf and cursor rules
 .windsurfrules
 .cursor
-
-# Playwright
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
