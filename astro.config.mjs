@@ -7,8 +7,7 @@ import fsExtra from 'fs-extra';
 import htmx from 'astro-htmx';
 import alpinejs from '@astrojs/alpinejs';
 import tailwindcss from '@tailwindcss/vite';
-// import node from '@astrojs/node';
-import vercel from '@astrojs/vercel';
+import node from '@astrojs/node';
 
 const COLORS = {
   reset: '\x1b[0m',
@@ -47,8 +46,7 @@ const copyLegacyContent = () => ({
   }
 });
 
-// const isProd = import.meta.env.PROD;
-const isProd = process.env.VERCEL;
+const isProd = process.env.NODE_ENV === 'production';
 const redisUrl = process.env.REDIS_URL || '';
 export default defineConfig({
   vite: {
@@ -98,13 +96,9 @@ export default defineConfig({
     domains: []
   },
 
-  // output: 'server',
-  // adapter: node({
-  //   mode: 'standalone'
-  // }),
   output: 'server',
-  adapter: vercel({
-    output: 'hybrid'
+  adapter: node({
+    mode: 'standalone'
   }),
 
   session: {
