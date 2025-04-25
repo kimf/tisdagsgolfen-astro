@@ -5,10 +5,11 @@ export default getViteConfig({
   test: {
     globals: true,
     environment: 'node', // or 'jsdom' if you want to test browser code
-    include: ['_spec/**/*.spec.{ts,js}'],
+    include: ['src/_spec/**/*.spec.{ts,js}'],
     coverage: {
-      include: ['src/**/*']
+      include: ['src/**/*'],
+      exclude: ['src/_spec/**/*']
     },
-    setupFiles: ['./_spec/setup.ts']
+    setupFiles: ['./src/_spec/setup.ts']
   }
 });

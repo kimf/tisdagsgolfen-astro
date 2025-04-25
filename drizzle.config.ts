@@ -5,7 +5,7 @@ const isProd = process.env.NODE_ENV && process.env.NODE_ENV === 'production';
 export default defineConfig({
   dialect: isProd ? 'turso' : 'sqlite',
   schema: './src/db/schema/*',
-  out: './drizzle',
+  out: './src/db/_drizzle',
   verbose: true,
   strict: true,
   dbCredentials: {

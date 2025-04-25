@@ -62,10 +62,10 @@ export default defineConfig({
       scope: '/',
       manifest: {
         name: 'Tisdagsgolfen',
-        short_name: 'TG',
+        short_name: 'TisGolf',
         description: 'Tisdagsgolfen',
-        theme_color: '#008080',
-        background_color: '#C7E0D9',
+        theme_color: 'oklch(0.141 0.005 285.823)',
+        background_color: '#f3f3f398',
         display: 'standalone',
         orientation: 'portrait-primary',
         icons: [

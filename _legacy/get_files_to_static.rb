@@ -18,10 +18,10 @@ events = [
 
 seasons.each_with_index do |id, index|
   puts "Season: #{id}"
-  Dir.mkdir("./src/pages/#{id}", 0700)
+  Dir.mkdir("./#{id}", 0700)
 
   # season index
-  File.open("./src/pages/#{id}/index.html","w") do |f|
+  File.open("./#{id}/index.html","w") do |f|
     url = "#{site_url}/#{id}"
     season_index_body = URI.open(url, {ssl_verify_mode: 0}).read
     f << season_index_body
@@ -30,8 +30,8 @@ seasons.each_with_index do |id, index|
   # # event index
   events[index].each do |eid|
     puts "Event: #{eid}"
-    Dir.mkdir("./src/pages/#{id}/#{eid}", 0700)
-    File.open("./src/pages/#{id}/#{eid}/index.html","w") do |f|
+    Dir.mkdir("./#{id}/#{eid}", 0700)
+    File.open("./#{id}/#{eid}/index.html","w") do |f|
       event_body = URI.open("#{site_url}/#{id}/#{eid}").read
       f << event_body
     end
@@ -40,7 +40,7 @@ seasons.each_with_index do |id, index|
   # # Final leaderboard
   # # 2020,2021,2022 = /2022/final.html
   if id == "2022" or id == "2021" or id == "2020"
-    File.open("./src/pages/#{id}/final","w") do |f|
+    File.open("./#{id}/final","w") do |f|
       leaderboard_body = URI.open("#{site_url}/scoring_sessions/final_#{id}/leaderboard").read
       f << leaderboard_body
     end
@@ -53,11 +53,11 @@ seasons.each_with_index do |id, index|
   # # /2022/513/kr.html
   if id != 2015 or id != 2014
     events[index].each do |eid|
-      File.open("./src/pages/#{id}/#{eid}/beers.html","w") do |f|
+      File.open("./#{id}/#{eid}/beers.html","w") do |f|
         beers_body = URI.open("#{site_url}/#{id}/#{eid}/beers.html").read
         f << beers_body
       end
-      File.open("./src/pages/#{id}/#{eid}/kr.html","w") do |f|
+      File.open("./#{id}/#{eid}/kr.html","w") do |f|
         kr_body = URI.open("#{site_url}/#{id}/#{eid}/kr.html").read
         f << kr_body
       end

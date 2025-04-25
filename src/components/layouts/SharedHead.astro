@@ -25,11 +25,17 @@ const { title } = Astro.props;
   <Font cssVariable="--font-mono" preload />
 
   <title>{title || 'Tisdagsgolfen'}</title>
-  {
+  <!-- {
     pwaAssetsHead.themeColor && (
       <meta name="theme-color" content={pwaAssetsHead.themeColor.content} />
     )
-  }
+  } -->
+  <meta name="theme-color" content="#f3f3f398" media="(prefers-color-scheme: light)" />
+  <meta
+    name="theme-color"
+    content="oklch(0.141 0.005 285.823)"
+    media="(prefers-color-scheme: dark)"
+  />
   {pwaAssetsHead.links.map((link: any) => <link {...link} />)}
   {pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
 

@@ -1,45 +1,29 @@
-FROM node:lts-alpine AS base
+FROM node:23.11.0-slim AS base
 WORKDIR /app
-
 ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
-
 ARG TURSO_AUTH_TOKEN
-ENV TURSO_AUTH_TOKEN=$TURSO_AUTH_TOKEN
-
-VOLUME /data
-RUN mkdir -p /data
-
-COPY package.json package-lock.json ./
-
-FROM base AS build
-RUN npm install --legacy-peer-deps
+ARG REDIS_URL
+ARG NODE_ENV
+ARG USER_PASSWORD
 
 COPY . .
-RUN npm run db:migrate
+
+RUN npm install
 RUN npm run build
+RUN npm run db:migrate
 
-FROM base AS runtime
-
-ENV DATABASE_URL=$DATABASE_URL
-ENV TURSO_AUTH_TOKEN=$TURSO_AUTH_TOKEN
-
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
-
-# Move the drizzle directory to the runtime image
-COPY --from=build /app/drizzle ./drizzle
-COPY --from=build ./app/run.sh ./run.sh
-
-# Create the data directory for the database
-VOLUME /data
-RUN mkdir -p /data
-
+# Set only runtime ENV here
 ENV HOST=0.0.0.0
 ENV PORT=4321
 ENV NODE_ENV=production
-ENV DATABASE_URL=$DATABASE_URL
-ENV TURSO_AUTH_TOKEN=$TURSO_AUTH_TOKEN
+
+ENV DATABASE_URL=${DATABASE_URL}
+ENV TURSO_AUTH_TOKEN=${TURSO_AUTH_TOKEN}
+ENV REDIS_URL=${REDIS_URL}
+ENV USER_PASSWORD=${USER_PASSWORD}
+
+VOLUME /data
+
 EXPOSE 4321
 
-CMD ["sh", "./run.sh"]
+CMD ["node", "./dist/server/entry.mjs"]
