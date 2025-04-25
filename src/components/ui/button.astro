@@ -27,9 +27,9 @@ const buttonVariants = cva(
 
 interface Props extends HTMLAttributes<'button'>, VariantProps<typeof buttonVariants> {}
 
-const { class: className, variant, size, ...props } = Astro.props;
+const { class: className, variant, size, type = 'button', ...props } = Astro.props;
 ---
 
-<button type="button" class={cn(buttonVariants({ variant, size }), className)} {...props}>
+<button type={type} class={cn(buttonVariants({ variant, size }), className)} {...props}>
   <slot />
 </button>

@@ -1,7 +1,7 @@
 import { defineConfig, envField, fontProviders } from 'astro/config';
 import playformCompress from '@playform/compress';
 import compressor from 'astro-compressor';
-import AstroPWA from '@vite-pwa/astro';
+// import AstroPWA from '@vite-pwa/astro';
 import path from 'path';
 import fsExtra from 'fs-extra';
 import htmx from 'astro-htmx';
@@ -56,37 +56,38 @@ export default defineConfig({
   integrations: [
     alpinejs(),
     htmx(),
-    AstroPWA({
-      registerType: 'autoUpdate',
-      base: '/',
-      scope: '/',
-      manifest: {
-        name: 'Tisdagsgolfen',
-        short_name: 'TisGolf',
-        description: 'Tisdagsgolfen',
-        theme_color: 'oklch(0.141 0.005 285.823)',
-        background_color: '#f3f3f398',
-        display: 'standalone',
-        orientation: 'portrait-primary',
-        icons: [
-          {
-            src: './src/assets/images/logo.png',
-            sizes: '192x192',
-            type: 'image/png'
-          }
-        ]
-      },
-      pwaAssets: {
-        config: true
-      },
-      workbox: {
-        navigateFallback: '/',
-        globPatterns: ['**/*.{css,js,html,svg,png,ico,txt}']
-      },
-      experimental: {
-        directoryAndTrailingSlashHandler: true
-      }
-    }),
+    // AstroPWA({
+    //   mode: 'production',
+    //   registerType: 'autoUpdate',
+    //   base: '/',
+    //   scope: '/',
+    //   manifest: {
+    //     name: 'Tisdagsgolfen',
+    //     short_name: 'TisGolf',
+    //     description: 'Tisdagsgolfen',
+    //     theme_color: 'oklch(0.141 0.005 285.823)',
+    //     background_color: '#f3f3f398',
+    //     display: 'standalone',
+    //     orientation: 'portrait-primary',
+    //     icons: [
+    //       {
+    //         src: './src/assets/images/logo.png',
+    //         sizes: '192x192',
+    //         type: 'image/png'
+    //       }
+    //     ]
+    //   },
+    //   pwaAssets: {
+    //     config: true
+    //   },
+    //   workbox: {
+    //     navigateFallback: '/',
+    //     globPatterns: ['**/*.{css,js,html,svg,png,ico,txt}']
+    //   },
+    //   experimental: {
+    //     directoryAndTrailingSlashHandler: true
+    //   }
+    // }),
     playformCompress(),
     compressor({ gzip: false, brotli: true }),
     copyLegacyContent()
