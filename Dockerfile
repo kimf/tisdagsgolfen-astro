@@ -8,7 +8,7 @@ ARG USER_PASSWORD
 
 COPY . .
 
-RUN npm install
+RUN npm install --include=dev
 RUN npm run build
 RUN npm run db:migrate
 
