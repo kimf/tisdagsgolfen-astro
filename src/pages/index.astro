@@ -7,6 +7,7 @@ import UserButton from 'src/components/homepage/UserButton.astro';
 import ThemeToggle from 'src/components/ui/theme-toggle.astro';
 import Button from 'src/components/ui/button.astro';
 import Link from 'src/assets/icons/link.svg';
+import StickyHeader from 'src/components/shared/StickyHeader.astro';
 ---
 
 <!doctype html>
@@ -15,32 +16,41 @@ import Link from 'src/assets/icons/link.svg';
   <body class="antialiased dark:bg-gray-900">
     <div class="wrapper">
       <nav class="border-gray-200 bg-gray-200 dark:bg-gray-950">
-        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
+        <div class="max-w-screen-xl flex items-center justify-between mx-auto p-4">
+          <a href="/">
             <h1 class="text-accent-foreground font-bold">Tisdagsgolfen</h1>
           </a>
+
+          <UserButton server:defer />
         </div>
       </nav>
 
-      <main
-        id="main"
-        class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
-      >
-        <ActiveSessions server:defer>
-          <div slot="fallback" class="activessioncard"></div>
-        </ActiveSessions>
+      <main id="main" class="w-full flex flex-col flex-wrap items-center justify-between gap-8 p-4">
+        <div class="w-full main-section">
+          <StickyHeader title="RUNDOR" />
+          <div class="flex overflow-x-scroll hide-scrollbar">
+            <div class="flex flex-nowrap">
+              <ActiveSessions server:defer>
+                <div slot="fallback" class="activessioncard"></div>
+              </ActiveSessions>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full main-section">
+          <StickyHeader title="LEDARTAVLA EFTER X RUNDOR" />
+        </div>
       </main>
 
-      <footer class="fixed p-1 bottom-1 right-1">
+      <footer class="fixed p-1 bottom-1 right-1 bg-background/75 backdrop-blur-xs">
         <div class="flex">
-          <ThemeToggle />
           <Button variant="link">
             <a href="/years" class="flex">
               HISTORIK
               <Link class="size-5" />
             </a>
           </Button>
-          <UserButton server:defer />
+          <ThemeToggle />
         </div>
       </footer>
     </div>

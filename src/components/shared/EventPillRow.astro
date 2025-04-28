@@ -1,4 +1,6 @@
 ---
+import Pill from './Pill.astro';
+
 interface Props {
   live?: boolean;
   special: boolean;
@@ -8,15 +10,15 @@ interface Props {
 const { live, special, teamEvent, strokes } = Astro.props;
 ---
 
-<div>
-  {live && <span class="pill live">LIVE</span>}
+<div class="flex gap-0.5 mb-2">
   {
     special && (
-      <div>
-        <span class="pill special">SPECIAL</span>
-        {teamEvent && <span class="pill teamevent">LAG</span>}
-      </div>
+      <Fragment>
+        <Pill variant="special">SPECIAL</Pill>
+        {teamEvent && <Pill variant="teamEvent">LAG</Pill>}
+      </Fragment>
     )
   }
-  <span class="pill scoringtype">{strokes ? 'SLAG' : 'POÄNG'}</span>
+  <Pill>{strokes ? 'SLAG' : 'POÄNG'}</Pill>
+  {live && <Pill variant="live">LIVE</Pill>}
 </div>

@@ -1,8 +1,8 @@
 ---
 import { getaActiveSessions } from 'src/db/queries/getActiveSessions';
 import type { ActiveSession } from 'src/db/queries/getActiveSessions';
-import EventPillRow from 'src/components/shared/EventPillRow.astro';
-import Button from '../ui/button.astro';
+import Button from 'src/components/ui/button.astro';
+import EventCard from './eventsrow/EventCard.astro';
 
 const userId = await Astro.session?.get('userId');
 const scoringSessions = await getaActiveSessions();
@@ -18,47 +18,62 @@ for (const sesh of scoringSessions) {
 }
 const groupedSessions: ActiveSession[][] = Object.values(groupedSessionsObj);
 
+console.log(groupedSessions.length);
+
 const ownedScoringSession = userId
   ? scoringSessions.find((sesh) => sesh.ownerId === Number(userId))
   : null;
+
+const flattenedSessions = groupedSessions.flatMap((gs) => gs.map((s) => s));
 ---
 
 {
-  groupedSessions.map((seshGroup) => (
-    <div class="activessioncard">
-      <EventPillRow
-        special={!!seshGroup[0].special}
-        strokes={!!seshGroup[0].strokes}
-        teamEvent={!!seshGroup[0].teamEvent}
-      />
-      <h3>
-        {seshGroup[0].course.club} - {seshGroup[0].course.name}
-      </h3>
-      {seshGroup.map((sesh) => (
-        <div id={`sesh.${sesh.id}`}>
+  flattenedSessions.map((sesh) => (
+    <EventCard
+      variant="live"
+      date={sesh.createdAt || ''}
+      special={!!sesh.special}
+      strokes={!!sesh.strokes}
+      teamEvent={!!sesh.teamEvent}
+      course={sesh.course}
+    >
+      <div id={`sesh.${sesh.id}`} class="flex justify-between">
+        <Button variant="secondary">
           <a href={`/scoring/${sesh.id}/leaderboard`} class="btn">
             LEDARTAVLA
           </a>
-          {userId && sesh.ownerId === Number(userId) && (
+        </Button>
+        {userId && sesh.ownerId === Number(userId) && (
+          <Button>
             <a href={`/scoring/${sesh.id}`} class="btn">
               {sesh.state === 'PENDING' ? 'REDIGERA' : 'FORTSÄTT'}
             </a>
-          )}
-          {userId && sesh.ownerId !== Number(userId) && (
+          </Button>
+        )}
+        {userId && sesh.ownerId !== Number(userId) && (
+          <Button>
             <a href={`/scoring/new?joinId=${sesh.id}`} class="btn">
               FÖR SCORE
             </a>
-          )}
-        </div>
-      ))}
-    </div>
+          </Button>
+        )}
+      </div>
+    </EventCard>
   ))
 }
 
 {
   userId && !ownedScoringSession && groupedSessions.length === 0 && (
-    <a href="/scoring/new" class="btn">
+    <a href="/scoring/new" class="new-round-btn">
       <Button>NY RUNDA</Button>
     </a>
   )
 }
+
+<style>
+  .new-round-btn {
+    position: fixed;
+    bottom: 8px;
+    left: 8px;
+  }
+</style>

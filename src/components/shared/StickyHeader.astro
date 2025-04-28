@@ -1,0 +1,18 @@
+---
+export interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<div
+  x-data="{ atTop: false }"
+  x-ref="div"
+  class="sticky top-0 left-0 right-0 transition p-4 -mx-4 duration-250 ease-in-out flex items-center"
+  :class="{'bg-background/50 backdrop-blur-xl': atTop}"
+  @scroll.window="atTop = (Math.abs($refs.div.getBoundingClientRect().top) > 40) ? false: true"
+>
+  <h2 class="shrink-0 pe-4">{title}</h2>
+  <span class="h-px flex-1 bg-gradient-to-l from-transparent to-gray-300 dark:to-cyan-600"></span>
+</div>

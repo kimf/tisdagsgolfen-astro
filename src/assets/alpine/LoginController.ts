@@ -3,8 +3,12 @@ document.addEventListener('alpine:init', () => {
   Alpine.data('login', () => ({
     userId: 0,
 
-    setUserId(id: number) {
-      this.userId = id;
+    toggleUserId(id: number) {
+      if (this.userId === id) {
+        this.userId = 0;
+      } else {
+        this.userId = id;
+      }
     },
 
     canLogin() {
@@ -13,6 +17,10 @@ document.addEventListener('alpine:init', () => {
 
     isUser(id: number) {
       return this.userId === id;
+    },
+
+    isAnotherUser(id: number) {
+      return this.userId !== 0 && this.userId !== id;
     }
   }));
 });

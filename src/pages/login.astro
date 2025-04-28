@@ -1,4 +1,5 @@
 ---
+import StickyHeader from 'src/components/shared/StickyHeader.astro';
 import Button from 'src/components/ui/button.astro';
 import db from 'src/db';
 import AppScreen from 'src/layouts/AppScreen.astro';
@@ -39,74 +40,52 @@ const players = await db.query.profiles.findMany({
 ---
 
 <AppScreen title="Logga in">
-   <div class="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div class="w-full max-w-sm">
+  <div class="flex min-h-svh w-full  p-6 md:p-10">
+    <div class="w-full">
+      <StickyHeader title="LOGGA IN" />
 
-        <div class"flex flex-col gap-6">
-  <h1>Logga in</h1>
-  {errors.password && <p style="color: red;">{errors.password}</p>}
-  <form method="post" class="login" x-data="login">
-    <div class="row">
-      <h3>Vem är du?</h3>
-      <input type="hidden" name="userId" x-model="userId" required />
-      <div class="players">
-        {
-          players.map((player) => (
-            <div class="usercard" x-on:click={`setUserId(${player.id})`}
-            :class={`[isUser(${player.id}) ? 'selected' : '']`}
-            >
-              {player.avatarUrl === '1' ? <img src={`/images/avatars/${player.id}.png`} /> : <img src="/images/avatars/default.png" />}
-              {shortName(player.fullName)}
-            </div>
-          ))
-        }
-      </div>
+      {errors.password && <p style="color: red;">{errors.password}</p>}
+      <form method="post" class="login" x-data="login">
+        <div class="flex gap-4">
+        <input type="hidden" name="userId" x-model="userId" required />
+        <div class="flex flex-wrap gap-2 flex-1/4">
+          {
+            players.map((player) => (
+              <div class="w-24 h-32 flex flex-col border-2 p-1" x-transition x-on:click={`toggleUserId(${player.id})`} :class={`[
+                isUser(${player.id}) ? 'bg-cyan-500' : '',
+                isAnotherUser(${player.id}) ? 'hidden' : ''
+              ]`}>
+                {player.avatarUrl === '1' ? (
+                  <img src={`/images/avatars/${player.id}.png`} />
+                ) : (
+                  <img src="/images/avatars/default.png" />
+                )}
+                <span class="text-sm uppercase">{shortName(player.fullName)}</span>
+              </div>
+            ))
+          }
+        </div>
+
+        <div
+          class="flex-col flex gap-4 flex-3/4"
+          x-show="canLogin()"
+          x-cloak
+          x-transition>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="hemligt!"
+            required
+            minlength="3"
+            class="bg-white border p-2"
+          />
+
+          <Button size="lg" :disabled="!canLogin()" type="submit">LOGGA IN</Button>
+        </div>
+        </div>
+      </form>
     </div>
-    <div class="row">
-      <h3>Access kod (Superhemlig)</h3>
-      <input type="password" id="password" name="password" required minlength="3" />
-    </div>
-    <div class="row">
-      <Button :disabled="!canLogin()" type="submit">LOGGA IN</Button>
-    </div>
-  </form>
-  </div></div>
-    </div>
+  </div>
+  <script src="src/assets/alpine//LoginController.ts"></script>
 </AppScreen>
-<script src="src/controllers/LoginController.ts"></script>
-<style>
-
-
-
-
-.players {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: space-around;
-
-  .usercard {
-    width: 80px;
-    max-height: 100px;
-    overflow: hidden;
-    padding: 8px;
-    background: rgba(112, 192, 209, 0.2);
-    border: 1px solid black;
-    box-shadow: 0 0 5px rgba(18, 26, 28, 0.2);
-    text-transform: uppercase;
-    font-size: 12px;
-
-    img {
-      max-width: 100%;
-    }
-
-    &:hover {
-      background: rgba(112, 192, 209, 0.4);
-    }
-
-    &.selected {
-      background: greenyellow;
-      color: black;
-  }
-}
-</style>

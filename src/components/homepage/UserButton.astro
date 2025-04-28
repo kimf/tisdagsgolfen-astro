@@ -1,9 +1,35 @@
 ---
+import db from 'src/db';
 import Button from '../ui/button.astro';
 const userId = await Astro.session?.get('userId');
+const player = userId
+  ? await db.query.profiles.findFirst({
+      where: (p, { eq }) => eq(p.id, Number(userId))
+    })
+  : undefined;
 ---
 
-<Button variant="link">
-  {!userId && <a href="/login">LOGGA IN</a>}
-  {userId && <a href="/logout">LOGGA UT</a>}
-</Button>
+{
+  !userId && (
+    <Button size="sm">
+      <a href="/login">LOGGA IN</a>
+    </Button>
+  )
+}
+
+{
+  userId && (
+    <div class="inline-flex gap-2  justify-center items-center">
+      <Button size="sm" variant="link">
+        <a href="/logout">LOGGA UT</a>
+      </Button>
+      <Button size="icon" variant="link" class="size-6">
+        {player?.avatarUrl === '1' ? (
+          <img src={`/images/avatars/${player.id}.png`} />
+        ) : (
+          <img src="/images/avatars/default.png" />
+        )}
+      </Button>
+    </div>
+  )
+}

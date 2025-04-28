@@ -5,7 +5,13 @@ export async function getaActiveSessions() {
     where: (sessions, { ne, and }) =>
       and(ne(sessions.state, 'CLOSED'), ne(sessions.state, 'FINALPENDING')),
     with: {
-      course: true
+      course: true,
+      scorecards: {
+        orderBy: (scorecards, { asc }) => [asc(scorecards.toPar)],
+        with: {
+          players: { with: { player: true } }
+        }
+      }
     }
   });
 }

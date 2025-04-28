@@ -36,7 +36,7 @@
   --card-foreground: oklch(0.141 0.005 285.823);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: #6dcff5;
+  --primary: oklch(58.8% 0.158 241.966);
   --primary-foreground: oklch(0.982 0.018 155.826);
   --secondary: oklch(0.967 0.001 286.375);
   --secondary-foreground: oklch(0.21 0.006 285.885);
@@ -57,7 +57,7 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.21 0.006 285.885);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: #6dcff5;
+  --primary: oklch(58.8% 0.158 241.966);
   --primary-foreground: oklch(0.393 0.095 152.535);
   --secondary: oklch(0.274 0.006 286.033);
   --secondary-foreground: oklch(0.985 0 0);
@@ -72,6 +72,15 @@
 }
 
 @layer base {
+  html {
+    font-size: 13px;
+  }
+  @media (min-width: 420px) {
+    html {
+      font-size: 15px;
+    }
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -79,17 +88,37 @@
     @apply bg-background text-foreground;
   }
 
+  h1,
+  h2 {
+    font-family: var(--font-vcr);
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+
   h1 {
     font-size: var(--text-xl);
+    letter-spacing: var(--tracking-tight); /* -0.025em */
   }
   h2 {
     font-size: var(--text-lg);
+    letter-spacing: var(--tracking-tight); /* -0.025em */
   }
+
+  h3 {
+    letter-spacing: var(--tracking-tight); /* -0.025em */
+  }
+
   h3,
   h4,
   h5 {
-    font-size: var(--text-lg--line-height);
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: var(--text-base);
   }
+}
+
+.vcr {
+  font-family: var(--font-vcr);
 }
 
 [x-cloak] {
@@ -98,16 +127,6 @@
 
 body {
   font-family: var(--font-mono);
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-strong {
-  font-family: var(--font-vcr);
-  text-transform: uppercase;
 }
 
 .transform {
@@ -143,16 +162,6 @@ strong {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
 /* Chrome, Safari & Opera */
 ::-webkit-scrollbar {
   width: 0;
@@ -182,4 +191,8 @@ strong {
 
 .scrollable::-webkit-scrollbar {
   display: none;
+}
+
+.activessioncard {
+  min-height: 100px;
 }

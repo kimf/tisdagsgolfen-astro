@@ -1,0 +1,61 @@
+---
+import { cn } from 'src/lib/utils';
+import { cva, type VariantProps } from 'class-variance-authority';
+import type { HTMLAttributes } from 'astro/types';
+import type { Course } from 'src/db/schema/course';
+import EventPillRow from 'src/components/shared/EventPillRow.astro';
+
+const eventCardVariants = cva(
+  'h-32 overflow-hidden rounded-md shadow-md bg-card-foreground/25 p-3 flex flex-col',
+  {
+    variants: {
+      variant: {
+        default: 'w-64',
+        live: 'w-80'
+      }
+    },
+    defaultVariants: {
+      variant: 'default'
+    }
+  }
+);
+
+interface Props extends HTMLAttributes<'div'>, VariantProps<typeof eventCardVariants> {
+  date: string;
+  course: Course;
+  special: boolean;
+  strokes: boolean;
+  teamEvent: boolean;
+}
+
+const { class: className, variant, ...props } = Astro.props;
+---
+
+<div class="inline-block px-3 first:pl-0">
+  <div class={cn(eventCardVariants({ variant }), className)} {...props}>
+    <div class="flex justify-between">
+      <span class="flex gap-2">
+        <h5>
+          {
+            new Date(props.date).toLocaleDateString('sv-SE', {
+              day: 'numeric',
+              month: 'short'
+            })
+          }
+        </h5>
+      </span>
+      <EventPillRow
+        special={props.special}
+        strokes={props.strokes}
+        teamEvent={props.teamEvent}
+        live
+      />
+    </div>
+
+    <h5>{props.course.name}</h5>
+
+    <div class="mt-auto">
+      <slot />
+    </div>
+  </div>
+</div>

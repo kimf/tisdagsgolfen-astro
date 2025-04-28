@@ -18,7 +18,6 @@ import ToPar from 'src/components/shared/ToPar.astro';
 const { id } = Astro.params;
 const userId = await Astro.session?.get('userId');
 
-if (!userId) throw new Error('Logga in för att föra score');
 if (!id) throw new Error('Id saknas för runda');
 
 const scoringSession = await getMinimalScoringSession(Number(id));
@@ -103,6 +102,12 @@ const rankedScorecards = scoringSession.strokes
     </div>
   </div>
   <footer id="menu">
-    <a href={`/scoring/${id}`}>&larr; TILLBAKA</a>
+    {
+      userId && scoringSession.ownerId === Number(userId) ? (
+        <a href={`/scoring/${id}`}>&larr; TILLBAKA</a>
+      ) : (
+        <a href={`/`}>&larr; TILLBAKA</a>
+      )
+    }
   </footer>
 </AppScreen>

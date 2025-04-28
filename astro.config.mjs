@@ -54,7 +54,9 @@ export default defineConfig({
   },
 
   integrations: [
-    alpinejs(),
+    alpinejs({
+      entrypoint: './src/assets/alpine/entrypoint'
+    }),
     htmx(),
     // AstroPWA({
     //   mode: 'production',
