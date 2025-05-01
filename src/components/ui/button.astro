@@ -1,36 +1,56 @@
 ---
-import { cn } from 'src/lib/utils';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { cx, cva } from 'src/components/cva.config';
+import { type VariantProps } from 'cva';
 import type { HTMLAttributes } from 'astro/types';
 
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer rounded-sm text-sm font-medium transition-[color,box-shadow, scale] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] vcr",
-  {
-    variants: {
-      variant: {
-        default: 'bg-foreground dark:bg-primary text-accent  font-bold uppercase',
-        secondary: 'bg-muted-foreground dark:bg-muted-background text-accent font-bold uppercase',
-        link: 'hover:text-muted-foreground dark:hover:text-primary text-foreground'
-      },
-      size: {
-        default: 'h-9 px-4 py-2 has-[>svg]:px-3',
-        sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
-        lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
-        icon: 'size-9'
-      }
+const buttonVariants = cva({
+  base: 'cursor-pointer flex items-center active:border rounded-md duration-100 active:scale-97 font-bold uppercase disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none',
+  variants: {
+    intent: {
+      default: 'fill-cyan-400 bg-cyan-950 hover:bg-cyan-900 text-cyan-400 justify-center p-2',
+      secondary: 'bg-muted-foreground dark:bg-muted-background text-cyan-400 justify-center p-2',
+      link: 'hover:text-cyan-950 dark:hover:text-cyan-700 dark:text-cyan-400 text-cyan-700'
     },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default'
+    size: {
+      default: 'h-9 px-4 py-2 has-[>svg]:px-3',
+      sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
+      lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
+      block: 'h-12 rounded-md px-6 w-full has-[>svg]:px-4',
+      icon: 'size-9'
+    },
+    muted: {
+      false: null,
+      true: ['opacity-50 hover:opacity-100']
     }
+  },
+  compoundVariants: [
+    {
+      intent: ['default', 'secondary'],
+      size: 'lg',
+      class: 'p-6 text-lg'
+    },
+    {
+      intent: ['default', 'secondary'],
+      size: 'block',
+      class: 'p-6 text-lg'
+    },
+    {
+      intent: 'link',
+      size: 'lg',
+      class: 'p-6 text-lg font-bold text-2xl'
+    }
+  ],
+  defaultVariants: {
+    intent: 'default',
+    size: 'default'
   }
-);
+});
 
-interface Props extends HTMLAttributes<'button'>, VariantProps<typeof buttonVariants> {}
+export interface Props extends HTMLAttributes<'button'>, VariantProps<typeof buttonVariants> {}
 
-const { class: className, variant, size, type = 'button', ...props } = Astro.props;
+const { class: className, intent, size, muted, type = 'button', ...props } = Astro.props;
 ---
 
-<button type={type} class={cn(buttonVariants({ variant, size }), className)} {...props}>
+<button type={type} class={cx(buttonVariants({ intent, size, muted }), className)} {...props}>
   <slot />
 </button>

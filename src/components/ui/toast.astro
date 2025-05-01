@@ -1,39 +1,38 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { cx, cva } from 'src/components/cva.config';
+import { type VariantProps } from 'cva';
 
-const alert = cva(
-  'flex-row items-center gap-4 alert toast w-fit m-4 text-black animate-pop-in-out opacity-0',
-  {
-    variants: {
-      variant: {
-        default: '',
-        info: 'bg-blue-400',
-        error: 'bg-red-600',
-        success: 'bg-green-500',
-        warning: 'bg-orange-500'
-      },
-      where: {
-        'top-start': 'toast-top toast-start',
-        'top-center': 'toast-top toast-center',
-        'top-end': 'toast-top toast-end',
-        'middle-start': 'toast-middle toast-start',
-        'middle-center': 'toast-middle toast-center',
-        'middle-end': 'toast-middle toast-end',
-        'bottom-start': 'toast-bottom toast-start',
-        'bottom-center': 'toast-bottom toast-center',
-        'bottom-end': 'toast-bottom toast-end'
-      }
+const alert = cva({
+  base: 'flex-row items-center gap-4 alert toast w-fit m-4 text-black animate-pop-in-out opacity-0',
+  variants: {
+    intent: {
+      default: '',
+      info: 'bg-blue-400',
+      error: 'bg-red-600',
+      success: 'bg-green-500',
+      warning: 'bg-orange-500'
     },
-    compoundVariants: [{ variant: 'default', where: 'bottom-end' }]
-  }
-);
+    where: {
+      'top-start': 'toast-top toast-start',
+      'top-center': 'toast-top toast-center',
+      'top-end': 'toast-top toast-end',
+      'middle-start': 'toast-middle toast-start',
+      'middle-center': 'toast-middle toast-center',
+      'middle-end': 'toast-middle toast-end',
+      'bottom-start': 'toast-bottom toast-start',
+      'bottom-center': 'toast-bottom toast-center',
+      'bottom-end': 'toast-bottom toast-end'
+    }
+  },
+  compoundVariants: [{ intent: 'default', where: 'bottom-end' }]
+});
 
 export interface Props extends HTMLAttributes<'div'>, VariantProps<typeof alert> {}
 
-const { variant = 'default', where = 'bottom-end', ...props } = Astro.props;
+const { intent = 'default', where = 'bottom-end', ...props } = Astro.props;
 ---
 
-<div class={alert({ variant, where })} {...props}>
+<div class={cx(alert({ intent, where }))} {...props}>
   <slot />
 </div>

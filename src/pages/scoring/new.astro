@@ -1,5 +1,4 @@
 ---
-import 'src/styles/newscoringsession.css';
 import AppScreen from 'src/layouts/AppScreen.astro';
 import db from 'src/db';
 
@@ -7,6 +6,7 @@ import Settings from 'src/components/newscoringsession/Settings.astro';
 import CourseSelector from 'src/components/newscoringsession/CourseSelector.astro';
 import TeamSetup from 'src/components/newscoringsession/TeamSetup.astro';
 import PlayerSetup from 'src/components/newscoringsession/PlayerSetup.astro';
+import Button from 'src/components/ui/button.astro';
 import { createScoringSession } from 'src/db/mutations/createScoringSession';
 
 if (Astro.request.method === 'POST') {
@@ -41,17 +41,23 @@ if (joinId) {
 ---
 
 <AppScreen title="Ny Runda">
-  <form
-    method="POST"
-    x-data={`teamForm(${joinSession?.courseId}, ${joinSession?.special}, ${joinSession?.teamEvent}, ${joinSession?.strokes})`}
-  >
-    <Settings />
-    <CourseSelector />
-    <TeamSetup allPlayers={allPlayers} />
-    <PlayerSetup allPlayers={allPlayers} />
-    <button class="btn" type="submit" style="margin-top: 2rem;" :disabled="disableSave"
-      >SPELA GOLF</button
+  <Button intent="link">
+    <a href="/"> &larr; TILLBAKA </a>
+  </Button>
+  <div class="max-w-screen-lg mx-auto p-4 pb-24">
+    <form
+      class="flex flex-col gap-4"
+      method="POST"
+      x-data={`teamForm(${joinSession?.courseId}, ${joinSession?.special}, ${joinSession?.teamEvent}, ${joinSession?.strokes})`}
     >
-  </form>
+      <Settings />
+      <CourseSelector />
+      <TeamSetup allPlayers={allPlayers} />
+      <PlayerSetup allPlayers={allPlayers} />
+      <div class="fixed bottom-0 left-0 p-4 w-full backdrop-blur">
+        <Button type="submit" size="block" x-bind:disabled="disableSave">SPELA GOLF</Button>
+      </div>
+    </form>
+  </div>
 </AppScreen>
 <script src="src/assets/alpine//NewScoringSessionController.ts"></script>

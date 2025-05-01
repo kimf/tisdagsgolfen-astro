@@ -1,0 +1,29 @@
+---
+import Label from './label.astro';
+
+export interface Props {
+  name: string;
+  label: string;
+  xModel?: string;
+  value?: string | number;
+}
+
+const { name, label, xModel, value } = Astro.props;
+const id = value && xModel ? `${value}_${xModel}` : name;
+---
+
+<div>
+  <input
+    x-model={xModel}
+    value={value}
+    type="checkbox"
+    id={id}
+    name={name}
+    class="sr-only peer"
+    required
+  />
+
+  <Label id={id} label={label}>
+    <slot />
+  </Label>
+</div>

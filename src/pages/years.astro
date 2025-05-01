@@ -91,40 +91,37 @@ const historyItems: HistoryItem[] = [
 ---
 
 <AppScreen title="Historik">
-  <main class="max-w-[600px] mx-auto p-8">
-    <div class="flex flex-col gap-8">
-      <a href="/" class="flex hover:bg-accent hover:text-muted-foreground"> &larr; TILLBAKA </a>
-
-      <h1 class="text-2xl font-bold">HISTORIK</h1>
+  <main class="p-4 pb-12">
+    <div class="-ml-4 mb-2">
+      <Button intent="link">
+        <a href="/"> &larr; TILLBAKA </a>
+      </Button>
     </div>
-    <hr class="my-8" />
 
-    <ol class="relative border-s border-gray-400 dark:border-gray-700 mt-8">
-      {
-        historyItems.map((item) => (
-          <li class="mb-6 pb-6 ms-4 w-full">
-            <div class="absolute w-3 h-3 bg-gray-400 rounded-full mt-[-4px] -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700" />
+    <h1 class="text-2xl font-bold">HISTORIK</h1>
 
-            <StickyHeader title={`${item.year} - ${item.winner}`} />
+    {
+      historyItems.map((item) => (
+        <div>
+          <StickyHeader title={`${item.year} - ${item.winner}`} />
 
-            {item.description && (
-              <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">
-                {item.description}
-              </p>
-            )}
-            {item.image && (
-              <img
-                class="object-cover w-full min-h-48 max-h-72 mt-4 border-4 border-gray-200"
-                src={item.image}
-              />
-            )}
+          {item.description && (
+            <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">
+              {item.description}
+            </p>
+          )}
+          {item.image && (
+            <img
+              class="object-cover w-full min-h-36 max-h-72 mt-4 border-4 border-gray-200"
+              src={item.image}
+            />
+          )}
 
-            <a href={`/${item.year}`} class="inline-flex gap-2 py-2 text-sm" target="_blank">
-              Ledartavla och rundor <Link class="size-5" />
-            </a>
-          </li>
-        ))
-      }
-    </ol>
+          <a href={`/${item.year}`} class="inline-flex gap-2 py-2 text-sm" target="_blank">
+            Ledartavla och rundor <Link class="size-5" />
+          </a>
+        </div>
+      ))
+    }
   </main>
 </AppScreen>

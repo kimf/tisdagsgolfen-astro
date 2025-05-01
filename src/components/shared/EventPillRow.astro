@@ -1,5 +1,5 @@
 ---
-import Pill from './Pill.astro';
+import Pill from 'src/components/ui/Pill.astro';
 
 interface Props {
   live?: boolean;
@@ -14,11 +14,11 @@ const { live, special, teamEvent, strokes } = Astro.props;
   {
     special && (
       <Fragment>
-        <Pill variant="special">SPECIAL</Pill>
-        {teamEvent && <Pill variant="teamEvent">LAG</Pill>}
+        <Pill intent="special">SPECIAL</Pill>
+        {teamEvent && <Pill intent="teamEvent">LAG</Pill>}
       </Fragment>
     )
   }
   <Pill>{strokes ? 'SLAG' : 'POÄNG'}</Pill>
-  {live && <Pill variant="live">LIVE</Pill>}
+  {live && <Pill intent="live">LIVE</Pill>}
 </div>

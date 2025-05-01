@@ -7,6 +7,9 @@ const player = userId
       where: (p, { eq }) => eq(p.id, Number(userId))
     })
   : undefined;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+await sleep(1000);
 ---
 
 {
@@ -19,11 +22,11 @@ const player = userId
 
 {
   userId && (
-    <div class="inline-flex gap-2  justify-center items-center">
-      <Button size="sm" variant="link">
+    <div class="inline-flex gap-1 justify-center items-center">
+      <Button size="sm" intent="link" muted>
         <a href="/logout">LOGGA UT</a>
       </Button>
-      <Button size="icon" variant="link" class="size-6">
+      <Button size="icon" intent="link" class="size-8">
         {player?.avatarUrl === '1' ? (
           <img src={`/images/avatars/${player.id}.png`} />
         ) : (

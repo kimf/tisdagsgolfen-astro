@@ -15,6 +15,10 @@ document.addEventListener('alpine:init', () => {
       selectedPlayers: [] as string[],
       teams: [{ players: [] }, { players: [] }] as Team[],
 
+      toggleSpecial() {
+        this.specialWeek = !this.specialWeek;
+      },
+
       addTeam() {
         this.teams.push({ players: [] });
       },
@@ -24,7 +28,7 @@ document.addEventListener('alpine:init', () => {
       },
 
       disableSave() {
-        if (this.course === null) {
+        if (!this.course) {
           return true;
         }
         if (this.teamEvent) {

@@ -1,0 +1,26 @@
+---
+import Label from './label.astro';
+
+export interface Props {
+  name: string;
+  label: string;
+  value: string | number;
+  xModel?: string;
+}
+
+const { name, label, value, xModel } = Astro.props;
+const id = `${value}_${xModel}`;
+---
+
+<div>
+  <input
+    x-model={xModel}
+    type="radio"
+    id={id}
+    name={name}
+    value={value}
+    class="peer sr-only"
+    required
+  />
+  <Label id={id} label={label} />
+</div>

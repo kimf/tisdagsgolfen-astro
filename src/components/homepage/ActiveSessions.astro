@@ -25,12 +25,14 @@ const ownedScoringSession = userId
   : null;
 
 const flattenedSessions = groupedSessions.flatMap((gs) => gs.map((s) => s));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+await sleep(1000);
 ---
 
 {
   flattenedSessions.map((sesh) => (
     <EventCard
-      variant="live"
+      intent="live"
       date={sesh.createdAt || ''}
       special={!!sesh.special}
       strokes={!!sesh.strokes}
@@ -38,7 +40,7 @@ const flattenedSessions = groupedSessions.flatMap((gs) => gs.map((s) => s));
       course={sesh.course}
     >
       <div id={`sesh.${sesh.id}`} class="flex justify-between">
-        <Button variant="secondary">
+        <Button intent="secondary">
           <a href={`/scoring/${sesh.id}/leaderboard`} class="btn">
             LEDARTAVLA
           </a>
@@ -64,16 +66,8 @@ const flattenedSessions = groupedSessions.flatMap((gs) => gs.map((s) => s));
 
 {
   userId && !ownedScoringSession && groupedSessions.length === 0 && (
-    <a href="/scoring/new" class="new-round-btn">
+    <a href="/scoring/new" class="new-round-btn fixed bottom-2 left-2">
       <Button>NY RUNDA</Button>
     </a>
   )
 }
-
-<style>
-  .new-round-btn {
-    position: fixed;
-    bottom: 8px;
-    left: 8px;
-  }
-</style>

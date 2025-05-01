@@ -5,6 +5,7 @@ export interface Props {
 
 const { title } = Astro.props;
 import SharedHead from 'src/components/layouts/SharedHead.astro';
+import ThemeToggle from 'src/components/ui/theme-toggle.astro';
 import 'src/styles/global.css';
 ---
 
@@ -12,8 +13,10 @@ import 'src/styles/global.css';
 <html lang="sv">
   <SharedHead title={title} />
   <body id="main" class="antialiased dark:bg-gray-900">
-    <div class="container">
-      <slot />
-    </div>
+    <slot />
+
+    <footer class="fixed pl-4 bottom-1 right-1 bg-background/75 backdrop-blur-xs">
+      <ThemeToggle />
+    </footer>
   </body>
 </html>

@@ -1,12 +1,16 @@
-<h3>Inställningar</h3>
-<div class="chips">
-  <label>
-    <input type="checkbox" name="specialweek" x-model="specialWeek" />Specialvecka
-  </label>
-  <label x-show="specialWeek" x-cloak>
-    <input type="checkbox" name="teamevent" x-model="teamEvent" />Lagtävling
-  </label>
-  <label x-show="specialWeek" x-cloak>
-    <input type="checkbox" name="strokes" x-model="strokes" />Slaggolf
-  </label>
+---
+import Checkbox from '../ui/checkbox.astro';
+---
+
+<h2>Inställningar</h2>
+
+<div class="flex gap-2 flex-wrap">
+  <Checkbox xModel="specialWeek" name="specialweek" label="Specialvecka" />
+
+  <div x-show="specialWeek" x-transition x-cloak>
+    <Checkbox xModel="teamEvent" name="teamevent" label="Lagtävling" />
+  </div>
+  <div x-show="specialWeek" x-transition x-cloak>
+    <Checkbox xModel="strokes" name="strokes" label="Slaggolf" />
+  </div>
 </div>

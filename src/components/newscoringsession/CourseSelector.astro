@@ -1,20 +1,18 @@
 ---
 import db from 'src/db';
 import { courses } from 'src/db/schema';
+import Radio from '../ui/radio.astro';
 
 const dbCourses = await db.query.courses.findMany({
   orderBy: courses.eventsCount
 });
 ---
 
-<h3>Välj Bana</h3>
-<div class="chips">
+<h2>Bana</h2>
+<div class="flex gap-4 flex-wrap">
   {
     dbCourses.map((course) => (
-      <label>
-        <input type="radio" name="course" value={course.id} x-model="course" />
-        {course.club} - {course.name}
-      </label>
+      <Radio xModel="course" name="course" label={course.name} value={course.id} />
     ))
   }
 </div>
