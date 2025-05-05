@@ -4,14 +4,17 @@ import Moon from 'src/assets/icons/moon.svg';
 import Sun from 'src/assets/icons/sun.svg';
 ---
 
-<Button data-theme-toggle size="icon" intent="link">
-  <Sun name="sun" class="size-5 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+<div data-theme-toggle class="fixed p-6 bottom-2 right-2">
+  <Sun
+    name="sun"
+    class="absolute size-5 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
+  />
   <Moon
     name="moon"
     class="absolute size-5 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
   />
   <span class="sr-only">Toggle theme</span>
-</Button>
+</div>
 
 <script>
   import { THEME_MAP, themeStore } from 'src/lib/theme';

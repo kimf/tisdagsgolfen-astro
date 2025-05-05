@@ -17,6 +17,17 @@ document.addEventListener('alpine:init', () => {
       this.isScoring = false;
     },
 
+    changeStrokes(newStrokes: number) {
+      this.strokes = newStrokes;
+      if (newStrokes === 1) {
+        this.putts = 0;
+      } else {
+        if (this.putts >= newStrokes) {
+          this.putts = newStrokes - 1;
+        }
+      }
+    },
+
     openScoring(
       par: number,
       index: number,

@@ -1,7 +1,7 @@
 ---
 export const partial = true;
 
-import ScoringScore from 'src/components/scoring/ScoringScore.astro';
+import ScoreRow from 'src/components/scoring/ScoreRow.astro';
 import ToPar from 'src/components/shared/ToPar.astro';
 import db from 'src/db';
 import { scores } from 'src/db/schema';
@@ -57,8 +57,16 @@ const score = scoreResult[0];
 
 const scorecard = await db.query.scorecards.findFirst({
   where: (s, { eq }) => eq(s.id, score.scorecardId),
-  with: { scoringSession: true, players: { with: { player: true } }, course: true }
+  with: {
+    scores: {
+      orderBy: (scores, { asc }) => [asc(scores.hole)]
+    },
+    scoringSession: true,
+    players: { with: { player: true } },
+    course: true
+  }
 });
+
 if (!scorecard) throw new Error('Scorekort kunde inte hittas');
 
 const holeData = await db.query.holes.findFirst({
@@ -69,14 +77,7 @@ const holeData = await db.query.holes.findFirst({
 // Astro.response.headers.set('HX-Trigger', 'score-updated');
 ---
 
-<ScoringScore
-  score={score}
-  hole={holeData!}
-  scorecardId={scorecard.id}
-  givenStrokes={scorecard.givenStrokes || 0}
-  players={scorecard.players}
-  holesCount={scorecard.course.holesCount || 0}
-/>
-<div id={`toPar-${scorecard.id}`} hx-swap-oob="true">
+<ScoreRow scorecard={scorecard} hole={holeData!} holesCount={scorecard.course.holesCount} oob />
+<!-- <div id={`toPar-${scorecard.id}`} hx-swap-oob="true">
   <ToPar toPar={scorecard.toPar || 0} />
-</div>
+</div> -->

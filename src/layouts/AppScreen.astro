@@ -12,11 +12,9 @@ import 'src/styles/global.css';
 <!doctype html>
 <html lang="sv">
   <SharedHead title={title} />
-  <body id="main" class="antialiased dark:bg-gray-900">
+  <body id="main" class="antialiased dark:bg-gray-900 h-screen">
     <slot />
 
-    <footer class="fixed pl-4 bottom-1 right-1 bg-background/75 backdrop-blur-xs">
-      <ThemeToggle />
-    </footer>
+    <ThemeToggle />
   </body>
 </html>

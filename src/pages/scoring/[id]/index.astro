@@ -2,49 +2,19 @@
 import Loader from 'src/assets/images/grid.svg';
 
 import AppScreen from 'src/layouts/AppScreen.astro';
-import ScoringTableHead from 'src/components/scoring/ScoringTableHead.astro';
-import ScoreRow from 'src/components/scoring/ScoreRow.astro';
-import { getScoringSession } from 'src/db/queries/getScoringSession';
-import ScoreForm from 'src/components/scoring/ScoreForm.astro';
 import Button from 'src/components/ui/button.astro';
+import Hole from 'src/pages/partials/scoring/[id]/holes/[number].astro';
 
 const { id } = Astro.params;
 const userId = await Astro.session?.get('userId');
 
 if (!userId) throw new Error('Logga in för att föra score');
 if (!id) throw new Error('Id saknas för runda');
-
-const scoringSession = await getScoringSession(Number(id));
-
-if (!scoringSession) {
-  throw new Error('Hittade ingen scoring session');
-}
 ---
 
 <AppScreen title="För score">
-  <div class="pb-20">
-    <div x-data="scoring">
-      <table class="w-full text-sm text-left text-gray-600 dark:text-gray-300">
-        <ScoringTableHead scorecards={scoringSession.scorecards} />
-        <tbody>
-          {
-            scoringSession.course.holes.map((hole) => (
-              <ScoreRow
-                hole={hole}
-                scorecards={scoringSession.scorecards}
-                currentHoleNumber={scoringSession.currentHole}
-                holesCount={scoringSession.course.holesCount}
-              />
-            ))
-          }
-        </tbody>
-      </table>
-      <ScoreForm special={!!scoringSession.special} id={scoringSession.id} />
-    </div>
-  </div>
-
   <footer
-    class="fixed max-w-screen-lg p-1 mx-auto bottom-1 left-1 bg-background/75 backdrop-blur-xs"
+    class="absolute z-5 max-w-screen-lg p-1 mx-auto bottom-1 left-1 bg-background/75 backdrop-blur-xs"
   >
     <div class="flex gap-2">
       <Button intent="link" size="sm">
@@ -59,6 +29,18 @@ if (!scoringSession) {
       <Loader class="htmx-indicator" width="20" height="20" />
     </div>
   </footer>
+
+  <Hole />
 </AppScreen>
 
-<script src="src/assets/alpine//ScoringController.ts"></script>
+<script src="src/assets/alpine/ScoringController.ts"></script>
+
+<style is:inline>
+  .slide-it.htmx-added {
+    opacity: 0;
+  }
+  .slide-it {
+    opacity: 1;
+    transition: opacity 1s ease-out;
+  }
+</style>
