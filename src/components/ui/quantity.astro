@@ -12,10 +12,10 @@ const { value, name } = Astro.props;
 <div x-data={`{value: ${value}}`}>
   <input name={name} x-model="value" class="sr-only" />
   <div class="flex items-center justify-between gap-0">
-    <Button intent="link" class="border active:bg-gray-100" @click="value--"> &minus; </Button>
+    <Button intent="inline" @click="value--"> &minus; </Button>
 
     <h2 x-text="value" class="w-10 text-center"></h2>
 
-    <Button intent="link" class="border active:bg-gray-100" @click="value++"> &plus; </Button>
+    <Button intent="inline" @click="value++"> &plus; </Button>
   </div>
 </div>

@@ -1,7 +1,5 @@
 ---
 // export const partial = true;
-
-import 'src/styles/scoring.css';
 import {
   getMinimalScoringSession,
   getLeaderboardForScoringSession
@@ -14,6 +12,7 @@ import { shortName } from 'src/lib/formatters';
 import Beers from 'src/components/shared/Beers.astro';
 import Ciders from 'src/components/shared/Ciders.astro';
 import ToPar from 'src/components/shared/ToPar.astro';
+import Button from 'src/components/ui/button.astro';
 
 const { id } = Astro.params;
 const userId = await Astro.session?.get('userId');
@@ -47,67 +46,85 @@ const rankedScorecards = scoringSession.strokes
 ---
 
 <AppScreen title="Ledartavla">
-  <Loader class="htmx-indicator" width="20" height="20" />
-  <div class="wrapper">
-    <h3>{scoringSession.course.club} - {scoringSession.course.name}</h3>
-
-    <div hx-get={`/scoring/${id}/leaderboard`} hx-trigger="every 300000s">
-      <table>
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Spelare</th>
-            {!scoringSession.special && <th>💸</th>}
-            <th>Hål</th>
-            <th>Slag</th>
-            <th>Poäng</th>
-            <th>+/-</th>
-          </tr>
-        </thead>
-        <tbody>
+  <div hx-get={`/scoring/${id}/leaderboard`} hx-trigger="every 3s" hx-swap="outerHTML">
+    <main class="max-w-3xl p-4 pb-12">
+      <div class="flex items-center justify-between">
+        <h2 class="mb-2">
           {
-            rankedScorecards.map((scorecard) => (
-              <tr>
-                <td>{scorecard.rank}</td>
-                <td>
-                  {scorecard.players.map((p) => (
-                    <div>
-                      {shortName(p.player.fullName)}
-                      <Beers beers={p.beers || 0} />
-                      <Ciders ciders={p.ciders || 0} />
-                    </div>
-                  ))}
-                  <div>SHCP {scorecard.givenStrokes}</div>
-                </td>
-                {!scoringSession.special && (
-                  <td>{scorecard.players.reduce((a, b) => a + (b.fines ?? 0), 0)}</td>
-                )}
-                <td>{scorecard.through}</td>
-                <td>{scorecard.strokes}</td>
-                <td>{scorecard.points}</td>
-                <td>
-                  <ToPar toPar={scorecard.toPar || 0} />
-                </td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-      <hr />
-      <EventPillRow
-        special={!!scoringSession.special}
-        strokes={!!scoringSession.strokes}
-        teamEvent={!!scoringSession.teamEvent}
-      />
-    </div>
+            new Date(scoringSession.createdAt || '').toLocaleDateString('sv-SE', {
+              day: 'numeric',
+              month: 'short'
+            })
+          } -
+          {scoringSession.course.name}
+        </h2>
+
+        <EventPillRow
+          special={!!scoringSession.special}
+          strokes={!!scoringSession.strokes}
+          teamEvent={!!scoringSession.teamEvent}
+        />
+      </div>
+
+      <div>
+        <table class="w-full text-sm text-left text-gray-600 dark:text-gray-300">
+          <thead class="text-xs uppercase">
+            <tr>
+              <th class="p-2 text-center vcr">#</th>
+              <th class="p-2 vcr">Spelare</th>
+              {!scoringSession.special && <th class="p-2 text-center vcr">💸</th>}
+              <th class="p-2 text-center vcr">Hål</th>
+              <th class="p-2 text-center vcr">Slag</th>
+              <th class="p-2 text-center vcr">Poäng</th>
+              <th class="p-2 text-center vcr">+/-</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              rankedScorecards.map((scorecard) => (
+                <tr class="border-b border-gray-200 odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 dark:border-gray-700">
+                  <td class="p-2 text-center vcr">{scorecard.rank}</td>
+                  <td class="p-2 text-xs">
+                    {scorecard.players.map((p) => (
+                      <div>
+                        {shortName(p.player.fullName)}
+                        <Beers beers={p.beers || 0} />
+                        <Ciders ciders={p.ciders || 0} />
+                      </div>
+                    ))}
+                    <small>{scorecard.givenStrokes} Slag</small>
+                  </td>
+                  {!scoringSession.special && (
+                    <td class="p-2 text-center vcr">
+                      {scorecard.players.reduce((a, b) => a + (b.fines ?? 0), 0)}
+                    </td>
+                  )}
+                  <td class="p-2 text-center vcr">{scorecard.through}</td>
+                  <td class="p-2 text-center vcr">{scorecard.strokes}</td>
+                  <td class="p-2 text-center vcr">{scorecard.points}</td>
+                  <td class="p-2 font-bold text-center vcr">
+                    <ToPar toPar={scorecard.toPar || 0} />
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </main>
+    <footer
+      class="fixed max-w-screen-lg p-1 mx-auto bottom-1 left-1 bg-background/75 backdrop-blur-xs"
+    >
+      <Button intent="link">
+        {
+          userId && scoringSession.ownerId === Number(userId) ? (
+            <a href={`/scoring/${id}`}>&larr; TILLBAKA</a>
+          ) : (
+            <a href={`/`}>&larr; TILLBAKA</a>
+          )
+        }
+      </Button>
+      <Loader class="htmx-indicator" width="20" height="20" />
+    </footer>
   </div>
-  <footer id="menu">
-    {
-      userId && scoringSession.ownerId === Number(userId) ? (
-        <a href={`/scoring/${id}`}>&larr; TILLBAKA</a>
-      ) : (
-        <a href={`/`}>&larr; TILLBAKA</a>
-      )
-    }
-  </footer>
 </AppScreen>

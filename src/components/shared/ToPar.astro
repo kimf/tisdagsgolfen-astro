@@ -8,6 +8,6 @@ const textColor = color || '$text';
 const toParColor = toPar === 0 ? textColor : toPar > 0 ? textColor : 'red';
 ---
 
-<span style={{ color: toParColor }}>
+<span style={{ color: toParColor }} class="text-[12px] vcr">
   {toPar === 0 ? 'E' : toPar > 0 ? `+${toPar}` : toPar}
 </span>

@@ -14,11 +14,13 @@ interface Props {
 const { scorecards, hole, currentHoleNumber, holesCount } = Astro.props;
 ---
 
-<tr class={currentHoleNumber === hole.number ? 'current-hole' : ''}>
-  <td>{hole.number}</td>
+<tr
+  class={`odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800  ${currentHoleNumber == hole.number ? 'border-cyan-400 border' : 'border-b border-gray-200 dark:border-gray-700'}`}
+>
+  <td class="h-16 p-2 vcr">{hole.number}</td>
   {
     scorecards.map((scorecard) => (
-      <td>
+      <td class="relative border-l">
         <ScoringScore
           score={scorecard.scores.find((s) => s.hole === hole.number)}
           hole={hole}

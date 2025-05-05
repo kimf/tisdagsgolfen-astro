@@ -2,15 +2,13 @@
 import { cx, cva } from 'src/components/cva.config';
 import { type VariantProps } from 'cva';
 import type { HTMLAttributes } from 'astro/types';
-import type { Course } from 'src/db/schema/course';
 import EventPillRow from 'src/components/shared/EventPillRow.astro';
 
 const eventCardVariants = cva({
-  base: 'h-32 overflow-hidden rounded-md shadow-md bg-card-foreground/25 p-3 flex flex-col bg-gradient-to-l from-slate-300 to-slate-100 border border-slate-300 p-4 gap-4 rounded-lg shadow-md',
+  base: 'text-muted-foreground h-26 overflow-hidden rounded-md shadow-md bg-card-foreground/25 p-3 flex flex-col bg-gradient-to-l from-slate-300 to-slate-100 border border-slate-300 rounded shadow-md',
   variants: {
     intent: {
-      default: 'w-64',
-      live: 'w-80'
+      default: 'w-70'
     }
   },
   defaultVariants: {
@@ -20,7 +18,6 @@ const eventCardVariants = cva({
 
 interface Props extends HTMLAttributes<'div'>, VariantProps<typeof eventCardVariants> {
   date: string;
-  course: Course;
   special: boolean;
   strokes: boolean;
   teamEvent: boolean;
@@ -29,31 +26,26 @@ interface Props extends HTMLAttributes<'div'>, VariantProps<typeof eventCardVari
 const { class: className, intent, ...props } = Astro.props;
 ---
 
-<div class="inline-block px-3 first:pl-0">
-  <div class={cx(eventCardVariants({ intent }), className)} {...props}>
-    <div class="flex justify-between">
-      <span class="flex gap-2">
-        <h5>
-          {
-            new Date(props.date).toLocaleDateString('sv-SE', {
-              day: 'numeric',
-              month: 'short'
-            })
-          }
-        </h5>
-      </span>
-      <EventPillRow
-        special={props.special}
-        strokes={props.strokes}
-        teamEvent={props.teamEvent}
-        live
-      />
-    </div>
+<div class={cx(eventCardVariants({ intent }), className)} {...props}>
+  <div class="flex justify-between">
+    <h4>
+      {
+        new Date(props.date).toLocaleDateString('sv-SE', {
+          day: 'numeric',
+          month: 'short'
+        })
+      }
+    </h4>
 
-    <h5>{props.course.name}</h5>
+    <EventPillRow
+      special={props.special}
+      strokes={props.strokes}
+      teamEvent={props.teamEvent}
+      live
+    />
+  </div>
 
-    <div class="mt-auto">
-      <slot />
-    </div>
+  <div class="mt-auto">
+    <slot />
   </div>
 </div>

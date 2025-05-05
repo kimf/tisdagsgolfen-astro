@@ -1,6 +1,8 @@
 ---
 import type { Profile } from 'src/db/schema/profile';
 import { shortName } from 'src/lib/formatters';
+import Quantity from '../ui/quantity.astro';
+import Button from '../ui/button.astro';
 
 export interface Props {
   allPlayers: Profile[];
@@ -9,46 +11,65 @@ const { allPlayers } = Astro.props;
 ---
 
 <div x-show="specialWeek && teamEvent" x-cloak>
-  <h3>Sätt ihop lagen + sätt slag</h3>
+  <div class="flex items-center justify-between">
+    <h2>Lag</h2>
+    <Button intent="link" @click="addTeam()">+ Nytt lag</Button>
+  </div>
   <template x-for="(team, index) in teams" :key="index">
-    <div class="team-box">
-      <div class="team-header">
-        <h4>
-          Lag <span x-text="index + 1"></span>
-          <button type="button" @click="removeTeam(index)" x-show="index>0">-</button>
-        </h4>
-
+    <div
+      class="flex flex-col w-full p-4 pb-4 mb-4 bg-white border border-b border-gray-200 dark:text-gray-400 rounded-xs dark:border-gray-700 dark:bg-gray-800"
+    >
+      <div
+        class="flex flex-row items-center justify-between pb-2 mb-2 border-b border-dashed team-header"
+      >
+        <div class="flex items-center gap-2">
+          <h3>
+            Lag <span x-text="index + 1"></span>
+          </h3>
+          <Button intent="inline" @click="removeTeam(index)" x-show="index>0">-</Button>
+        </div>
         <template x-if="teamEvent">
-          <span>
+          <div>
             <input
-              inputmode="numeric"
-              type="text"
-              pattern="[0-9]*"
-              value="10"
               :name="`teams[${index}][strokes]`"
+              x-model="teams[index].strokes"
+              class="sr-only"
             />
-            Slag
-          </span>
+            <div class="flex items-center justify-between gap-0">
+              <Button intent="inline" @click="teams[index].strokes--"> &minus; </Button>
+
+              <h2 x-text="teams[index].strokes" class="w-10 text-center"></h2>
+
+              <Button intent="inline" @click="teams[index].strokes++"> &plus; </Button>
+            </div>
+          </div>
         </template>
       </div>
-
-      <div class="chips">
-        {
-          allPlayers.map((player, index) => (
-            <label
-              x-data={`{playerId: ${player.id}}`}
-              x-show="!playerIsInAnotherTeam(playerId, index)"
-            >
-              <input type="checkbox" value={player.id} x-model="teams[index].players" value="yes" />
-              {shortName(player.fullName)}
-            </label>
-          ))
-        }
-      </div>
       <template x-if="teamEvent">
-        <input type="hidden" x-model="team.players" :name="`teams[${index}][players]`" />
+        <div class="flex flex-wrap gap-2">
+          {
+            allPlayers.map((player, index) => (
+              <div
+                x-data={`{playerId: ${player.id}}`}
+                x-show="!playerIsInAnotherTeam(playerId, index)"
+              >
+                <label class="inline-flex items-center justify-between w-full px-4 py-1 bg-white border-2 border-gray-200 cursor-pointer rounded-xs active:scale-97 has-checked:bg-cyan-50 has-checked:active:scale-100 dark:border-gray-700 has-checked:border-cyan-600 dark:has-checked:border-cyan-600 has-checked:text-cyan-600 dark:text-gray-400 dark:bg-gray-800">
+                  <input
+                    type="checkbox"
+                    value={player.id}
+                    x-model="teams[index].players"
+                    value="yes"
+                    class="sr-only"
+                  />
+                  {shortName(player.fullName)}
+                </label>
+              </div>
+            ))
+          }
+        </div>
       </template>
+
+      <input type="hidden" x-model="team.players" :name="`teams[${index}][players]`" />
     </div>
   </template>
-  <button type="button" @click="addTeam()">+ Nytt lag</button>
 </div>

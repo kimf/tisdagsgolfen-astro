@@ -7,9 +7,6 @@ const player = userId
       where: (p, { eq }) => eq(p.id, Number(userId))
     })
   : undefined;
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-await sleep(1000);
 ---
 
 {
@@ -22,7 +19,7 @@ await sleep(1000);
 
 {
   userId && (
-    <div class="inline-flex gap-1 justify-center items-center">
+    <div class="inline-flex items-center justify-center gap-1">
       <Button size="sm" intent="link" muted>
         <a href="/logout">LOGGA UT</a>
       </Button>

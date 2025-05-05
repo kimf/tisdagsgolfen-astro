@@ -2,6 +2,7 @@ import Alpine from 'alpinejs';
 
 type Team = {
   players: string[];
+  strokes: number;
 };
 
 document.addEventListener('alpine:init', () => {
@@ -13,14 +14,17 @@ document.addEventListener('alpine:init', () => {
       strokes: strokes === 1,
       teamEvent: teamEvent === 1,
       selectedPlayers: [] as string[],
-      teams: [{ players: [] }, { players: [] }] as Team[],
+      teams: [
+        { players: [], strokes: 10 },
+        { players: [], strokes: 10 }
+      ] as Team[],
 
       toggleSpecial() {
         this.specialWeek = !this.specialWeek;
       },
 
       addTeam() {
-        this.teams.push({ players: [] });
+        this.teams.push({ players: [], strokes: 10 });
       },
 
       removeTeam(index: number) {

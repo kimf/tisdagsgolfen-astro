@@ -25,48 +25,45 @@ const ownedScoringSession = userId
   : null;
 
 const flattenedSessions = groupedSessions.flatMap((gs) => gs.map((s) => s));
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-await sleep(1000);
 ---
 
-{
-  flattenedSessions.map((sesh) => (
-    <EventCard
-      intent="live"
-      date={sesh.createdAt || ''}
-      special={!!sesh.special}
-      strokes={!!sesh.strokes}
-      teamEvent={!!sesh.teamEvent}
-      course={sesh.course}
-    >
-      <div id={`sesh.${sesh.id}`} class="flex justify-between">
-        <Button intent="secondary">
-          <a href={`/scoring/${sesh.id}/leaderboard`} class="btn">
-            LEDARTAVLA
-          </a>
-        </Button>
-        {userId && sesh.ownerId === Number(userId) && (
-          <Button>
-            <a href={`/scoring/${sesh.id}`} class="btn">
-              {sesh.state === 'PENDING' ? 'REDIGERA' : 'FORTSÄTT'}
+<div class="inline-block px-3 first:pl-0">
+  {
+    flattenedSessions.map((sesh) => (
+      <EventCard
+        date={sesh.createdAt || ''}
+        special={!!sesh.special}
+        strokes={!!sesh.strokes}
+        teamEvent={!!sesh.teamEvent}
+      >
+        <div id={`sesh.${sesh.id}`} class="flex justify-between">
+          {userId && sesh.ownerId === Number(userId) && (
+            <Button size="sm" intent="secondary">
+              <a href={`/scoring/${sesh.id}`} class="btn">
+                {sesh.state === 'PENDING' ? 'REDIGERA' : 'FORTSÄTT'}
+              </a>
+            </Button>
+          )}
+          <Button intent="inline" size="sm">
+            <a href={`/scoring/${sesh.id}/leaderboard`} class="btn">
+              LEDARTAVLA
             </a>
           </Button>
-        )}
-        {userId && sesh.ownerId !== Number(userId) && (
-          <Button>
-            <a href={`/scoring/new?joinId=${sesh.id}`} class="btn">
-              FÖR SCORE
-            </a>
-          </Button>
-        )}
-      </div>
-    </EventCard>
-  ))
-}
-
+          {userId && sesh.ownerId !== Number(userId) && (
+            <Button>
+              <a href={`/scoring/new?joinId=${sesh.id}`} class="btn">
+                FÖR SCORE
+              </a>
+            </Button>
+          )}
+        </div>
+      </EventCard>
+    ))
+  }
+</div>
 {
   userId && !ownedScoringSession && groupedSessions.length === 0 && (
-    <a href="/scoring/new" class="new-round-btn fixed bottom-2 left-2">
+    <a href="/scoring/new" class="fixed new-round-btn bottom-2 left-2 animate-bounce-with-end">
       <Button>NY RUNDA</Button>
     </a>
   )

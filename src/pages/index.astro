@@ -16,17 +16,17 @@ import Tabs from 'src/components/ui/tabs.astro';
   <SharedHead title="Tisdagsgolfen" />
   <body class="antialiased dark:bg-gray-900">
     <div class="wrapper">
-      <nav class="border-gray-200 bg-gray-200 dark:bg-gray-950">
-        <div class="max-w-screen-lg flex items-center justify-between mx-auto p-4">
+      <nav class="bg-gray-200 border-gray-200 dark:bg-gray-950">
+        <div class="flex items-center justify-between max-w-screen-lg p-4 mx-auto">
           <a href="/">
-            <h1 class="text-accent-foreground font-bold">Tisdagsgolfen</h1>
+            <h1 class="font-bold text-accent-foreground">Tisdagsgolfen</h1>
           </a>
 
           <UserButton server:defer>
             <div
               slot="fallback"
               x-transition
-              class="inline-flex gap-1 justify-center items-center animate-pulse"
+              class="inline-flex items-center justify-center gap-1 animate-pulse"
             >
               <Button size="icon" intent="link" class="size-8">
                 <div class="w-full h-full bg-gray-300"></div>
@@ -39,17 +39,17 @@ import Tabs from 'src/components/ui/tabs.astro';
 
     <main
       id="main"
-      class="max-w-screen-lg mx-auto flex flex-col flex-wrap items-center justify-between p-4"
+      class="flex flex-col flex-wrap items-center justify-between max-w-screen-lg p-4 mx-auto"
     >
-      <div class="w-full main-section min-h-34">
+      <div class="w-full main-section min-h-26">
         <StickyHeader title="RUNDOR" />
         <div class="flex overflow-x-scroll hide-scrollbar">
-          <div class="flex flex-nowrap h-32">
+          <div class="flex flex-nowrap h-26">
             <ActiveSessions server:defer>
               <div slot="fallback">
                 <div class="inline-block px-3 first:pl-0">
                   <div
-                    class="animate-pulse h-32 overflow-hidden bg-card-foreground/25 flex flex-col bg-gradient-to-l from-slate-300 to-slate-100 border border-slate-300 p-4 gap-4 rounded-lg shadow-md w-64"
+                    class="flex flex-col gap-4 p-4 overflow-hidden border rounded-lg shadow-md w-70 h-26 animate-pulse bg-card-foreground/25 bg-gradient-to-l from-slate-300 to-slate-100 border-slate-300"
                   >
                   </div>
                 </div>
@@ -65,7 +65,7 @@ import Tabs from 'src/components/ui/tabs.astro';
     </main>
 
     <footer
-      class="fixed p-1 bottom-1 right-1 bg-background/75 backdrop-blur-xs max-w-screen-lg mx-auto"
+      class="fixed max-w-screen-lg p-1 mx-auto bottom-1 right-1 bg-background/75 backdrop-blur-xs"
     >
       <div class="flex">
         <Button intent="link">

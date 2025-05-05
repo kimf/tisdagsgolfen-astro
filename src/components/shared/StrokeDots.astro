@@ -13,13 +13,6 @@ const length = calculateExtraStrokes(holeIndex, givenStrokes, holesCount);
 const dots = Array.from({ length }, (_, i) => i + 1);
 ---
 
-<div class="stroke-dots">
-  {dots.map((dot) => <small>•</small>)}
+<div class="absolute z-0 flex flex-col stroke-dots bottom-1 right-1">
+  {dots.map((dot) => <span class="text-gray-400 dark:text-gray-600">•</span>)}
 </div>
-
-<style>
-  .stroke-dots {
-    display: flex;
-    flex-direction: column;
-  }
-</style>

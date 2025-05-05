@@ -1,12 +1,12 @@
 ---
 import Loader from 'src/assets/images/grid.svg';
-import 'src/styles/scoring.css';
 
 import AppScreen from 'src/layouts/AppScreen.astro';
 import ScoringTableHead from 'src/components/scoring/ScoringTableHead.astro';
 import ScoreRow from 'src/components/scoring/ScoreRow.astro';
 import { getScoringSession } from 'src/db/queries/getScoringSession';
 import ScoreForm from 'src/components/scoring/ScoreForm.astro';
+import Button from 'src/components/ui/button.astro';
 
 const { id } = Astro.params;
 const userId = await Astro.session?.get('userId');
@@ -22,10 +22,9 @@ if (!scoringSession) {
 ---
 
 <AppScreen title="För score">
-  <Loader class="htmx-indicator" width="20" height="20" />
-  <div class="wrapper">
+  <div class="pb-20">
     <div x-data="scoring">
-      <table>
+      <table class="w-full text-sm text-left text-gray-600 dark:text-gray-300">
         <ScoringTableHead scorecards={scoringSession.scorecards} />
         <tbody>
           {
@@ -43,10 +42,22 @@ if (!scoringSession) {
       <ScoreForm special={!!scoringSession.special} id={scoringSession.id} />
     </div>
   </div>
-  <footer id="menu">
-    <a href={`/`}>START</a>
-    <!-- <a href={`/scoring/${id}/menu`}>MENY</a> -->
-    <a href={`/scoring/${id}/leaderboard`}>LEDARTAVLA</a>
+
+  <footer
+    class="fixed max-w-screen-lg p-1 mx-auto bottom-1 left-1 bg-background/75 backdrop-blur-xs"
+  >
+    <div class="flex gap-2">
+      <Button intent="link" size="sm">
+        <a href={`/`}>START</a>
+      </Button>
+      <Button intent="link" size="sm">
+        <a href={`/scoring/${id}/menu`}>MENY</a>
+      </Button>
+      <Button intent="link" size="sm">
+        <a href={`/scoring/${id}/leaderboard`}>LEDARTAVLA</a>
+      </Button>
+      <Loader class="htmx-indicator" width="20" height="20" />
+    </div>
   </footer>
 </AppScreen>
 

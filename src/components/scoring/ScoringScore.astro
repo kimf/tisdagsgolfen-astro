@@ -25,7 +25,7 @@ const ciders =
 
 <div
   id={`scorebutton-${hole.number}-${scorecardId}`}
-  class="scoreinfo"
+  class="w-full h-full min-h-12 active:scale-96 active:bg-accent"
   hx-swap-oob="true"
   x-on:click={`openScoring(${hole.par}, ${hole.index}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecardId}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
 >

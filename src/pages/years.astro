@@ -91,8 +91,8 @@ const historyItems: HistoryItem[] = [
 ---
 
 <AppScreen title="Historik">
-  <main class="p-4 pb-12">
-    <div class="-ml-4 mb-2">
+  <main class="max-w-3xl p-4 pb-12">
+    <div class="mb-2 -ml-4">
       <Button intent="link">
         <a href="/"> &larr; TILLBAKA </a>
       </Button>
@@ -112,7 +112,7 @@ const historyItems: HistoryItem[] = [
           )}
           {item.image && (
             <img
-              class="object-cover w-full min-h-36 max-h-72 mt-4 border-4 border-gray-200"
+              class="object-cover w-full mt-4 border-4 border-gray-200 min-h-36 max-h-72"
               src={item.image}
             />
           )}

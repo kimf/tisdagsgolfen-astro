@@ -22,13 +22,7 @@ const { allPlayers } = Astro.props;
           label={shortName(player.fullName)}
         >
           <template x-if={`!teamEvent && hasSelectedPlayer(${player.id})`}>
-            <Quantity
-              label="Slag"
-              value={10}
-              name={`players[${index}]['strokes']`}
-              pattern="[0-9]*"
-              inputmode="numeric"
-            />
+            <Quantity value={10} name={`players[${index}]['strokes']`} />
           </template>
         </Checkbox>
       ))

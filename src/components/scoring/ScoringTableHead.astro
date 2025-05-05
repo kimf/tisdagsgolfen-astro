@@ -10,13 +10,14 @@ interface Props {
 const { scorecards } = Astro.props;
 ---
 
-<thead>
+<!-- text-cyan-100 bg-[size:10px_10px] bg-fixed bg-[image:repeating-linear-gradient(315deg,currentColor_0,currentColor_1px,_transparent_0,_transparent_50%)] -->
+<thead class="sticky top-0 w-full uppercase z-1 backdrop-blur-xs">
   <tr>
     <th></th>
     {
       scorecards.map((scorecard) => (
-        <th>
-          <div>
+        <th class="p-2 text-center border">
+          <div class="flex flex-col gap-1">
             {scorecard.players.map((player) => shortName(player.player.fullName))}
             <small>{scorecard.givenStrokes} SLAG</small>
           </div>
@@ -25,12 +26,12 @@ const { scorecards } = Astro.props;
     }
   </tr>
   <tr>
-    <th></th>
+    <th class="p-4 text-gray-300 border bg-accent-foreground dark:bg-background/75 vcr">HÅL</th>
     {
       scorecards.map((scorecard) => (
-        <th>
+        <th class="p-4 text-center border vcr bg-accent-foreground dark:bg-background/75">
           <div id={`toPar-${scorecard.id}`} hx-swap-oob="true">
-            <ToPar toPar={scorecard.toPar || 0} />
+            <ToPar toPar={scorecard.toPar || 0} color="white" />
           </div>
         </th>
       ))

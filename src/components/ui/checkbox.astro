@@ -13,15 +13,7 @@ const id = value && xModel ? `${value}_${xModel}` : name;
 ---
 
 <div>
-  <input
-    x-model={xModel}
-    value={value}
-    type="checkbox"
-    id={id}
-    name={name}
-    class="sr-only peer"
-    required
-  />
+  <input x-model={xModel} value={value} type="checkbox" id={id} name={name} class="sr-only peer" />
 
   <Label id={id} label={label}>
     <slot />
