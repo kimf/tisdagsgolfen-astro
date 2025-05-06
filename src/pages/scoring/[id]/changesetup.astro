@@ -37,7 +37,7 @@ if (Astro.request.method === 'POST') {
   }
 
   await updateScoringSession(Number(id), formData);
-  //return Astro.redirect(`/scoring/${id}`);
+  return Astro.redirect(`/scoring/${id}`);
 }
 ---
 
