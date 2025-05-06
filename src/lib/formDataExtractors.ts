@@ -42,3 +42,23 @@ export function extractTeams(formData: FormData | null) {
   // Convert to array and filter out incomplete entries
   return Object.values(teams).filter((t) => t.players && t.players.length > 0);
 }
+
+export function extractScorecards(formData: FormData | null) {
+  if (!formData) {
+    return null;
+  }
+
+  const scorecards: { id: number; strokes: number }[] = [];
+  for (const [key, value] of formData.entries()) {
+    // Match keys like scorecards[id]['strokes']
+    const match = key.match(/^scorecards\[(\w+)\]\[(?:'|")?(\w+)(?:'|")?\]$/);
+    if (match) {
+      const id = match[1];
+      scorecards.push({
+        id: Number(id),
+        strokes: Number(value)
+      });
+    }
+  }
+  return scorecards;
+}

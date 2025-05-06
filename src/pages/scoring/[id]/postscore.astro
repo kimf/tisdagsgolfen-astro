@@ -7,6 +7,7 @@ import db from 'src/db';
 import { scores } from 'src/db/schema';
 import { calculateEarnings } from 'src/lib/calculateEarnings';
 import { calculatePoints } from 'src/lib/calculatePoints';
+import { shortName } from 'src/lib/formatters';
 
 const { id } = Astro.params;
 const userId = await Astro.session?.get('userId');
@@ -76,7 +77,15 @@ const holeData = await db.query.holes.findFirst({
 // Astro.response.headers.set('HX-Trigger', 'score-updated');
 ---
 
-<ScoreRow scorecard={scorecard} hole={holeData!} holesCount={scorecard.course.holesCount} oob />
+<ScoreRow
+  score={score}
+  givenStrokes={scorecard.givenStrokes || 0}
+  name={scorecard.players.map((player) => shortName(player.player.fullName)).join(', ')}
+  scorecardId={scorecard.id}
+  hole={holeData!}
+  holesCount={scorecard.course.holesCount}
+  oob
+/>
 <!-- <div id={`toPar-${scorecard.id}`} hx-swap-oob="true">
   <ToPar toPar={scorecard.toPar || 0} />
 </div> -->

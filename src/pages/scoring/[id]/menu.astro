@@ -1,0 +1,30 @@
+---
+import AppScreen from 'src/layouts/AppScreen.astro';
+import Loader from 'src/assets/images/grid.svg';
+import LiveLeaderboard from 'src/pages/partials/scoring/[id]/live-leaderboard.astro';
+import { getScoringSession } from 'src/db/queries/getScoringSession';
+import Button from 'src/components/ui/button.astro';
+
+const { id } = Astro.params;
+if (!id) throw new Error('Id saknas för runda');
+// Astro.response.headers.set('HX-Trigger', 'score-updated');
+---
+
+<AppScreen title="Meny" back={`/scoring/${id}`}>
+  <div class="flex flex-col gap-4">
+    <a href="/"><Button size="block">Gå till startsidan</Button></a>
+    <a href={`/scoring/${id}/changesetup`}>
+      <Button size="block"> Ändra spelare, och slag </Button>
+    </a>
+    <div class="mt-12">
+      <Button
+        size="block"
+        intent="destructive"
+        hx-delete={`/scoring/${id}`}
+        hx-confirm="Är du säker? Riktigt säker?"
+      >
+        Avbryt (och radera) runda</Button
+      >
+    </div>
+  </div>
+</AppScreen>

@@ -1,0 +1,61 @@
+---
+import Loader from 'src/assets/images/grid.svg';
+import 'src/styles/embla.css';
+import ScoreForm from 'src/components/scoring/ScoreForm.astro';
+import ScoreRow from 'src/components/scoring/ScoreRow.astro';
+import EventPillRow from 'src/components/shared/EventPillRow.astro';
+import { updateCurrentHole } from 'src/db/mutations/updateCurrentHole';
+import { getScoringSession } from 'src/db/queries/getScoringSession';
+import { updateScoringSession } from 'src/db/mutations/updateScoringSession';
+import { shortName } from 'src/lib/formatters';
+import AppScreen from 'src/layouts/AppScreen.astro';
+import Button from 'src/components/ui/button.astro';
+import Checkbox from 'src/components/ui/checkbox.astro';
+import Quantity from 'src/components/ui/quantity.astro';
+
+const { id } = Astro.params;
+const userId = await Astro.session?.get('userId');
+
+if (!userId) throw new Error('Logga in för att föra score');
+if (!id) throw new Error('Id saknas för runda');
+
+const scoringSession = await getScoringSession(parseInt(id, 10));
+
+if (!scoringSession) {
+  throw new Error('Hittade ingen scoring session');
+}
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+  const userId = await Astro.session?.get('userId');
+
+  if (!userId) {
+    throw new Error('Logga in för att ändra runda');
+  }
+  if (scoringSession.ownerId !== Number(userId)) {
+    throw new Error('Du kan bara ändra din egen runda');
+  }
+
+  await updateScoringSession(Number(id), formData);
+  //return Astro.redirect(`/scoring/${id}`);
+}
+---
+
+<AppScreen title="Ändra runda" back={`/scoring/${id}`}>
+  <form method="POST">
+    {
+      scoringSession.scorecards.map((scorecard, index) => (
+        <div class="flex gap-2 p-4 border-b mb-2">
+          <h3>{scorecard.players.map((player) => shortName(player.player.fullName)).join(', ')}</h3>
+          <div class="ml-auto">
+            <Quantity
+              value={scorecard.givenStrokes || 0}
+              name={`scorecards[${scorecard.id}]['strokes']`}
+            />
+          </div>
+        </div>
+      ))
+    }
+    <Button type="submit" size="block">SPARA</Button>
+  </form>
+</AppScreen>

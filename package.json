@@ -36,6 +36,7 @@
     "dotenv": "^16.5.0",
     "drizzle-kit": "^0.31.1",
     "drizzle-orm": "^0.43.0",
+    "embla-carousel": "^8.6.0",
     "htmx.org": "^1.9.12",
     "ioredis": "^5.6.1",
     "nanostores": "^1.0.1",

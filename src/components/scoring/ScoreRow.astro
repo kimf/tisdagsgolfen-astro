@@ -2,23 +2,21 @@
 import type { Hole } from 'src/db/schema/hole';
 import StrokeDots from 'src/components/shared/StrokeDots.astro';
 import type { ScoringSessionWithAllData } from 'src/db/queries/getScoringSession';
-import { shortName } from 'src/lib/formatters';
 import { calculateExtraStrokes } from 'src/lib/calculateExtraStrokes';
-import ToPar from '../shared/ToPar.astro';
 
 interface Props {
-  scorecard: ScoringSessionWithAllData['scorecards'][number];
+  score?: ScoringSessionWithAllData['scorecards'][number]['scores'][number];
+  scorecardId: number;
+  name: string;
   hole: Hole;
   holesCount: number;
+  givenStrokes: number;
   oob?: boolean;
 }
 
-const { scorecard, hole, holesCount, oob = false } = Astro.props;
+const { score, scorecardId, name, givenStrokes, hole, holesCount, oob = false } = Astro.props;
+const extraStrokes = calculateExtraStrokes(hole.index, givenStrokes || 0, holesCount);
 
-const extraStrokes = calculateExtraStrokes(hole.index, scorecard.givenStrokes || 0, holesCount);
-const score = scorecard.scores.find((s) => s.hole === hole?.number);
-
-const name = scorecard.players.map((player) => shortName(player.player.fullName)).join(', ');
 const beers = score && score.beers > 0 ? Array.from({ length: score.beers }, (_, i) => i + 1) : [];
 const ciders =
   score && score.ciders > 0 ? Array.from({ length: score.ciders }, (_, i) => i + 1) : [];
@@ -26,9 +24,8 @@ const props = oob ? { 'hx-swap-oob': 'true' } : {};
 ---
 
 <tr
-  class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 active:scale-97 active:opacity-90"
-  x-on:click={`openScoring(${hole.par}, ${hole.index}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecard.id}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
-  id={`scorecardRow-${scorecard.id}`}
+  class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 score-row"
+  id={`scorecardRow-${scorecardId}`}
   {...props}
 >
   <td class="text-left vcr w-[36%] h-24 border-r border-b">
@@ -38,21 +35,47 @@ const props = oob ? { 'hx-swap-oob': 'true' } : {};
 
         <StrokeDots
           holeIndex={hole?.index || 0}
-          givenStrokes={scorecard.givenStrokes || 0}
+          givenStrokes={givenStrokes || 0}
           holesCount={holesCount}
         />
       </div>
-      <div class="flex flex-col gap-2">
-        <!-- <div id={`toPar-${scorecard.id}`} hx-swap-oob="true">
-          <ToPar toPar={scorecard.toPar || 0} color="white" />
-        </div> -->
-        <div>{beers.map((i) => <small>🍺</small>)}</div>
-        <div>{ciders.map((i) => <small>🥤</small>)}</div>
+      <div class="flex gap-2 flex-wrap">
+        {beers.map((i) => <small>🍺</small>)}
+        {ciders.map((i) => <small>🥤</small>)}
       </div>
     </div>
   </td>
   <td class="w-[16%] p-2 text-center vcr border-r border-b">
-    {score?.strokes}
+    <div
+      class="w-full min-h-20 content-center"
+      x-on:click={`openScoring(${hole.par}, ${hole.index}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecardId}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
+    >
+      {
+        score && (
+          <span
+            class={`inline-block ${
+              score?.strokes === hole.par - 1
+                ? // birdie
+                  'border border-foreground/20 px-4 py-2.5 rounded-full'
+                : // eagle
+                  score?.strokes === hole.par - 2
+                  ? 'border-4 border-double border-foreground/20 px-4 py-2.5 rounded-full'
+                  : // bogey
+                    score?.strokes === hole.par + 1
+                    ? 'border border-foreground/20 px-4 py-2'
+                    : // double or more
+                      score && score.strokes > hole.par + 1
+                      ? 'border-4 border-double border-foreground/20 px-4 py-2'
+                      : ''
+            }`}
+          >
+            {score?.strokes}
+          </span>
+        )
+      }
+
+      {!score && <span>✏️</span>}
+    </div>
   </td>
   <td class="w-[16%] p-2 text-center vcr border-r border-b">
     {score?.putts}
@@ -60,7 +83,7 @@ const props = oob ? { 'hx-swap-oob': 'true' } : {};
   <td
     class={`w-[16%] p-2 text-center vcr border-r border-b ${score?.fines ? '' : 'text-foreground/60'}`}
   >
-    {score?.fines ? score.fines : ''}
+    {score ? (score.fines ? score.fines : 0) : ''}
   </td>
   <td class="w-[16%] p-2 text-center vcr border-b">
     {score?.points}

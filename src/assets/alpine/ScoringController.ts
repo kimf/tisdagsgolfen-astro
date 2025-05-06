@@ -1,6 +1,13 @@
 import Alpine from 'alpinejs';
+import EmblaCarousel, { type EmblaCarouselType } from 'embla-carousel';
+import { actions } from 'astro:actions';
+
 document.addEventListener('alpine:init', () => {
-  Alpine.data('scoring', () => ({
+  Alpine.data('scoring', (startIndex: number, scoringSessionId: number) => ({
+    embla: null as EmblaCarouselType | null,
+    next: true,
+    prev: true,
+
     isScoring: false,
     playerName: '',
     par: 0,
@@ -12,6 +19,32 @@ document.addEventListener('alpine:init', () => {
     putts: 0,
     beers: 0,
     ciders: 0,
+
+    init() {
+      this.embla = EmblaCarousel(this.$refs.viewport, { loop: false, startIndex: startIndex });
+      this.embla.on('select', () => {
+        this.next = this.embla?.canScrollNext() ?? false;
+        this.prev = this.embla?.canScrollPrev() ?? false;
+      });
+      this.embla.on('init', () => {
+        this.next = this.embla?.canScrollNext() ?? false;
+        this.prev = this.embla?.canScrollPrev() ?? false;
+      });
+
+      this.embla.on('settle', () => {
+        const scrollIndex = this.embla?.selectedScrollSnap();
+        console.log(scrollIndex);
+        actions.setCurrentHole({ scoringSessionId, currentHole: Number(scrollIndex) + 1 });
+      });
+    },
+
+    scrollNext() {
+      this.embla?.scrollNext();
+    },
+
+    scrollPrev() {
+      this.embla?.scrollPrev();
+    },
 
     hideForm() {
       this.isScoring = false;
