@@ -1,0 +1,80 @@
+---
+import type { LeaderboardItem } from 'src/lib/buildLeaderboardItems';
+import { shortName } from 'src/lib/formatters';
+
+export interface Props {
+  item: LeaderboardItem;
+  sorting: 'rank' | 'kr' | 'scratch';
+}
+
+const { item, sorting } = Astro.props;
+
+let pointValue = '';
+let pointText = '';
+let summaryString = '';
+let subSummaryString = '';
+let subSubSummaryString = `${item.events} rundor`;
+if (sorting === 'kr') {
+  pointValue = `${item.totalFines <= 0 ? '' : '+'}${item.totalFines}`;
+  pointText = 'kr';
+  summaryString = `${item.fines} kr`;
+  subSummaryString = ``;
+  subSummaryString += ` | ${item.beers} öl`;
+  subSummaryString += ` | ${item.ciders} cider`;
+} else if (sorting === 'rank') {
+  pointValue = parseFloat(`${item.points}`).toFixed(1);
+  pointText = 'p';
+  const emptyPoints =
+    item.points_array.length < 4 ? [...Array(4 - item.points_array.length)].map((_) => 0) : [];
+  const emptySpecialPoints =
+    item.special_array.length < 4 ? [...Array(2 - item.special_array.length)].map((_) => 0) : [];
+  summaryString = `${[...item.points_array, ...emptyPoints].join(', ')} | ${[
+    ...item.special_array,
+    ...emptySpecialPoints
+  ].join(', ')}`;
+  subSubSummaryString = `${item.events} rundor | Snitt: ${item.average.toFixed(1)}`;
+} else if (sorting === 'scratch') {
+  pointValue = parseFloat(`${item.strokes}`).toFixed(0);
+  pointText = '';
+  summaryString = `${item.strokes_array.join(', ')}`;
+}
+
+const rankColor =
+  item.rank && sorting === 'rank'
+    ? item.rank > 4
+      ? 'gray-200'
+      : item.rank === 1
+        ? 'amber-400'
+        : item.rank === 2
+          ? 'stone-600'
+          : item.rank === 3
+            ? 'yellow-700'
+            : 'foreground'
+    : 'foreground';
+---
+
+{
+  item.events >= 1 && (
+    <div class={`flex gap-3 items-start mb-2 px-2 pr-2 border-b border-l-8 border-l-${rankColor}`}>
+      <strong class={`font-bold text-2xl vcr text-right text-${rankColor}`}>{item.rank}</strong>
+      <div class="size-18">
+        {item.player.avatarUrl === '1' ? (
+          <img src={`/images/avatars/${item.player.id}.png`} />
+        ) : (
+          <img src="/images/avatars/default.png" />
+        )}
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <h4 class="uppercase vcr text-2xl">{shortName(item.player.fullName)}</h4>
+        <div class="text-sm uppercase vcr">
+          {summaryString} {subSummaryString}
+        </div>
+        <div class="text-xs uppercase vcr">{subSubSummaryString}</div>
+      </div>
+      <h5 class="vcr text-3xl ml-auto">
+        {pointValue} {pointText}
+      </h5>
+    </div>
+  )
+}

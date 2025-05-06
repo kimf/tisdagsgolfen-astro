@@ -1,16 +1,9 @@
 ---
-import Loader from 'src/assets/images/grid.svg';
-import 'src/styles/embla.css';
-import ScoreForm from 'src/components/scoring/ScoreForm.astro';
-import ScoreRow from 'src/components/scoring/ScoreRow.astro';
-import EventPillRow from 'src/components/shared/EventPillRow.astro';
-import { updateCurrentHole } from 'src/db/mutations/updateCurrentHole';
 import { getScoringSession } from 'src/db/queries/getScoringSession';
 import { updateScoringSession } from 'src/db/mutations/updateScoringSession';
 import { shortName } from 'src/lib/formatters';
 import AppScreen from 'src/layouts/AppScreen.astro';
 import Button from 'src/components/ui/button.astro';
-import Checkbox from 'src/components/ui/checkbox.astro';
 import Quantity from 'src/components/ui/quantity.astro';
 
 const { id } = Astro.params;

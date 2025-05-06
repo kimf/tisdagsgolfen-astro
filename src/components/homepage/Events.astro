@@ -1,0 +1,23 @@
+---
+import { getEvents } from 'src/db/queries/getEvents';
+import EventCard from 'src/components/homepage/EventCard.astro';
+
+const events = await getEvents(1);
+---
+
+{
+  events.map((event) => (
+    <a href={`/events/${event.id}`}>
+      <EventCard
+        date={event.createdAt || ''}
+        special={!!event.special}
+        strokes={!!event.strokes}
+        teamEvent={!!event.teamEvent}
+      >
+        <div class="flex flex-col justify-between">
+          <h5>{event.course.name}</h5>
+        </div>
+      </EventCard>
+    </a>
+  ))
+}

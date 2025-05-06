@@ -1,0 +1,84 @@
+---
+import EventPillRow from 'src/components/shared/EventPillRow.astro';
+import { shortName } from 'src/lib/formatters';
+import AppScreen from 'src/layouts/AppScreen.astro';
+import { getEventWithLeaderboardData } from 'src/db/queries/getEvents';
+import standardCompRank from 'src/lib/standardCompRank';
+import type { LeaderboardScorecard } from 'src/db/queries/getScoringSession';
+import Beers from 'src/components/shared/Beers.astro';
+import Ciders from 'src/components/shared/Ciders.astro';
+import ToPar from 'src/components/shared/ToPar.astro';
+
+const { id } = Astro.params;
+if (!id) throw new Error('Id saknas för runda');
+
+const event = await getEventWithLeaderboardData(Number(id));
+
+if (!event) {
+  throw new Error('Hittade ingen runda');
+}
+
+const date =
+  event.createdAt &&
+  new Date(event.createdAt).toLocaleDateString('sv-SE', {
+    month: 'long',
+    day: 'numeric'
+  });
+
+const title = `${date} - ${event.course.name}`;
+
+const scorecards = event.eventSessions.flatMap((es) => es.session.scorecards);
+const rankedScorecards = standardCompRank(
+  scorecards as LeaderboardScorecard[],
+  'weekPoints',
+  false,
+  null
+);
+---
+
+<AppScreen title={title} back="/">
+  <EventPillRow special={!!event.special} strokes={!!event.strokes} teamEvent={!!event.teamEvent} />
+
+  <table class="w-full text-left text-gray-600 dark:text-gray-300 mt-4">
+    <thead class="uppercase bg-background">
+      <th class="p-2 text-center vcr">#</th>
+      <th class="p-2 vcr">Spelare</th>
+      <th class="p-2 text-center vcr">SLAG</th>
+      <th class="p-2 text-center vcr">POÄNG</th>
+      <th class="p-2 text-center vcr">+/-</th>
+      {!event.special && <th class="p-2 text-center vcr">💸</th>}
+      <th class="p-2 text-center vcr">P</th>
+    </thead>
+    <tbody>
+      {
+        rankedScorecards.map((scorecard) => (
+          <tr class="border-b border-gray-200 odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 dark:border-gray-700">
+            <td class="p-2 text-center vcr">{scorecard.rank}</td>
+            <td class="px-2 py-1 flex flex-col vcr uppercase">
+              {scorecard.players.map((p) => (
+                <div>
+                  {shortName(p.player.fullName)}
+                  <div class="text-xs">
+                    <Beers beers={p.beers || 0} />
+                    <Ciders ciders={p.ciders || 0} />
+                  </div>
+                </div>
+              ))}
+            </td>
+            <td class="p-2 text-center vcr">{scorecard.strokes}</td>
+            <td class="p-2 text-center vcr">{scorecard.points}</td>
+            <td class="p-2 font-bold text-center vcr">
+              <ToPar toPar={scorecard.toPar || 0} />
+            </td>
+            {!event.special && (
+              <td class="p-2 text-center vcr">
+                {scorecard.players.reduce((a, b) => a + (b.fines ?? 0), 0)}
+              </td>
+            )}
+            <td class="p-2 text-center vcr">{scorecard.weekPoints}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</AppScreen>

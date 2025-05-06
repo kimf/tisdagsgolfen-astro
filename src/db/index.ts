@@ -16,7 +16,11 @@ import {
   scorecardsRelations,
   scoringSessions,
   scoringSessionRelations,
-  seasons
+  seasons,
+  events,
+  eventsRelations,
+  eventSessions,
+  eventSesssionsRelations
 } from './schema';
 
 const url = import.meta.env.DATABASE_URL;
@@ -54,7 +58,11 @@ const db = drizzle(turso, {
     scorecardsRelations,
     scoringSessions,
     scoringSessionRelations,
-    seasons
+    seasons,
+    events,
+    eventsRelations,
+    eventSessions,
+    eventSesssionsRelations
   }
 });
 

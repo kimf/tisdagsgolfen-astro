@@ -2,7 +2,7 @@
 import { getaActiveSessions } from 'src/db/queries/getActiveSessions';
 import type { ActiveSession } from 'src/db/queries/getActiveSessions';
 import Button from 'src/components/ui/button.astro';
-import EventCard from './eventsrow/EventCard.astro';
+import EventCard from 'src/components/homepage/EventCard.astro';
 
 const userId = await Astro.session?.get('userId');
 const scoringSessions = await getaActiveSessions();
@@ -32,38 +32,36 @@ const flattenedSessions = groupedSessions.flatMap((gs) => gs.map((s) => s));
     </Button>
   )
 }
-
-<div class="inline-block px-3 first:pl-0">
-  {
-    flattenedSessions.map((sesh) => (
-      <EventCard
-        date={sesh.createdAt || ''}
-        special={!!sesh.special}
-        strokes={!!sesh.strokes}
-        teamEvent={!!sesh.teamEvent}
-      >
-        <div id={`sesh.${sesh.id}`} class="flex justify-between">
-          {userId && sesh.ownerId === Number(userId) && (
-            <Button size="sm" intent="default">
-              <a href={`/scoring/${sesh.id}`} class="btn">
-                {sesh.state === 'PENDING' ? 'REDIGERA' : 'FORTSÄTT'}
-              </a>
-            </Button>
-          )}
-          <Button intent="link" size="sm">
-            <a href={`/scoring/${sesh.id}/leaderboard`} class="btn">
-              LEDARTAVLA
+{
+  flattenedSessions.map((sesh) => (
+    <EventCard
+      date={sesh.createdAt || ''}
+      special={!!sesh.special}
+      strokes={!!sesh.strokes}
+      teamEvent={!!sesh.teamEvent}
+      live
+    >
+      <div id={`sesh.${sesh.id}`} class="flex justify-between">
+        {userId && sesh.ownerId === Number(userId) && (
+          <Button size="sm" intent="default">
+            <a href={`/scoring/${sesh.id}`} class="btn">
+              {sesh.state === 'PENDING' ? 'REDIGERA' : 'FORTSÄTT'}
             </a>
           </Button>
-          {userId && sesh.ownerId !== Number(userId) && (
-            <Button>
-              <a href={`/scoring/new?joinId=${sesh.id}`} class="btn">
-                FÖR SCORE
-              </a>
-            </Button>
-          )}
-        </div>
-      </EventCard>
-    ))
-  }
-</div>
+        )}
+        <Button intent="link" size="sm">
+          <a href={`/scoring/${sesh.id}/leaderboard`} class="btn">
+            LEDARTAVLA
+          </a>
+        </Button>
+        {userId && sesh.ownerId !== Number(userId) && (
+          <Button>
+            <a href={`/scoring/new?joinId=${sesh.id}`} class="btn">
+              FÖR SCORE
+            </a>
+          </Button>
+        )}
+      </div>
+    </EventCard>
+  ))
+}

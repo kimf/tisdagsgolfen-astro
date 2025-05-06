@@ -12,8 +12,10 @@ import { shortName } from 'src/lib/formatters';
 import Beers from 'src/components/shared/Beers.astro';
 import Ciders from 'src/components/shared/Ciders.astro';
 import ToPar from 'src/components/shared/ToPar.astro';
+import Button from 'src/components/ui/button.astro';
 
 const { id } = Astro.params;
+const userId = await Astro.session?.get('userId');
 if (!id) throw new Error('Id saknas för runda');
 
 const scoringSession = await getMinimalScoringSession(Number(id));
@@ -38,6 +40,12 @@ const rankedScorecards = scoringSession.strokes
       true,
       null
     );
+
+const canCloseWeek =
+  userId === '2'
+    ? leaderboards.every((l) => l.state === 'PENDING') &&
+      scorecards.every((s) => s.through === scoringSession.course.holesCount)
+    : false;
 
 // Astro.response.headers.set('HX-Trigger', 'score-updated');
 ---
@@ -104,4 +112,19 @@ const rankedScorecards = scoringSession.strokes
       }
     </tbody>
   </table>
+
+  {
+    canCloseWeek && (
+      <div class="mt-40">
+        <Button
+          size="sm"
+          intent="destructive"
+          hx-post={`/scoring/${id}/close`}
+          hx-confirm="Helt säker?"
+        >
+          KIM - STÄNG RUNDA
+        </Button>
+      </div>
+    )
+  }
 </main>

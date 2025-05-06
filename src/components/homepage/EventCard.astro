@@ -3,6 +3,7 @@ import { cx, cva } from 'src/components/cva.config';
 import { type VariantProps } from 'cva';
 import type { HTMLAttributes } from 'astro/types';
 import EventPillRow from 'src/components/shared/EventPillRow.astro';
+import type { Course } from 'src/db/schema/course';
 
 const eventCardVariants = cva({
   base: 'text-muted-foreground h-26 overflow-hidden rounded-md shadow-md bg-card p-3 flex flex-col border rounded shadow-md',
@@ -21,9 +22,10 @@ interface Props extends HTMLAttributes<'div'>, VariantProps<typeof eventCardVari
   special: boolean;
   strokes: boolean;
   teamEvent: boolean;
+  live?: boolean;
 }
 
-const { class: className, intent, ...props } = Astro.props;
+const { class: className, intent, live = false, ...props } = Astro.props;
 ---
 
 <div class={cx(eventCardVariants({ intent }), className)} {...props}>
@@ -41,7 +43,7 @@ const { class: className, intent, ...props } = Astro.props;
       special={props.special}
       strokes={props.strokes}
       teamEvent={props.teamEvent}
-      live
+      live={live}
     />
   </div>
 

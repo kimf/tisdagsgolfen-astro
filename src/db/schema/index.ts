@@ -6,7 +6,8 @@ import holes, { holesRelations } from './hole';
 import scorecards, { scorecardsRelations } from './scorecard';
 import scorecardPlayers, { scorecardPlayersRelations } from './scorecard_player';
 import scores, { scoresRelations } from './score';
-
+import events, { eventsRelations } from './event';
+import eventSessions, { eventSesssionsRelations } from './event_session';
 export {
   courses,
   coursesRelations,
@@ -22,5 +23,9 @@ export {
   scorecardsRelations,
   scoringSessions,
   scoringSessionRelations,
-  seasons
+  seasons,
+  events,
+  eventsRelations,
+  eventSessions,
+  eventSesssionsRelations
 };

@@ -1,5 +1,6 @@
-import { sql, type InferSelectModel } from 'drizzle-orm';
+import { relations, sql, type InferSelectModel } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import events from './event';
 
 const seasons = sqliteTable('seasons', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
@@ -9,6 +10,10 @@ const seasons = sqliteTable('seasons', {
   closedAt: text('closed_at'),
   createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`)
 });
+
+export const seasonsRelations = relations(seasons, ({ many }) => ({
+  events: many(events)
+}));
 
 export type Season = InferSelectModel<typeof seasons>;
 

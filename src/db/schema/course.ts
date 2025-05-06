@@ -3,6 +3,7 @@ import { text, integer, unique, sqliteTable } from 'drizzle-orm/sqlite-core';
 import scoringSessions from './scoring_sessions';
 import holes from './hole';
 import scorecards from './scorecard';
+import events from './event';
 
 const courses = sqliteTable(
   'courses',
@@ -21,7 +22,8 @@ const courses = sqliteTable(
 export const coursesRelations = relations(courses, ({ many }) => ({
   scoringSessions: many(scoringSessions),
   scorecards: many(scorecards),
-  holes: many(holes)
+  holes: many(holes),
+  events: many(events)
 }));
 
 export type Course = InferSelectModel<typeof courses>;

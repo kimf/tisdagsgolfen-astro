@@ -1,0 +1,78 @@
+---
+import { getEventsWithLeaderboardData } from 'src/db/queries/getEvents';
+import StickyHeader from '../shared/StickyHeader.astro';
+import { getPlayers } from 'src/db/queries/getPlayers';
+import buildLeaderboardItems from 'src/lib/buildLeaderboardItems';
+import LeaderboardCard from 'src/components/homepage/LeaderboardCard.astro';
+
+export interface Props {
+  seasonId: number;
+}
+
+const { seasonId } = Astro.props;
+const players = await getPlayers();
+const events = await getEventsWithLeaderboardData(Number(seasonId));
+
+const scoringSessions = events.flatMap((event) => event.eventSessions.flatMap((es) => es.session));
+
+const leaderboardItems = buildLeaderboardItems(scoringSessions, players);
+const tabs = [
+  { name: 'rank', title: 'Poäng' },
+  { name: 'kr', title: 'Böter' },
+  { name: 'scratch', title: 'Scratch' }
+];
+const totalFines = leaderboardItems['kr']
+  .map((player) => player.totalFines)
+  .reduce((a, b) => a + b, 0);
+---
+
+<StickyHeader
+  title={`LEDARTAVLA EFTER ${events.length} ${events.length <= 1 ? 'RUNDA' : 'RUNDOR'}`}
+/>
+<div x-data="{ activeTab: 0 }">
+  <div class="flex">
+    <div
+      role="tablist"
+      class="inline-flex flex-wrap justify-center bg-slate-200 rounded p-1 max-w-screen min-w-[400px] mb-4"
+    >
+      {
+        tabs.map((tab, index) => (
+          <button
+            id={`tab-${index}`}
+            class="flex-1 uppercase vcr h-8 px-4 rounded font-bold whitespace-nowrap transition-all duration-150 ease-in-out"
+            :class={`activeTab === ${index} ? 'bg-white text-slate-900' : 'text-slate-600 hover:text-slate-900'`}
+            :tabindex={`activeTab === ${index} ? 0 : -1`}
+            :aria-selected={`activeTab == ${index}`}
+            aria-controls={`tabpanel-${index}`}
+            @click={`activeTab = ${index}`}
+            @focus={`activeTab = ${index}`}
+          >
+            {tab.title}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  {
+    tabs.map((key, index) => (
+      <article
+        id={`tabpanel-${index}`}
+        class="w-full focus-visible"
+        role="tabpanel"
+        tabindex="0"
+        aria-labelledby={`tab-${index}`}
+        x-show={`activeTab === ${index}`}
+      >
+        {' '}
+        {leaderboardItems[key.name as keyof typeof leaderboardItems]
+          .filter((item) => item.events !== 0)
+          .map((item) => (
+            <LeaderboardCard item={item} sorting={key.name as keyof typeof leaderboardItems} />
+          ))}
+      </article>
+    ))
+  }
+
+  <h2 x-show={`activeTab === 1`}>Totalt: {totalFines} kr</h2>
+</div>

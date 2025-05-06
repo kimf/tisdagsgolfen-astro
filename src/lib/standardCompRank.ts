@@ -4,15 +4,16 @@
 // });
 
 import type { LeaderboardScorecard } from 'src/db/queries/getScoringSession';
+import type { LeaderboardItem } from './buildLeaderboardItems';
 
 export type RankedScorecard = LeaderboardScorecard & { rank: number };
 
-export default function standardCompRank(
-  scorecards: LeaderboardScorecard[],
-  attribute: keyof LeaderboardScorecard,
+export default function standardCompRank<T extends LeaderboardScorecard | LeaderboardItem>(
+  scorecards: T[],
+  attribute: keyof T,
   reverse: boolean,
-  dealbreaker: keyof LeaderboardScorecard | null
-): RankedScorecard[] {
+  dealbreaker: keyof T | null
+): (T & { rank: number })[] {
   // Sort scorecards first by attribute, then by dealbreaker if provided
   scorecards.sort((a, b) => {
     const primaryComparison = !reverse
@@ -30,7 +31,7 @@ export default function standardCompRank(
   });
 
   // Assign ranks with handling of ties
-  const ranked: RankedScorecard[] = [];
+  const ranked: (T & { rank: number })[] = [];
   const rank = { next: 1, current: [] };
 
   scorecards.forEach((item, i) => {
