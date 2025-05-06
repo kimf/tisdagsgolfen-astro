@@ -137,13 +137,6 @@ body {
 
 main {
   -webkit-overflow-scrolling: touch;
-  overflow-x: scroll;
-}
-
-html,
-body {
-  position: fixed;
-  overflow: hidden;
 }
 
 .transform {
