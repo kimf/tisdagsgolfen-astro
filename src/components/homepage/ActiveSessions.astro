@@ -18,14 +18,20 @@ for (const sesh of scoringSessions) {
 }
 const groupedSessions: ActiveSession[][] = Object.values(groupedSessionsObj);
 
-console.log(groupedSessions.length);
-
 const ownedScoringSession = userId
   ? scoringSessions.find((sesh) => sesh.ownerId === Number(userId))
   : null;
 
 const flattenedSessions = groupedSessions.flatMap((gs) => gs.map((s) => s));
 ---
+
+{
+  userId && !ownedScoringSession && groupedSessions.length === 0 && (
+    <Button class="absolute right-0 top-3" size="sm">
+      <a href="/scoring/new">NY RUNDA</a>
+    </Button>
+  )
+}
 
 <div class="inline-block px-3 first:pl-0">
   {
@@ -38,13 +44,13 @@ const flattenedSessions = groupedSessions.flatMap((gs) => gs.map((s) => s));
       >
         <div id={`sesh.${sesh.id}`} class="flex justify-between">
           {userId && sesh.ownerId === Number(userId) && (
-            <Button size="sm" intent="secondary">
+            <Button size="sm" intent="default">
               <a href={`/scoring/${sesh.id}`} class="btn">
                 {sesh.state === 'PENDING' ? 'REDIGERA' : 'FORTSÄTT'}
               </a>
             </Button>
           )}
-          <Button intent="inline" size="sm">
+          <Button intent="link" size="sm">
             <a href={`/scoring/${sesh.id}/leaderboard`} class="btn">
               LEDARTAVLA
             </a>
@@ -61,10 +67,3 @@ const flattenedSessions = groupedSessions.flatMap((gs) => gs.map((s) => s));
     ))
   }
 </div>
-{
-  userId && !ownedScoringSession && groupedSessions.length === 0 && (
-    <a href="/scoring/new" class="fixed new-round-btn bottom-2 left-2 animate-bounce-with-end">
-      <Button>NY RUNDA</Button>
-    </a>
-  )
-}

@@ -1,81 +1,69 @@
 ---
 export const prerender = true;
 import 'src/styles/global.css';
-import SharedHead from 'src/components/layouts/SharedHead.astro';
 import ActiveSessions from 'src/components/homepage/ActiveSessions.astro';
 import UserButton from 'src/components/homepage/UserButton.astro';
-import ThemeToggle from 'src/components/ui/theme-toggle.astro';
 import Button from 'src/components/ui/button.astro';
 import Link from 'src/assets/icons/link.svg';
 import StickyHeader from 'src/components/shared/StickyHeader.astro';
 import Tabs from 'src/components/ui/tabs.astro';
+import AppScreen from 'src/layouts/AppScreen.astro';
+import { Head } from 'astro-capo';
 ---
 
-<!doctype html>
-<html lang="sv">
-  <SharedHead title="Tisdagsgolfen" />
-  <body class="antialiased dark:bg-gray-900">
-    <div class="wrapper">
-      <nav class="bg-gray-200 border-gray-200 dark:bg-gray-950">
-        <div class="flex items-center justify-between max-w-screen-lg p-4 mx-auto">
-          <a href="/">
-            <h1 class="font-bold text-accent-foreground">Tisdagsgolfen</h1>
-          </a>
+<AppScreen title="Tisdagsgolfen">
+  {
+    [1, 2, 7, 8, 11, 12, 13, 'default'].map((img) => (
+      <link rel="preload" as="image" href={`/images/avatars/${img}.png`} slot="head" />
+    ))
+  }
 
-          <UserButton server:defer>
-            <div
-              slot="fallback"
-              x-transition
-              class="inline-flex items-center justify-center gap-1 animate-pulse"
-            >
-              <Button size="icon" intent="link" class="size-8">
-                <div class="w-full h-full bg-gray-300"></div>
-              </Button>
-            </div>
-          </UserButton>
-        </div>
-      </nav>
+  <!-- {
+    [
+      '2013-hakan.png',
+      '2014-daniel.png',
+      '2015-patrik.jpg',
+      '2016-niklas.jpg',
+      '2017-tobbe.jpg',
+      '2018-tobbe.jpg',
+      '2019-niklas.jpg',
+      '2020-tobbe.jpg',
+      '2022-khalex.jpg',
+      '2024-tobbe.jpg'
+    ].map((img) => (
+      <link rel="preload" as="image" href={`/images/winnerphotos/${img}`} slot="head" />
+    ))
+  } -->
+
+  <UserButton server:defer slot="header">
+    <div
+      slot="fallback"
+      x-transition
+      class="inline-flex items-center justify-center gap-1 animate-pulse"
+    >
+      <Button size="icon" intent="link" class="size-8">
+        <div class="w-full h-full bg-gray-300"></div>
+      </Button>
     </div>
+  </UserButton>
 
-    <main
-      id="main"
-      class="flex flex-col flex-wrap items-center justify-between max-w-screen-lg p-4 mx-auto"
-    >
-      <div class="w-full main-section min-h-26">
-        <StickyHeader title="RUNDOR" />
-        <div class="flex overflow-x-scroll hide-scrollbar">
-          <div class="flex flex-nowrap h-26">
-            <ActiveSessions server:defer>
-              <div slot="fallback">
-                <div class="inline-block px-3 first:pl-0">
-                  <div
-                    class="flex flex-col gap-4 p-4 overflow-hidden border rounded-lg shadow-md w-70 h-26 animate-pulse bg-card-foreground/25 bg-gradient-to-l from-slate-300 to-slate-100 border-slate-300"
-                  >
-                  </div>
-                </div>
-              </div>
-            </ActiveSessions>
-          </div>
-        </div>
+  <div class="w-full main-section min-h-26 relative">
+    <StickyHeader title="RUNDOR" />
+    <div class="flex overflow-x-scroll hide-scrollbar">
+      <div class="flex flex-nowrap h-26">
+        <ActiveSessions server:defer />
       </div>
-      <div class="w-full main-section">
-        <StickyHeader title="LEDARTAVLA EFTER X RUNDOR" />
-        <Tabs options={['Poäng', 'Böter']} />
-      </div>
-    </main>
+    </div>
+  </div>
+  <div class="w-full main-section">
+    <StickyHeader title="LEDARTAVLA EFTER X RUNDOR" />
+    <Tabs />
+  </div>
 
-    <footer
-      class="fixed max-w-screen-lg p-1 mx-auto bottom-1 left-1 bg-background/75 backdrop-blur-xs"
-    >
-      <div class="flex">
-        <Button intent="link">
-          <a href="/years" class="flex">
-            HISTORIK
-            <Link class="size-5" />
-          </a>
-        </Button>
-      </div>
-    </footer>
-    <ThemeToggle />
-  </body>
-</html>
+  <Button intent="link" slot="footer-right">
+    <a href="/years" class="flex">
+      HISTORIK
+      <Link class="size-5" />
+    </a>
+  </Button>
+</AppScreen>

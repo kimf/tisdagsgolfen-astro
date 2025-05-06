@@ -6,16 +6,17 @@ export interface Props {
   label: string;
   xModel?: string;
   value?: string | number;
+  size?: 'default' | 'lg';
 }
 
-const { name, label, xModel, value } = Astro.props;
+const { name, label, xModel, value, size = 'default' } = Astro.props;
 const id = value && xModel ? `${value}_${xModel}` : name;
 ---
 
 <div>
   <input x-model={xModel} value={value} type="checkbox" id={id} name={name} class="sr-only peer" />
 
-  <Label id={id} label={label}>
+  <Label id={id} label={label} size={size}>
     <slot />
   </Label>
 </div>

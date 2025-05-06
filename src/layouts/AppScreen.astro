@@ -1,20 +1,58 @@
 ---
 export interface Props {
-  title: string;
+  title?: string;
+  back?: string;
+  hideHeader?: boolean;
 }
 
-const { title } = Astro.props;
+const { title, back, hideHeader = false } = Astro.props;
 import SharedHead from 'src/components/layouts/SharedHead.astro';
+import Button from 'src/components/ui/button.astro';
 import ThemeToggle from 'src/components/ui/theme-toggle.astro';
 import 'src/styles/global.css';
 ---
 
 <!doctype html>
 <html lang="sv">
-  <SharedHead title={title} />
-  <body id="main" class="antialiased dark:bg-gray-900 h-screen">
-    <slot />
+  <SharedHead title={title}>
+    <slot name="head" slot="head" />
+  </SharedHead>
+  <body id="main" class="antialiased dark:bg-gray-900 h-screen w-screen">
+    {
+      !hideHeader && (
+        <div class="flex w-full items-center p-4 bg-gray-200 border-gray-200 dark:bg-gray-950">
+          {back && (
+            <Button intent="link" slot="footer-left">
+              <a href={back}> &larr;</a>
+            </Button>
+          )}
+          <div class="flex justify-between w-full">
+            {title && (
+              <a href="/">
+                <h1 class="font-bold text-accent-foreground">{title}</h1>
+              </a>
+            )}
+            <div class="ml-auto">
+              <slot name="header" />
+            </div>
+          </div>
+        </div>
+      )
+    }
 
-    <ThemeToggle />
+    <main class="max-w-screen-xl h-full mx-auto p-4 pb-20">
+      <slot />
+    </main>
+
+    <footer
+      class="flex w-full z-1 fixed bottom-0 left-0 backdrop-blur bg-gray-200 border-gray-200 dark:bg-gray-950 h-12 p-2"
+    >
+      <slot name="footer-left" />
+
+      <div class="ml-auto flex gap-1">
+        <slot name="footer-right" />
+        <ThemeToggle />
+      </div>
+    </footer>
   </body>
 </html>

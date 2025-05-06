@@ -1,8 +1,7 @@
 ---
 import AppScreen from 'src/layouts/AppScreen.astro';
 import Link from 'src/assets/icons/link.svg';
-import Button from 'src/components/ui/button.astro';
-import StickyHeader from 'src/components/shared/StickyHeader.astro';
+import HeaderTitle from 'src/components/shared/HeaderTitle.astro';
 
 type HistoryItem = {
   year: string;
@@ -90,20 +89,12 @@ const historyItems: HistoryItem[] = [
 ];
 ---
 
-<AppScreen title="Historik">
-  <main class="max-w-3xl p-4 pb-12">
-    <div class="mb-2 -ml-4">
-      <Button intent="link">
-        <a href="/"> &larr; TILLBAKA </a>
-      </Button>
-    </div>
-
-    <h1 class="text-2xl font-bold">HISTORIK</h1>
-
+<AppScreen title="Historik" back="/">
+  <div class="overflow-y-scroll h-full pb-50">
     {
       historyItems.map((item) => (
         <div>
-          <StickyHeader title={`${item.year} - ${item.winner}`} />
+          <HeaderTitle title={`${item.year} - ${item.winner}`} />
 
           {item.description && (
             <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">
@@ -123,5 +114,5 @@ const historyItems: HistoryItem[] = [
         </div>
       ))
     }
-  </main>
+  </div>
 </AppScreen>

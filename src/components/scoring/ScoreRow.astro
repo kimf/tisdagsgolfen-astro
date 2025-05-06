@@ -23,9 +23,6 @@ const beers = score && score.beers > 0 ? Array.from({ length: score.beers }, (_,
 const ciders =
   score && score.ciders > 0 ? Array.from({ length: score.ciders }, (_, i) => i + 1) : [];
 const props = oob ? { 'hx-swap-oob': 'true' } : {};
-
-console.log(name);
-console.log(score);
 ---
 
 <tr

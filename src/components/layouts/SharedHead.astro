@@ -1,13 +1,11 @@
 ---
-// import { pwaInfo } from 'virtual:pwa-info';
-// import { pwaAssetsHead } from 'virtual:pwa-assets/head';
 import { STORAGE_THEME_KEY, THEME_MAP } from 'src/lib/theme';
 
 import { Font } from 'astro:assets';
 import { Head } from 'astro-capo';
 
 export interface Props {
-  title: string;
+  title?: string;
 }
 
 const { title } = Astro.props;
@@ -17,39 +15,44 @@ const { title } = Astro.props;
   <meta charset="UTF-8" />
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui"
   />
+  <!-- Allow web app to be run in full-screen mode - iOS. -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <!-- Allow web app to be run in full-screen mode - Android. -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="format-detection" content="telephone=no" />
   <meta name="generator" content={Astro.generator} />
   <Font cssVariable="--font-vcr" preload />
   <Font cssVariable="--font-mono" preload />
 
-  <title>{title || 'Tisdagsgolfen'}</title>
-  <!-- {
-    pwaAssetsHead.themeColor && (
-      <meta name="theme-color" content={pwaAssetsHead.themeColor.content} />
-    )
-  } -->
+  <title>{title ? `${title} - ` : ''}Tisdagsgolfen</title>
   <meta name="theme-color" content="#f3f3f398" media="(prefers-color-scheme: light)" />
   <meta
     name="theme-color"
     content="oklch(0.141 0.005 285.823)"
     media="(prefers-color-scheme: dark)"
   />
-  <!-- {pwaAssetsHead.links.map((link: any) => <link {...link} />)}
-  {pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />} -->
+  <link rel="icon" type="image/x-icon" href="/favicon.png" />
 
-  <script is:inline define:vars={{ STORAGE_THEME_KEY, THEME_MAP }}>
-    const getThemePreference = () => {
-      if (typeof localStorage !== 'undefined' && localStorage.getItem(STORAGE_THEME_KEY))
-        return localStorage.getItem(STORAGE_THEME_KEY);
-
-      return window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? THEME_MAP.dark
-        : THEME_MAP.light;
-    };
-
-    const isDark = getThemePreference() === THEME_MAP.dark;
-    document.documentElement.classList[isDark ? 'add' : 'remove'](THEME_MAP.dark);
-    localStorage.setItem(STORAGE_THEME_KEY, isDark ? THEME_MAP.dark : THEME_MAP.light);
-  </script>
+  <slot name="head" />
 </Head>
+<script is:inline define:vars={{ STORAGE_THEME_KEY, THEME_MAP }}>
+  const getThemePreference = () => {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem(STORAGE_THEME_KEY))
+      return localStorage.getItem(STORAGE_THEME_KEY);
+
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? THEME_MAP.dark
+      : THEME_MAP.light;
+  };
+
+  const isDark = getThemePreference() === THEME_MAP.dark;
+  document.documentElement.classList[isDark ? 'add' : 'remove'](THEME_MAP.dark);
+
+  const metaTag = document.querySelector('meta[name=theme-color]');
+  metaTag.setAttribute('content', isDark ? 'oklch(0.141 0.005 285.823)' : '#f3f3f398');
+
+  localStorage.setItem(STORAGE_THEME_KEY, isDark ? THEME_MAP.dark : THEME_MAP.light);
+</script>

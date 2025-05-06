@@ -20,6 +20,7 @@ const { allPlayers } = Astro.props;
           value={player.id}
           xModel="selectedPlayers"
           label={shortName(player.fullName)}
+          size="lg"
         >
           <template x-if={`!teamEvent && hasSelectedPlayer(${player.id})`}>
             <Quantity value={10} name={`players[${index}]['strokes']`} />

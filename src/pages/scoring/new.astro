@@ -14,7 +14,7 @@ if (Astro.request.method === 'POST') {
     const formData = await Astro.request.formData();
     const userId = await Astro.session?.get('userId');
 
-    console.log(formData);
+    // console.log(formData);
 
     if (!userId) {
       throw new Error('Logga in för att skapa scoringSession');
@@ -42,10 +42,7 @@ if (joinId) {
 }
 ---
 
-<AppScreen title="Ny Runda">
-  <Button intent="link">
-    <a href="/"> &larr; TILLBAKA </a>
-  </Button>
+<AppScreen title="Ny Runda" back="/">
   <div class="max-w-screen-lg p-4 pb-24 mx-auto">
     <form
       class="flex flex-col gap-4"
@@ -56,7 +53,7 @@ if (joinId) {
       <CourseSelector />
       <TeamSetup allPlayers={allPlayers} />
       <PlayerSetup allPlayers={allPlayers} />
-      <div class="fixed bottom-0 left-0 w-full p-4 backdrop-blur">
+      <div class="fixed bottom-12 left-0 w-full p-4 backdrop-blur">
         <Button type="submit" size="block" x-bind:disabled="disableSave">SPELA GOLF</Button>
       </div>
     </form>

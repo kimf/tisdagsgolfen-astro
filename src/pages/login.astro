@@ -1,4 +1,5 @@
 ---
+import HeaderTitle from 'src/components/shared/HeaderTitle.astro';
 import StickyHeader from 'src/components/shared/StickyHeader.astro';
 import Button from 'src/components/ui/button.astro';
 import db from 'src/db';
@@ -39,10 +40,10 @@ const players = await db.query.profiles.findMany({
 });
 ---
 
-<AppScreen title="Logga in">
+<AppScreen title="Logga in" back="/">
   <div class="flex min-h-svh w-full  p-6 md:p-10">
     <div class="w-full">
-      <StickyHeader title="LOGGA IN" />
+      <HeaderTitle title="VÄLJ KARAKTÄR" />
 
       {errors.password && <p style="color: red;">{errors.password}</p>}
       <form method="post" class="login" x-data="login">

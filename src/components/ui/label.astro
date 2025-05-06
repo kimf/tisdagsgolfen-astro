@@ -1,16 +1,33 @@
 ---
+import { cx, cva } from 'src/components/cva.config';
+import { type VariantProps } from 'cva';
+import type { HTMLAttributes } from 'astro/types';
 export interface Props {
   id: string;
   label: string;
 }
 
 const { id, label } = Astro.props;
+
+const labelVariants = cva({
+  base: 'inline-flex items-center justify-between w-full  bg-white border-2 border-gray-200 cursor-pointer rounded-xs active:scale-99 peer-checked:bg-cyan-50 peer-checked:active:scale-100 dark:border-gray-700 peer-checked:border-cyan-600 dark:peer-checked:border-cyan-600 peer-checked:text-cyan-600 dark:text-gray-400 dark:bg-gray-800',
+  variants: {
+    size: {
+      default: 'px-4 py-1',
+      lg: 'p-4'
+    }
+  },
+  defaultVariants: {
+    size: 'default'
+  }
+});
+
+export interface Props extends HTMLAttributes<'label'>, VariantProps<typeof labelVariants> {}
+
+const { class: className, size, ...props } = Astro.props;
 ---
 
-<label
-  for={id}
-  class="inline-flex items-center justify-between w-full px-4 py-1 bg-white border-2 border-gray-200 cursor-pointer rounded-xs active:scale-97 peer-checked:bg-cyan-50 peer-checked:active:scale-100 dark:border-gray-700 peer-checked:border-cyan-600 dark:peer-checked:border-cyan-600 peer-checked:text-cyan-600 dark:text-gray-400 dark:bg-gray-800"
->
+<label for={id} class={cx(labelVariants({ size }), className)} {...props}>
   <div class="flex items-center justify-between w-full h-8">
     <div>{label}</div>
     <slot />

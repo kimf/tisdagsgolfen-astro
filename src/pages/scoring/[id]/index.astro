@@ -12,14 +12,10 @@ if (!userId) throw new Error('Logga in för att föra score');
 if (!id) throw new Error('Id saknas för runda');
 ---
 
-<AppScreen title="För score">
-  <footer
-    class="absolute z-5 max-w-screen-lg p-1 mx-auto bottom-1 left-1 bg-background/75 backdrop-blur-xs"
-  >
+<AppScreen hideHeader>
+  <Hole />
+  <Fragment slot="footer-left">
     <div class="flex gap-2">
-      <Button intent="link" size="sm">
-        <a href={`/`}>START</a>
-      </Button>
       <Button intent="link" size="sm">
         <a href={`/scoring/${id}/menu`}>MENY</a>
       </Button>
@@ -28,19 +24,7 @@ if (!id) throw new Error('Id saknas för runda');
       </Button>
       <Loader class="htmx-indicator" width="20" height="20" />
     </div>
-  </footer>
-
-  <Hole />
+  </Fragment>
 </AppScreen>
 
 <script src="src/assets/alpine/ScoringController.ts"></script>
-
-<style is:inline>
-  .slide-it.htmx-added {
-    opacity: 0;
-  }
-  .slide-it {
-    opacity: 1;
-    transition: opacity 1s ease-out;
-  }
-</style>
