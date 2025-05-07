@@ -5,10 +5,10 @@ import type { HTMLAttributes } from 'astro/types';
 import EventPillRow from 'src/components/shared/EventPillRow.astro';
 
 const eventCardVariants = cva({
-  base: 'block p-4 rounded-lg bg-gradient-to-b from-blue-50 to-blue-100 border-2 border-blue-100 shadow-md box-border w-full my-2',
+  base: 'block p-4 rounded bg-gradient-to-b from-blue-50 to-blue-100 border-2 border-blue-100 shadow-md box-border',
   variants: {
     intent: {
-      default: 'w-70'
+      default: 'w-52 h-24'
     }
   },
   defaultVariants: {
@@ -29,7 +29,7 @@ const { class: className, intent, live = false, ...props } = Astro.props;
 
 <div class={cx(eventCardVariants({ intent }), className)} {...props}>
   <div class="flex justify-between">
-    <h4 class="m-0 text-lg font-bold">
+    <h4 class="m-0 text-lg font-bold text-gray-800">
       {
         new Date(props.date).toLocaleDateString('sv-SE', {
           day: 'numeric',
@@ -46,7 +46,7 @@ const { class: className, intent, live = false, ...props } = Astro.props;
     />
   </div>
 
-  <div class="mt-auto text-gray-500 font-light text-xs mb-4">
+  <div class="mt-auto text-gray-800 font-light text-xs mb-4">
     <slot />
   </div>
 </div>

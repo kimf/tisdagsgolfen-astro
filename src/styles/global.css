@@ -73,12 +73,7 @@
 
 @layer base {
   html {
-    font-size: 13px;
-  }
-  @media (min-width: 420px) {
-    html {
-      font-size: 15px;
-    }
+    font-size: 14px;
   }
 
   * {

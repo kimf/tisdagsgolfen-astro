@@ -14,6 +14,7 @@ export type LeaderboardItem = {
   beers: number;
   ciders: number;
   fines: number;
+  averageFines: number;
   totalFines: number;
   events: number;
   strokes_array: number[];
@@ -21,6 +22,11 @@ export type LeaderboardItem = {
   special_array: number[];
   shortName: string;
   avatarUrl: string | null;
+  finesSummary: string;
+  beersAndCidersSummary: string;
+  rankSummary: string;
+  specialSummary: string;
+  scratchSummary: string;
 };
 
 type ScoringSessionItem = EventsWithLeaderboard['eventSessions'][number]['session'];
@@ -80,6 +86,33 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
 
     const totalFines = fines - beers * 50 - ciders * 25;
 
+    const finesSummary = `${fines > 0 ? '+' : ''}${fines} kr`;
+    const beersString = beers === 0 ? null : beers > 1 ? `${beers}x🍺` : '🍺';
+    const cidersString = ciders === 0 ? null : ciders > 1 ? `${ciders}x🥤` : '🥤';
+    const beersAndCidersSummary = [
+      beersString,
+      beersString && cidersString ? '•' : '',
+      cidersString
+    ].join('');
+
+    const strokes_array = playerRegularScorecards
+      .map((s) => s.strokes)
+      .filter((p): p is number => p !== null);
+
+    const points_array = playerRegularPointsArray.filter((p): p is number => p !== null);
+    const special_array = playerSpecialPointsArray.filter((p): p is number => p !== null);
+
+    const emptyStrokes =
+      strokes_array.length < 5 ? [...Array(5 - strokes_array.length)].map((_) => 0) : [];
+    const scratchSummary = `${[...strokes_array, ...emptyStrokes].join(', ')}`;
+
+    const emptyPoints =
+      points_array.length < 5 ? [...Array(5 - points_array.length)].map((_) => 0) : [];
+    const emptySpecialPoints =
+      special_array.length < 2 ? [...Array(2 - special_array.length)].map((_) => 0) : [];
+    const rankSummary = [...points_array, ...emptyPoints].join(', ');
+    const specialSummary = [...special_array, ...emptySpecialPoints].join(', ');
+
     leaderboardItems.push({
       id: player.id,
       avatarUrl: player.avatarUrl,
@@ -100,12 +133,16 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
       ciders,
       fines,
       totalFines,
+      averageFines: playerScorecards.length ? fines / playerScorecards.length : 0,
       events: playerScorecards.length,
-      strokes_array: playerRegularScorecards
-        .map((s) => s.strokes)
-        .filter((p): p is number => p !== null),
-      points_array: playerRegularPointsArray.filter((p): p is number => p !== null),
-      special_array: playerSpecialPointsArray.filter((p): p is number => p !== null)
+      strokes_array,
+      points_array,
+      special_array,
+      finesSummary,
+      rankSummary,
+      scratchSummary,
+      specialSummary,
+      beersAndCidersSummary
     });
   }
 

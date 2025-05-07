@@ -25,64 +25,85 @@ const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a
   <div class="flex flex-col">
     <div
       role="tablist"
-      class="inline-flex flex-wrap justify-center bg-slate-200 rounded p-1 w-full mb-4"
+      class="inline-flex flex-wrap justify-center bg-stone-200 dark:bg-stone-700 rounded p-1 w-full mb-4"
       x-auto-animate
     >
       <template x-for="(tab, index) in tabs" :key="index">
         <button
           :id="`tab-${index}`"
           class="flex-1 uppercase vcr h-8 px-4 rounded font-bold whitespace-nowrap transition-all duration-150 ease-in-out"
-          :class={`currentTab === tab.name ? 'bg-white text-slate-900' : 'text-slate-600 hover:text-slate-900'`}
+          :class={`currentTab === tab.name ? 'text-slate-900 bg-gradient-to-b from-cyan-50 to-cyan-200 border-blue-100 shadow-md box-border' : 'text-slate-600 dark:text-slate-100 hover:text-slate-900 '`}
           @click={`changeTab(tab.name)`}
           x-text="tab.title"></button>
       </template>
     </div>
 
-    <table class="w-full text-left text-gray-600 dark:text-gray-300 mt-4">
-      <thead class="uppercase bg-background">
-        <tr>
-          <th class="p-2 text-center vcr">#</th>
-          <th class="p-2 vcr">Spelare</th>
-          <th class="p-2 text-center vcr">Rundor</th>
-          <th class="p-2 text-center vcr">Snitt</th>
-          <th class="p-2 text-center vcr">Topp 5+2</th>
-          <th class="p-2 text-center vcr font-bold">TOT</th>
+    <table class="w-full text-left text-gray-600 dark:text-gray-300">
+      <thead class="uppercase bg-background text-sm">
+        <tr class="border-b">
+          <th></th>
+          <th class="pb-2 vcr">Spelare</th>
+          <th class="pb-2 text-left vcr">
+          </th>
+          <th class="pb-2 text-right vcr font-bold pr-2">TOT</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody x-ref="list" x-auto-animate.linear>
+        <template x-for="item in sortedItems" :key="item.id">
+          <tr
+            class="border-b border-gray-200 odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 dark:border-gray-700 ranked"
+            :data-rank="item.rank"
+          >
+            <td class="p-2 text-center content-start font-bold vcr" x-text="item.rank"></td>
+            <td class="py-2 uppercase text-sm">
+              <div class="flex gap-2">
+                <img
+                  :src="item.avatarUrl ? `/images/avatars/${item.id}.png` : '/images/avatars/default.png'"
+                  class="size-12"
+                />
+                <div class="flex gap-1 flex-col justify-between">
+                  <div class="uppercase font-bold vcr text-lg tracking-tight" x-text="item.shortName"></div>
+                  <div class="flex text-xs tracking-tighter">
+                    <span x-text="`${item.events} ${item.events === 1 ? 'runda' : 'rundor'}`"
+                    ></span>
+                    <div class="pl-1">
+                      &bull; Snitt
+                      <span x-text="item.average" x-show={`currentTab == 'rank'`}></span>
+                      <span x-text="item.averageStrokes" x-show={`currentTab == 'scratch'`}></span>
+                      <span x-text="item.averageFines" x-show={`currentTab == 'kr'`}></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            <td class="vcr uppercase  text-xs tracking-tighter">
+              <div class="flex gap-2 flex-col justify-between">
+                <div>
+                  <span x-text="item.rankSummary" x-show={`currentTab == 'rank'`}></span>
+                  <span x-text="item.scratchSummary" x-show={`currentTab == 'scratch'`}></span>
+                  <span x-text="item.finesSummary" x-show={`currentTab == 'kr'`}></span>
+                </div>
+                <div>
+                  <span x-text="item.beersAndCidersSummary" x-show={`currentTab == 'kr'`}></span>
+                  <span x-text="item.specialSummary" x-show={`currentTab == 'rank'`}></span>
+                </div>
+              </div>
+            </td>
+
+
+            <td class="text-right vcr text-lg font-bold ml-auto pr-2 uppercase">
+              <span x-text="item.points" x-show={`currentTab == 'rank'`}></span>
+              <span x-text="item.strokes" x-show={`currentTab == 'scratch'`}></span>
+              <span x-text="`${item.totalFines} kr`" x-show={`currentTab == 'kr'`}></span>
+            </td>
+          </tr>
+        </template>
+      </tbody>
     </table>
-
-    <ul x-ref="list" x-auto-animate.linear>
-      <template x-for="item in sortedItems" :key="item.id">
-        <div
-          class="flex gap-4 items-center mb-2 p-2 border-l-4 border-b"
-          :data-rank="item.rank"
-          :class={`[currentTab === 'rank' ? 'ranked' : '']`}
-        >
-          <strong x-text="item.rank" class="font-bold text-2xl vcr"></strong>
-
-          <img
-            :src="item.avatarUrl ? `/images/avatars/${item.id}.png` : '/images/avatars/default.png'"
-            class="size-14"
-          />
-
-          <div class="flex flex-col content-center leading-2">
-            <span class="uppercase font-bold vcr text-lg leading-6" x-text="item.shortName"> </span>
-            <div class="text-xs uppercase vcr" x-text={`summaryString(item)`}></div>
-            <div class="text-xs uppercase vcr" x-text={`subSummaryString(item)`}></div>
-          </div>
-
-          <h5 class="vcr text-2xl ml-auto">
-            <span x-text={`pointValue(item)`}></span>
-            <small class="ml-1 text-xs" x-show={`currentTab == 'kr'`}>kr</small>
-          </h5>
-        </div>
-      </template>
-    </ul>
   </div>
+  <h2 class="mt-4" x-show={`currentTab === 'kr'`}>Totalt: {totalFines} kr</h2>
 </div>
-
-<h2 x-show={`currentTab === 'kr'`}>Totalt: {totalFines} kr</h2>
 
 <script type="module" define:vars={{ leaderboardItems }}>
   // import type { LeaderboardItem } from 'src/lib/buildLeaderboardItems';
@@ -166,51 +187,6 @@ const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a
           this.sortedItems = standardCompRank(this.items, 'points', false, 'average');
         }
         this.currentTab = newTab;
-      },
-
-      pointValue(item) {
-        if (this.currentTab == 'kr') {
-          return `${item.totalFines <= 0 ? '' : '+'}${item.totalFines}`;
-        } else if (this.currentTab == 'scratch') {
-          return parseFloat(`${item.strokes}`).toFixed(0);
-        } else {
-          return parseFloat(`${item.points}`).toFixed(1);
-        }
-      },
-
-      summaryString(item) {
-        if (this.currentTab == 'kr') {
-          return `${item.fines} kr | ${item.beers} öl | ${item.ciders} cider`;
-        } else if (this.currentTab == 'scratch') {
-          const emptyStrokes =
-            item.strokes_array.length < 5
-              ? [...Array(5 - item.strokes_array.length)].map((_) => 0)
-              : [];
-          return `${[...item.strokes_array, ...emptyStrokes].join(', ')}`;
-        } else {
-          const emptyPoints =
-            item.points_array.length < 5
-              ? [...Array(5 - item.points_array.length)].map((_) => 0)
-              : [];
-          const emptySpecialPoints =
-            item.special_array.length < 2
-              ? [...Array(2 - item.special_array.length)].map((_) => 0)
-              : [];
-          return `${[...item.points_array, ...emptyPoints].join(', ')} | ${[
-            ...item.special_array,
-            ...emptySpecialPoints
-          ].join(', ')}`;
-        }
-      },
-
-      subSummaryString(item) {
-        if (this.currentTab == 'kr') {
-          return `${item.events} rundor | Snitt: ${(item.totalFines / item.events).toFixed(1)} kr`;
-        } else if (this.currentTab == 'scratch') {
-          return `${item.events} rundor  | Snitt: ${item.averageStrokes.toFixed(1)} kr`;
-        } else {
-          return `${item.events} rundor | Snitt: ${item.average.toFixed(1)} p`;
-        }
       }
     }));
   });
@@ -225,7 +201,6 @@ const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a
   }
   .ranked[data-rank='2'] {
     border-left-color: oklch(44.4% 0.011 73.639);
-  }
   .ranked[data-rank='3'] {
     border-left-color: oklch(55.4% 0.135 66.442);
   }
