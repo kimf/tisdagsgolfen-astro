@@ -1,7 +1,7 @@
 import type { EventsWithLeaderboard } from 'src/db/queries/getEvents';
 import type { Player } from 'src/db/queries/getPlayers';
 import type { Profile } from 'src/db/schema/profile';
-import standardCompRank from './standardCompRank';
+import { shortName } from 'src/lib/formatters';
 import { cacheable } from './cacheable';
 
 export type LeaderboardItem = {
@@ -10,6 +10,7 @@ export type LeaderboardItem = {
   points: number;
   strokes: number;
   average: number;
+  averageStrokes: number;
   beers: number;
   ciders: number;
   fines: number;
@@ -18,7 +19,8 @@ export type LeaderboardItem = {
   strokes_array: number[];
   points_array: number[];
   special_array: number[];
-  player: Player;
+  shortName: string;
+  avatarUrl: string | null;
 };
 
 type ScoringSessionItem = EventsWithLeaderboard['eventSessions'][number]['session'];
@@ -49,7 +51,7 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
     const playerRegularScorecards = regularScorecards
       .filter((s) => s.players.flatMap((p) => p.player).find((p) => p.id === player.id))
       .sort((a, b) => (b.weekPoints ?? 0) - (a.weekPoints ?? 0))
-      .slice(0, 4);
+      .slice(0, 5);
     const playerSpecialScorecards = specialScorecards
       .filter((s) => s.players.flatMap((p) => p.player).find((p) => p.id === player.id))
       .sort((a, b) => (b.weekPoints ?? 0) - (a.weekPoints ?? 0))
@@ -57,6 +59,12 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
 
     const playerRegularPointsArray = playerRegularScorecards.map((s) => s.weekPoints);
     const playerSpecialPointsArray = playerSpecialScorecards.map((s) => s.weekPoints);
+
+    const playerStrokesArray = regularScorecards
+      .filter((s) => s.players.flatMap((p) => p.player).find((p) => p.id === player.id))
+      .sort((a, b) => (b.strokes ?? 0) - (a.strokes ?? 0))
+      .slice(0, 5)
+      .map((s) => s.strokes);
 
     const beers = playerScorecards.length
       ? playerScorecards.reduce((a, b) => a + b.players.reduce((a, b) => a + (b.beers ?? 0), 0), 0)
@@ -74,7 +82,8 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
 
     leaderboardItems.push({
       id: player.id,
-      player,
+      avatarUrl: player.avatarUrl,
+      shortName: shortName(player.fullName),
       points: [...playerRegularPointsArray, ...playerSpecialPointsArray]
         .filter((p): p is number => p !== null)
         .reduce((a, b) => a + b, 0),
@@ -82,7 +91,8 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
         ? allPlayerRegularScorecards.reduce((a, b) => a + (b.points ?? 0), 0) /
           allPlayerRegularScorecards.length
         : 0,
-      strokes: allPlayerRegularScorecards.length
+      strokes: playerStrokesArray.filter((p): p is number => p !== null).reduce((a, b) => a + b, 0),
+      averageStrokes: allPlayerRegularScorecards.length
         ? allPlayerRegularScorecards.reduce((a, b) => a + (b.strokes ?? 0), 0) /
           allPlayerRegularScorecards.length
         : 0,
@@ -99,15 +109,7 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
     });
   }
 
-  const finesPlayers = standardCompRank(leaderboardItems, 'totalFines', true, null);
-  const sortedPlayers = standardCompRank(leaderboardItems, 'points', false, 'average');
-  const scratchPlayers = standardCompRank(leaderboardItems, 'strokes', true, null);
-
-  return {
-    kr: finesPlayers,
-    rank: sortedPlayers,
-    scratch: scratchPlayers
-  };
+  return leaderboardItems;
 }
 
 const cachedBuilder = cacheable((sessions: ScoringSessionItem[], players: Player[]) =>

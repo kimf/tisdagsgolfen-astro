@@ -1,6 +1,11 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
 
+// Declare a module to handle the lack of type definitions
+declare module '@marcreichel/alpine-auto-animate' {
+  const AutoAnimate: any;
+  export default AutoAnimate;
+}
 interface ImportMetaEnv {
   readonly DATABASE_URL: string;
   readonly REDIS_URL: string;

@@ -3,8 +3,7 @@ import { getEventsWithLeaderboardData } from 'src/db/queries/getEvents';
 import StickyHeader from '../shared/StickyHeader.astro';
 import { getPlayers } from 'src/db/queries/getPlayers';
 import buildLeaderboardItems from 'src/lib/buildLeaderboardItems';
-import LeaderboardCard from 'src/components/homepage/LeaderboardCard.astro';
-
+import standardCompRank from 'src/lib/standardCompRank';
 export interface Props {
   seasonId: number;
 }
@@ -14,65 +13,220 @@ const players = await getPlayers();
 const events = await getEventsWithLeaderboardData(Number(seasonId));
 
 const scoringSessions = events.flatMap((event) => event.eventSessions.flatMap((es) => es.session));
-
 const leaderboardItems = buildLeaderboardItems(scoringSessions, players);
-const tabs = [
-  { name: 'rank', title: 'Poäng' },
-  { name: 'kr', title: 'Böter' },
-  { name: 'scratch', title: 'Scratch' }
-];
-const totalFines = leaderboardItems['kr']
-  .map((player) => player.totalFines)
-  .reduce((a, b) => a + b, 0);
+const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a, b) => a + b, 0);
 ---
 
 <StickyHeader
   title={`LEDARTAVLA EFTER ${events.length} ${events.length <= 1 ? 'RUNDA' : 'RUNDOR'}`}
 />
-<div x-data="{ activeTab: 0 }">
-  <div class="flex">
+
+<div x-data={`fruitList(${JSON.stringify(leaderboardItems)})`}>
+  <div class="flex flex-col">
     <div
       role="tablist"
-      class="inline-flex flex-wrap justify-center bg-slate-200 rounded p-1 max-w-screen min-w-[400px] mb-4"
+      class="inline-flex flex-wrap justify-center bg-slate-200 rounded p-1 w-full mb-4"
+      x-auto-animate
     >
-      {
-        tabs.map((tab, index) => (
-          <button
-            id={`tab-${index}`}
-            class="flex-1 uppercase vcr h-8 px-4 rounded font-bold whitespace-nowrap transition-all duration-150 ease-in-out"
-            :class={`activeTab === ${index} ? 'bg-white text-slate-900' : 'text-slate-600 hover:text-slate-900'`}
-            :tabindex={`activeTab === ${index} ? 0 : -1`}
-            :aria-selected={`activeTab == ${index}`}
-            aria-controls={`tabpanel-${index}`}
-            @click={`activeTab = ${index}`}
-            @focus={`activeTab = ${index}`}
-          >
-            {tab.title}
-          </button>
-        ))
-      }
+      <template x-for="(tab, index) in tabs" :key="index">
+        <button
+          :id="`tab-${index}`"
+          class="flex-1 uppercase vcr h-8 px-4 rounded font-bold whitespace-nowrap transition-all duration-150 ease-in-out"
+          :class={`currentTab === tab.name ? 'bg-white text-slate-900' : 'text-slate-600 hover:text-slate-900'`}
+          @click={`changeTab(tab.name)`}
+          x-text="tab.title"></button>
+      </template>
     </div>
+
+    <table class="w-full text-left text-gray-600 dark:text-gray-300 mt-4">
+      <thead class="uppercase bg-background">
+        <tr>
+          <th class="p-2 text-center vcr">#</th>
+          <th class="p-2 vcr">Spelare</th>
+          <th class="p-2 text-center vcr">Rundor</th>
+          <th class="p-2 text-center vcr">Snitt</th>
+          <th class="p-2 text-center vcr">Topp 5+2</th>
+          <th class="p-2 text-center vcr font-bold">TOT</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <ul x-ref="list" x-auto-animate.linear>
+      <template x-for="item in sortedItems" :key="item.id">
+        <div
+          class="flex gap-4 items-center mb-2 p-2 border-l-4 border-b"
+          :data-rank="item.rank"
+          :class={`[currentTab === 'rank' ? 'ranked' : '']`}
+        >
+          <strong x-text="item.rank" class="font-bold text-2xl vcr"></strong>
+
+          <img
+            :src="item.avatarUrl ? `/images/avatars/${item.id}.png` : '/images/avatars/default.png'"
+            class="size-14"
+          />
+
+          <div class="flex flex-col content-center leading-2">
+            <span class="uppercase font-bold vcr text-lg leading-6" x-text="item.shortName"> </span>
+            <div class="text-xs uppercase vcr" x-text={`summaryString(item)`}></div>
+            <div class="text-xs uppercase vcr" x-text={`subSummaryString(item)`}></div>
+          </div>
+
+          <h5 class="vcr text-2xl ml-auto">
+            <span x-text={`pointValue(item)`}></span>
+            <small class="ml-1 text-xs" x-show={`currentTab == 'kr'`}>kr</small>
+          </h5>
+        </div>
+      </template>
+    </ul>
   </div>
-
-  {
-    tabs.map((key, index) => (
-      <article
-        id={`tabpanel-${index}`}
-        class="w-full focus-visible"
-        role="tabpanel"
-        tabindex="0"
-        aria-labelledby={`tab-${index}`}
-        x-show={`activeTab === ${index}`}
-      >
-        {' '}
-        {leaderboardItems[key.name as keyof typeof leaderboardItems]
-          .filter((item) => item.events !== 0)
-          .map((item) => (
-            <LeaderboardCard item={item} sorting={key.name as keyof typeof leaderboardItems} />
-          ))}
-      </article>
-    ))
-  }
-
-  <h2 x-show={`activeTab === 1`}>Totalt: {totalFines} kr</h2>
 </div>
+
+<h2 x-show={`currentTab === 'kr'`}>Totalt: {totalFines} kr</h2>
+
+<script type="module" define:vars={{ leaderboardItems }}>
+  // import type { LeaderboardItem } from 'src/lib/buildLeaderboardItems';
+  function standardCompRank(scorecards, attribute, reverse, dealbreaker) {
+    // Sort scorecards first by attribute, then by dealbreaker if provided
+    scorecards.sort((a, b) => {
+      const primaryComparison = !reverse
+        ? Number(b[attribute] ?? 0) - Number(a[attribute] ?? 0) // Descending order if reverse is true
+        : Number(a[attribute] ?? 0) - Number(b[attribute] ?? 0); // Ascending order if reverse is false
+
+      if (primaryComparison !== 0 || !dealbreaker) {
+        return primaryComparison;
+      }
+
+      // If primaryComparison is a tie and dealbreaker is provided, compare by dealbreaker
+      return !reverse
+        ? Number(b[dealbreaker] ?? 0) - Number(a[dealbreaker] ?? 0) // Descending order if reverse is true
+        : Number(a[dealbreaker] ?? 0) - Number(b[dealbreaker] ?? 0); // Ascending order if reverse is false
+    });
+
+    // Assign ranks with handling of ties
+    const ranked = [];
+    const rank = { next: 1, current: [] };
+
+    scorecards.forEach((item, i) => {
+      let currentRank;
+      if (i > 0 && scorecards[i][attribute] === scorecards[i - 1][attribute]) {
+        // Check for dealbreaker tie as well
+        if (!dealbreaker || scorecards[i][dealbreaker] === scorecards[i - 1][dealbreaker]) {
+          currentRank = ranked[i - 1].rank;
+        } else {
+          currentRank = rank.next;
+        }
+      } else {
+        currentRank = rank.next;
+      }
+
+      ranked.push({ ...item, rank: currentRank });
+      rank.next++;
+    });
+
+    return ranked;
+  }
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('fruitList', () => ({
+      tabs: [
+        { name: 'rank', title: 'Poäng' },
+        { name: 'kr', title: 'Böter' },
+        { name: 'scratch', title: 'Scratch' }
+      ],
+      currentTab: 'rank',
+      finesPlayers: [], // as LeaderboardItem[],
+      sortedPlayers: [], // as LeaderboardItem[],
+      scratchPlayers: [], // as LeaderboardItem[],
+      items: [], // as LeaderboardItem[],
+      sortedItems: [], // as LeaderboardItem[],
+
+      init() {
+        const items = leaderboardItems;
+        const filteredItems = items.filter((item) => item.events > 0); // item: LeaderboardItem
+        this.items = filteredItems;
+        this.sortedItems = standardCompRank(filteredItems, 'points', false, 'average');
+      },
+
+      rankColor(rank) {
+        // : number
+        if (rank > 4) return 'oklch(55.2% 0.016 285.938)';
+        if (rank === 1) return 'oklch(82.8% 0.189 84.429)';
+        if (rank === 2) return 'oklch(44.4% 0.011 73.639)';
+        if (rank === 3) return 'oklch(55.4% 0.135 66.442)';
+        return 'oklch(55.2% 0.016 285.938)';
+      },
+
+      changeTab(newTab) {
+        // : 'rank' | 'kr' | 'scratch'
+        if (newTab === 'kr') {
+          this.sortedItems = standardCompRank(this.items, 'totalFines', true, null);
+        } else if (newTab === 'scratch') {
+          this.sortedItems = standardCompRank(this.items, 'strokes', true, null);
+        } else {
+          this.sortedItems = standardCompRank(this.items, 'points', false, 'average');
+        }
+        this.currentTab = newTab;
+      },
+
+      pointValue(item) {
+        if (this.currentTab == 'kr') {
+          return `${item.totalFines <= 0 ? '' : '+'}${item.totalFines}`;
+        } else if (this.currentTab == 'scratch') {
+          return parseFloat(`${item.strokes}`).toFixed(0);
+        } else {
+          return parseFloat(`${item.points}`).toFixed(1);
+        }
+      },
+
+      summaryString(item) {
+        if (this.currentTab == 'kr') {
+          return `${item.fines} kr | ${item.beers} öl | ${item.ciders} cider`;
+        } else if (this.currentTab == 'scratch') {
+          const emptyStrokes =
+            item.strokes_array.length < 5
+              ? [...Array(5 - item.strokes_array.length)].map((_) => 0)
+              : [];
+          return `${[...item.strokes_array, ...emptyStrokes].join(', ')}`;
+        } else {
+          const emptyPoints =
+            item.points_array.length < 5
+              ? [...Array(5 - item.points_array.length)].map((_) => 0)
+              : [];
+          const emptySpecialPoints =
+            item.special_array.length < 2
+              ? [...Array(2 - item.special_array.length)].map((_) => 0)
+              : [];
+          return `${[...item.points_array, ...emptyPoints].join(', ')} | ${[
+            ...item.special_array,
+            ...emptySpecialPoints
+          ].join(', ')}`;
+        }
+      },
+
+      subSummaryString(item) {
+        if (this.currentTab == 'kr') {
+          return `${item.events} rundor | Snitt: ${(item.totalFines / item.events).toFixed(1)} kr`;
+        } else if (this.currentTab == 'scratch') {
+          return `${item.events} rundor  | Snitt: ${item.averageStrokes.toFixed(1)} kr`;
+        } else {
+          return `${item.events} rundor | Snitt: ${item.average.toFixed(1)} p`;
+        }
+      }
+    }));
+  });
+</script>
+
+<style>
+  .ranked {
+    border-left-width: 8px;
+  }
+  .ranked[data-rank='1'] {
+    border-left-color: oklch(82.8% 0.189 84.429);
+  }
+  .ranked[data-rank='2'] {
+    border-left-color: oklch(44.4% 0.011 73.639);
+  }
+  .ranked[data-rank='3'] {
+    border-left-color: oklch(55.4% 0.135 66.442);
+  }
+</style>

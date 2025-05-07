@@ -23,7 +23,7 @@ if (sorting === 'kr') {
   subSummaryString += ` | ${item.ciders} cider`;
 } else if (sorting === 'rank') {
   pointValue = parseFloat(`${item.points}`).toFixed(1);
-  pointText = 'p';
+  pointText = '';
   const emptyPoints =
     item.points_array.length < 4 ? [...Array(4 - item.points_array.length)].map((_) => 0) : [];
   const emptySpecialPoints =
@@ -42,22 +42,25 @@ if (sorting === 'kr') {
 const rankColor =
   item.rank && sorting === 'rank'
     ? item.rank > 4
-      ? 'gray-200'
+      ? 'oklch(55.2% 0.016 285.938)'
       : item.rank === 1
-        ? 'amber-400'
+        ? 'oklch(82.8% 0.189 84.429)'
         : item.rank === 2
-          ? 'stone-600'
+          ? 'oklch(44.4% 0.011 73.639)'
           : item.rank === 3
-            ? 'yellow-700'
-            : 'foreground'
-    : 'foreground';
+            ? 'oklch(55.4% 0.135 66.442)'
+            : 'oklch(55.2% 0.016 285.938)'
+    : 'oklch(55.2% 0.016 285.938)';
 ---
 
 {
   item.events >= 1 && (
-    <div class={`flex gap-3 items-start mb-2 px-2 pr-2 border-b border-l-8 border-l-${rankColor}`}>
+    <div
+      class="flex gap-4 items-center mb-2 p-2 border-l-4 border-b"
+      style={`border-left-color: ${rankColor}`}
+    >
       <strong class={`font-bold text-2xl vcr text-right text-${rankColor}`}>{item.rank}</strong>
-      <div class="size-18">
+      <div class="size-14">
         {item.player.avatarUrl === '1' ? (
           <img src={`/images/avatars/${item.player.id}.png`} />
         ) : (
@@ -65,15 +68,17 @@ const rankColor =
         )}
       </div>
 
-      <div class="flex flex-col gap-1">
-        <h4 class="uppercase vcr text-2xl">{shortName(item.player.fullName)}</h4>
-        <div class="text-sm uppercase vcr">
+      <div class="flex flex-col content-center leading-2">
+        <span class="uppercase font-bold vcr text-lg leading-6">
+          {shortName(item.player.fullName)}
+        </span>
+        <div class="text-xs uppercase vcr">
           {summaryString} {subSummaryString}
         </div>
         <div class="text-xs uppercase vcr">{subSubSummaryString}</div>
       </div>
-      <h5 class="vcr text-3xl ml-auto">
-        {pointValue} {pointText}
+      <h5 class="vcr text-2xl ml-auto">
+        {pointValue} <small class="ml-1 text-xs">{pointText}</small>
       </h5>
     </div>
   )

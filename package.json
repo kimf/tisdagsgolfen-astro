@@ -23,6 +23,7 @@
     "@astrojs/vercel": "^8.1.4",
     "@conform-to/zod": "^1.5.0",
     "@libsql/client": "^0.15.4",
+    "@marcreichel/alpine-auto-animate": "^1.1.0",
     "@nanostores/persistent": "^1.0.0",
     "@playform/compress": "^0.1.9",
     "@tailwindcss/vite": "^4.1.5",
