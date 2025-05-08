@@ -22,12 +22,12 @@ import 'src/styles/global.css';
       !hideHeader && (
         <div class="flex w-full items-center p-4 bg-gray-200 border-gray-200 dark:bg-gray-950">
           {back && (
-            <Button intent="link" class="p-4 bg-cyan-50/25 mr-4" slot="footer-left">
-              <a href={back} data-astro-prefetch="false">
+            <a href={back} data-astro-prefetch="false">
+              <Button intent="link" class="p-4 bg-cyan-50/25 mr-4" slot="footer-left">
                 {' '}
                 &larr;
-              </a>
-            </Button>
+              </Button>
+            </a>
           )}
           <div class="flex justify-between w-full">
             {title && (
