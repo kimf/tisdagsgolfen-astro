@@ -3,21 +3,6 @@ import AppScreen from 'src/layouts/AppScreen.astro';
 import Link from 'src/assets/icons/link.svg';
 import HeaderTitle from 'src/components/shared/HeaderTitle.astro';
 import Button from 'src/components/ui/button.astro';
-import { Image } from 'astro:assets';
-
-import winnerphotosDefault from 'src/assets/images/winnerphotos/default.png';
-import winnerphotos2024tobbe from 'src/assets/images/winnerphotos/2024-tobbe.jpg';
-import winnerphotos2022khalex from 'src/assets/images/winnerphotos/2022-khalex.jpg';
-import winnerphotos2021patrik from 'src/assets/images/winnerphotos/2021-patrik.jpeg';
-import winnerphotos2020tobbe from 'src/assets/images/winnerphotos/2020-tobbe.jpg';
-import winnerphotos2019niklas from 'src/assets/images/winnerphotos/2019-niklas.jpg';
-import winnerphotos2018patrik from 'src/assets/images/winnerphotos/2018-patrik.png';
-import winnerphotos2017tobbe from 'src/assets/images/winnerphotos/2017-tobbe.jpg';
-import winnerphotos2016niklas from 'src/assets/images/winnerphotos/2016-niklas.jpg';
-import winnerphotos2015patrik from 'src/assets/images/winnerphotos/2015-patrik.jpg';
-import winnerphotos2014daniel from 'src/assets/images/winnerphotos/2014-daniel.png';
-import winnerphotos2013hakan from 'src/assets/images/winnerphotos/2013-hakan.png';
-import type { ImageMetadata } from 'astro';
 
 Astro.response.headers.set(
   'Cache-Control',
@@ -28,7 +13,7 @@ Astro.response.headers.set('E-tag', 'v1');
 type HistoryItem = {
   year: string;
   winner: string;
-  image?: ImageMetadata;
+  image?: string;
   description?: string;
 };
 const historyItems: HistoryItem[] = [
@@ -36,74 +21,74 @@ const historyItems: HistoryItem[] = [
     year: '2024',
     winner: 'Tobias',
     description: 'Nyköping igen... Dominanten och giganten Tobias var oslagbar',
-    image: winnerphotos2024tobbe
+    image: '/images/winnerphotos/2024-tobbe.jpg'
   },
   {
     year: '2023',
     winner: 'Khalex',
     description: 'Nyköping. Var han fortfarande på väg ner i hcp? :D',
-    image: winnerphotosDefault
+    image: '/images/winnerphotos/default.png'
   },
   {
     year: '2022',
     winner: 'Khalex',
     description: '10 år! Lanna Lodge. Khalex var på väg ner i hcp :)',
-    image: winnerphotos2022khalex
+    image: '/images/winnerphotos/2022-khalex.jpg'
   },
   {
     year: '2021',
     winner: 'Patrik',
     description:
       'Packe totaldominerade. Täby Gk (kallt satan) + Sala GK med den intressanta restaurangen',
-    image: winnerphotos2021patrik
+    image: '/images/winnerphotos/2021-patrik.jpeg'
   },
   {
     year: '2020',
     winner: 'Tobias',
     description: 'Åda + Finspång',
-    image: winnerphotos2020tobbe
+    image: '/images/winnerphotos/2020-tobbe.jpg'
   },
   {
     year: '2019',
     winner: 'Niklas',
     description: 'Åda + Nyköping. Straffgolf och mycket whiskey',
-    image: winnerphotos2019niklas
+    image: '/images/winnerphotos/2019-niklas.jpg'
   },
   {
     year: '2018',
     winner: 'Patrik',
     description: 'Ombergs, och delad seger troddes det ett tag',
-    image: winnerphotos2018patrik
+    image: '/images/winnerphotos/2018-patrik.png'
   },
   {
     year: '2017',
     winner: 'Tobias',
     description: '5-års jubileum och final i Spanien!',
-    image: winnerphotos2017tobbe
+    image: '/images/winnerphotos/2017-tobbe.jpg'
   },
   {
     year: '2016',
     winner: 'Niklas',
     description: 'Lindö igen?',
-    image: winnerphotos2016niklas
+    image: '/images/winnerphotos/2016-niklas.jpg'
   },
   {
     year: '2015',
     winner: 'Patrik',
     description: 'Lindö',
-    image: winnerphotos2015patrik
+    image: '/images/winnerphotos/2015-patrik.jpg'
   },
   {
     year: '2014',
     winner: 'Daniel',
     description: 'Finalspel på Körunda? Matchspel A & B finaler',
-    image: winnerphotos2014daniel
+    image: '/images/winnerphotos/2014-daniel.png'
   },
   {
     year: '2013',
     winner: 'Håkan',
     description: 'Final på Körunda och åt på thaien',
-    image: winnerphotos2013hakan
+    image: '/images/winnerphotos/2013-hakan.png'
   },
   {
     year: '2012',
@@ -126,10 +111,9 @@ const historyItems: HistoryItem[] = [
             </p>
           )}
           {item.image && (
-            <Image
-              src={item.image}
-              alt={`Vinnarbild ${item.year}`}
+            <img
               class="object-cover w-full mt-4 border-4 border-gray-200 min-h-36 max-w-[600px] aspect-[16/9]"
+              src={item.image}
             />
           )}
 
