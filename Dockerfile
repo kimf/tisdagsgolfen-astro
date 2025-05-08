@@ -8,6 +8,7 @@ ARG USER_PASSWORD
 
 COPY . .
 
+RUN npm install sharp
 RUN npm install --include=dev
 RUN npm run build
 RUN npm run db:migrate
