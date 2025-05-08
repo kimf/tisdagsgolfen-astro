@@ -72,6 +72,8 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
       .slice(0, 5)
       .map((s) => s.strokes);
 
+    const events = playerScorecards.length;
+
     const beers = playerScorecards.length
       ? playerScorecards.reduce((a, b) => a + b.players.reduce((a, b) => a + (b.beers ?? 0), 0), 0)
       : 0;
@@ -85,6 +87,8 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
       : 0;
 
     const totalFines = fines - beers * 50 - ciders * 25;
+
+    const averageFines = Math.abs(totalFines / events);
 
     const finesSummary = `${fines > 0 ? '+' : ''}${fines} kr`;
     const beersString = beers === 0 ? null : beers > 1 ? `${beers}x🍺` : '🍺';
@@ -133,8 +137,8 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
       ciders,
       fines,
       totalFines,
-      averageFines: playerScorecards.length ? fines / playerScorecards.length : 0,
-      events: playerScorecards.length,
+      averageFines,
+      events,
       strokes_array,
       points_array,
       special_array,
