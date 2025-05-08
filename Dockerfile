@@ -8,8 +8,8 @@ ARG USER_PASSWORD
 
 COPY . .
 
+RUN npm install --arch=arm64 --platform=linux --libc=musl -g sharp
 RUN npm install --include=dev
-RUN npm install --arch=arm64 --platform=linux --libc=musl sharp
 RUN npm run build
 RUN npm run db:migrate
 
