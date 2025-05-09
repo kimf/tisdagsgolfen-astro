@@ -39,7 +39,7 @@ const rankedScorecards = standardCompRank(
 <AppScreen title={title} back="/">
   <EventPillRow special={!!event.special} strokes={!!event.strokes} teamEvent={!!event.teamEvent} />
 
-  <table class="w-full text-left text-gray-600 dark:text-gray-300 mt-4">
+  <table class="w-full text-left text-gray-600 mt-4">
     <thead class="uppercase bg-background">
       <th class="p-2 text-center vcr">#</th>
       <th class="p-2 vcr">Spelare</th>
@@ -52,7 +52,7 @@ const rankedScorecards = standardCompRank(
     <tbody>
       {
         rankedScorecards.map((scorecard) => (
-          <tr class="border-b border-gray-200 odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 dark:border-gray-700">
+          <tr class="border-b border-gray-200 odd:bg-white even:bg-gray-50">
             <td class="p-2 text-center vcr">{scorecard.rank}</td>
             <td class="px-2 py-1 flex flex-col vcr uppercase">
               {scorecard.players.map((p) => (

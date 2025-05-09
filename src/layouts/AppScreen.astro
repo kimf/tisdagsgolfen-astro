@@ -8,7 +8,6 @@ export interface Props {
 const { title, back, hideHeader = false } = Astro.props;
 import SharedHead from 'src/components/layouts/SharedHead.astro';
 import Button from 'src/components/ui/button.astro';
-import ThemeToggle from 'src/components/ui/theme-toggle.astro';
 import 'src/styles/global.css';
 ---
 
@@ -17,10 +16,10 @@ import 'src/styles/global.css';
   <SharedHead title={title}>
     <slot name="head" slot="head" />
   </SharedHead>
-  <body id="main" class="antialiased dark:bg-gray-900 h-screen w-screen">
+  <body id="main" class="antialiased h-screen w-screen">
     {
       !hideHeader && (
-        <div class="flex w-full items-center p-4 bg-gray-200 border-gray-200 dark:bg-gray-950">
+        <div class="flex w-full items-center p-4 bg-gray-200 border-gray-200">
           {back && (
             <a href={back} data-astro-prefetch="false">
               <Button intent="link" class="p-4 bg-cyan-50/25 mr-4" slot="footer-left">
@@ -48,13 +47,12 @@ import 'src/styles/global.css';
     </main>
 
     <footer
-      class="flex w-full z-1 fixed bottom-0 left-0 backdrop-blur bg-gray-200 border-gray-200 dark:bg-gray-950 h-12 p-2"
+      class="flex w-full z-1 fixed bottom-0 left-0 backdrop-blur bg-gray-200 border-gray-200 h-12 p-2"
     >
       <slot name="footer-left" />
 
       <div class="ml-auto flex gap-1">
         <slot name="footer-right" />
-        <ThemeToggle />
       </div>
     </footer>
   </body>

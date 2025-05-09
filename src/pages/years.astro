@@ -106,9 +106,7 @@ const historyItems: HistoryItem[] = [
           <HeaderTitle title={`${item.year} - ${item.winner}`} />
 
           {item.description && (
-            <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">
-              {item.description}
-            </p>
+            <p class="mb-2 text-base font-normal text-gray-500">{item.description}</p>
           )}
           {item.image && (
             <img

@@ -10,7 +10,7 @@ export interface Props {
 const { id, label } = Astro.props;
 
 const labelVariants = cva({
-  base: 'inline-flex items-center justify-between w-full  bg-white border-2 border-gray-200 cursor-pointer rounded-xs active:scale-99 peer-checked:bg-cyan-50 peer-checked:active:scale-100 dark:border-gray-700 peer-checked:border-cyan-600 dark:peer-checked:border-cyan-600 peer-checked:text-cyan-600 dark:text-gray-400 dark:bg-gray-800',
+  base: 'inline-flex items-center justify-between w-full  bg-white border-2 border-gray-200 cursor-pointer rounded-xs active:scale-99 peer-checked:bg-cyan-50 peer-checked:active:scale-100 peer-checked:border-cyan-600 peer-checked:text-cyan-600',
   variants: {
     size: {
       default: 'px-4 py-1',

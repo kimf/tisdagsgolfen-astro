@@ -1,6 +1,4 @@
 ---
-import { STORAGE_THEME_KEY, THEME_MAP } from 'src/lib/theme';
-
 import { Font } from 'astro:assets';
 import { Head } from 'astro-capo';
 
@@ -28,31 +26,8 @@ const { title } = Astro.props;
   <Font cssVariable="--font-mono" preload />
 
   <title>{title ? `${title} - ` : ''}Tisdagsgolfen</title>
-  <meta name="theme-color" content="#f3f3f398" media="(prefers-color-scheme: light)" />
-  <meta
-    name="theme-color"
-    content="oklch(0.141 0.005 285.823)"
-    media="(prefers-color-scheme: dark)"
-  />
+  <meta name="theme-color" content="#f3f3f398" />
   <link rel="icon" type="image/x-icon" href="/favicon.png" />
 
   <slot name="head" />
 </Head>
-<script is:inline define:vars={{ STORAGE_THEME_KEY, THEME_MAP }}>
-  const getThemePreference = () => {
-    if (typeof localStorage !== 'undefined' && localStorage.getItem(STORAGE_THEME_KEY))
-      return localStorage.getItem(STORAGE_THEME_KEY);
-
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? THEME_MAP.dark
-      : THEME_MAP.light;
-  };
-
-  const isDark = getThemePreference() === THEME_MAP.dark;
-  document.documentElement.classList[isDark ? 'add' : 'remove'](THEME_MAP.dark);
-
-  const metaTag = document.querySelector('meta[name=theme-color]');
-  metaTag.setAttribute('content', isDark ? 'oklch(0.141 0.005 285.823)' : '#f3f3f398');
-
-  localStorage.setItem(STORAGE_THEME_KEY, isDark ? THEME_MAP.dark : THEME_MAP.light);
-</script>

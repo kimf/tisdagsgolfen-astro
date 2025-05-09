@@ -25,33 +25,24 @@ const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a
   <div class="flex flex-col">
     <div
       role="tablist"
-      class="inline-flex flex-wrap justify-center bg-stone-200 dark:bg-stone-700 rounded p-1 w-full mb-4"
+      class="inline-flex flex-wrap justify-center bg-stone-200 rounded p-1 w-full mb-4"
       x-auto-animate
     >
       <template x-for="(tab, index) in tabs" :key="index">
         <button
           :id="`tab-${index}`"
           class="flex-1 uppercase vcr h-8 px-4 rounded font-bold whitespace-nowrap transition-all duration-150 ease-in-out"
-          :class={`currentTab === tab.name ? 'text-slate-900 bg-gradient-to-b from-cyan-50 to-cyan-200 border-blue-100 shadow-md box-border' : 'text-slate-600 dark:text-slate-100 hover:text-slate-900 '`}
+          :class={`currentTab === tab.name ? 'text-slate-900 bg-gradient-to-b from-cyan-50 to-cyan-200 border-blue-100 shadow-md box-border' : 'text-slate-600 hover:text-slate-900 '`}
           @click={`changeTab(tab.name)`}
           x-text="tab.title"></button>
       </template>
     </div>
 
-    <table class="w-full text-left text-gray-600 dark:text-gray-300">
-      <thead class="uppercase bg-background text-sm">
-        <tr class="border-b">
-          <th></th>
-          <th class="pb-2 vcr">Spelare</th>
-          <th class="pb-2 text-left vcr">
-          </th>
-          <th class="pb-2 text-right vcr font-bold pr-2">TOT</th>
-        </tr>
-      </thead>
+    <table class="w-full text-left text-gray-600">
       <tbody x-ref="list" x-auto-animate.linear>
         <template x-for="item in sortedItems" :key="item.id">
           <tr
-            class="border-b border-gray-200 odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 dark:border-gray-700 ranked"
+            class="border-b border-gray-200 odd:bg-whit even:bg-gray-50 ranked"
             :data-rank="item.rank"
           >
             <td class="p-2 text-center content-start font-bold vcr" x-text="item.rank"></td>
