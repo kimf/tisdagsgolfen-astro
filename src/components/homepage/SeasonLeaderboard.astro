@@ -3,7 +3,6 @@ import { getEventsWithLeaderboardData } from 'src/db/queries/getEvents';
 import HeaderTitle from '../shared/HeaderTitle.astro';
 import { getPlayers } from 'src/db/queries/getPlayers';
 import buildLeaderboardItems from 'src/lib/buildLeaderboardItems';
-import standardCompRank from 'src/lib/standardCompRank';
 export interface Props {
   seasonId: number;
 }

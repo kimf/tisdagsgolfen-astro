@@ -42,6 +42,8 @@ export async function getStaticPaths() {
   const events = await db.query.events.findMany();
   return events?.map((ev) => ({ params: { id: ev.id } })) ?? [];
 }
+
+Astro.response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=3600');
 ---
 
 <AppScreen title="VECKORESULTAT" back="/">
