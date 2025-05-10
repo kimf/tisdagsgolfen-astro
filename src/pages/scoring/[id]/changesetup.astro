@@ -34,7 +34,7 @@ if (Astro.request.method === 'POST') {
 }
 ---
 
-<AppScreen title="Ändra runda" back>
+<AppScreen title="Ändra runda" back={`/scoring/${id}`}>
   <form method="POST">
     {
       scoringSession.scorecards.map((scorecard, index) => (

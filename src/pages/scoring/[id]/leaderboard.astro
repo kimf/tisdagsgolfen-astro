@@ -3,10 +3,17 @@ import AppScreen from 'src/layouts/AppScreen.astro';
 import LiveLeaderboard from 'src/pages/partials/scoring/[id]/live-leaderboard.astro';
 
 const { id } = Astro.params;
+const userId = await Astro.session?.get('userId');
 if (!id) throw new Error('Id saknas för runda');
+
+let back = '/';
+if (userId) {
+  const referer = Astro.request.headers?.get('referer');
+  back = referer && !referer.includes('leaderboard') ? referer : `/`;
+}
 ---
 
-<AppScreen title="Ledartavla" back>
+<AppScreen title="Ledartavla" back={back}>
   <div
     hx-get={`/partials/scoring/${id}/live-leaderboard`}
     hx-trigger="every 5s"

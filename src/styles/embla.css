@@ -35,7 +35,6 @@
 .embla__slide__inner {
   position: relative;
   overflow: hidden;
-  height: calc(100vh - 200px);
 }
 
 .embla__button {

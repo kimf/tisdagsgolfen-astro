@@ -1,13 +1,12 @@
 ---
 export interface Props {
   title?: string;
-  back?: boolean;
-  transition?: 'fade' | 'none' | 'slide';
+  back?: string;
   hideHeader?: boolean;
   skipPadding?: boolean;
 }
 
-const { title, back = false, hideHeader = false, skipPadding = false, transition } = Astro.props;
+const { title, back, hideHeader = false, skipPadding = false } = Astro.props;
 import { cx } from 'cva';
 import SharedHead from 'src/components/layouts/SharedHead.astro';
 import Button from 'src/components/ui/button.astro';
@@ -15,12 +14,7 @@ import 'src/styles/global.css';
 ---
 
 <!doctype html>
-<html
-  lang="sv"
-  class="text-xs sm:text-base"
-  transition:name="root"
-  transition:animate={transition ?? 'none'}
->
+<html lang="sv" class="text-sm sm:text-base">
   <SharedHead title={title}>
     <slot name="head" slot="head" />
   </SharedHead>
@@ -28,9 +22,9 @@ import 'src/styles/global.css';
   <body class="h-screen w-screen bg-noise-light-gradient-bottom">
     {
       !hideHeader && (
-        <div class="flex w-full items-center p-4 backdrop-blur-3xl text-black fixed h-16 overflow-hidden z-100 shadow">
+        <div class="flex w-full items-center p-4 backdrop-blur-3xl text-black fixed h-16 overflow-hidden z-50 shadow">
           {back && (
-            <a href="/" data-astro-prefetch="false" @click="history.back()">
+            <a href={back}>
               <Button intent="link" class="p-4 bg-cyan-50/25 mr-4" slot="footer-left">
                 {' '}
                 &larr;
@@ -38,11 +32,7 @@ import 'src/styles/global.css';
             </a>
           )}
           <div class="flex justify-between w-full">
-            {title && (
-              <a href="/">
-                <h1 class="font-bold text-accent-foreground">{title}</h1>
-              </a>
-            )}
+            {title && <h1 class="font-bold text-accent-foreground">{title}</h1>}
             <div class="ml-auto">
               <slot name="header" />
             </div>
@@ -57,7 +47,6 @@ import 'src/styles/global.css';
         hideHeader ? '' : 'pt-20',
         skipPadding ? '' : 'p-4'
       )}
-      transition:animate={transition ?? 'slide'}
     >
       <slot />
     </main>
@@ -71,17 +60,5 @@ import 'src/styles/global.css';
         <slot name="footer-right" />
       </div>
     </footer>
-
-    <script>
-      import Alpine from 'alpinejs';
-      document.addEventListener('astro:after-preparation', () => {
-        Alpine.stopObservingMutations();
-      });
-      document.addEventListener('astro:page-load', () => {
-        document.dispatchEvent(new Event('alpine:init'));
-        Alpine.initTree(document.documentElement);
-        Alpine.startObservingMutations();
-      });
-    </script>
   </body>
 </html>

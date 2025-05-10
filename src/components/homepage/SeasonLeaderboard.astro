@@ -42,10 +42,10 @@ const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a
       <tbody x-ref="list" x-auto-animate.linear>
         <template x-for="item in sortedItems" :key="item.id">
           <tr
-            class="border-b border-gray-200 odd:bg-white/50 even:bg-gray-50 ranked backdrop-blur-sm"
+            class="border-b border-gray-200 odd:bg-white even:bg-gray-50 ranked "
             :data-rank="item.rank"
           >
-            <td class="p-2 text-center content-start font-bold vcr" x-text="item.rank"></td>
+            <td class="px-1 text-center content-center vcr" x-text="item.rank"></td>
             <td class="py-2 uppercase text-sm">
               <div class="flex gap-2">
                 <img

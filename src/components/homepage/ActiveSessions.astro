@@ -23,7 +23,8 @@ const ownedScoringSession = userId
   ? scoringSessions.find((sesh) => sesh.ownerId === Number(userId))
   : null;
 
-const flattenedSessions = groupedSessions.flatMap((gs) => gs.map((s) => s));
+const hasFinishedSession = ownedScoringSession && ownedScoringSession.state === 'PENDING';
+const scoringSession = ownedScoringSession || scoringSessions[0];
 ---
 
 {
@@ -34,33 +35,31 @@ const flattenedSessions = groupedSessions.flatMap((gs) => gs.map((s) => s));
   )
 }
 {
-  flattenedSessions.map((sesh) => (
+  scoringSession && (
     <EventCard
-      date={sesh.createdAt || ''}
-      special={!!sesh.special}
-      strokes={!!sesh.strokes}
-      teamEvent={!!sesh.teamEvent}
+      date={scoringSession.createdAt || ''}
+      special={!!scoringSession.special}
+      strokes={!!scoringSession.strokes}
+      teamEvent={!!scoringSession.teamEvent}
       live
     >
-      <div id={`sesh.${sesh.id}`} class="flex justify-between">
-        {userId && sesh.ownerId === Number(userId) && (
+      <div id={`scoringSession.${scoringSession.id}`} class="flex justify-between">
+        <a
+          href={
+            !ownedScoringSession
+              ? `/scoring/new?joinId=${scoringSession.id}`
+              : `/scoring/${scoringSession.id}`
+          }
+        >
           <Button size="xs" intent="default" class="absolute bottom-2 left-2">
-            <a href={`/scoring/${sesh.id}`} class="btn">
-              {sesh.state === 'PENDING' ? 'REDIGERA' : 'FORTSÄTT'}
-            </a>
+            {hasFinishedSession ? 'REDIGERA' : ownedScoringSession ? 'FORTSÄTT' : 'FÖR SCORE'}
           </Button>
-        )}
-        <a href={`/scoring/${sesh.id}/leaderboard`} class="absolute bottom-2 right-2">
-          <Link class="size-5" />
         </a>
-        {userId && sesh.ownerId !== Number(userId) && (
-          <Button size="xs" class="absolute bottom-2 left-2">
-            <a href={`/scoring/new?joinId=${sesh.id}`} class="btn">
-              FÖR SCORE
-            </a>
-          </Button>
-        )}
       </div>
+
+      <a href={`/scoring/${scoringSession.id}/leaderboard`} class="absolute bottom-2 right-2">
+        <Link class="size-5" />
+      </a>
     </EventCard>
-  ))
+  )
 }
