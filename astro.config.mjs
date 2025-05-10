@@ -6,8 +6,7 @@ import fsExtra from 'fs-extra';
 import htmx from 'astro-htmx';
 import alpinejs from '@astrojs/alpinejs';
 import tailwindcss from '@tailwindcss/vite';
-import node from '@astrojs/node';
-import vercel from '@astrojs/vercel';
+import cloudflare from '@astrojs/cloudflare';
 
 const COLORS = {
   reset: '\x1b[0m',
@@ -46,7 +45,7 @@ const copyLegacyContent = () => ({
   }
 });
 
-const isProd = process.env.VERCEL;
+const isProd = process.env.NODE_ENV === 'production';
 const redisUrl = process.env.REDIS_URL || '';
 export default defineConfig({
   vite: {
@@ -68,9 +67,7 @@ export default defineConfig({
   },
 
   output: 'server',
-  adapter: vercel({
-    output: 'hybrid'
-  }),
+  adapter: cloudflare(),
 
   session: {
     driver: isProd ? 'redis' : 'fs-lite',
