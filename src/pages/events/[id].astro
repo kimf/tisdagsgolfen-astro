@@ -41,7 +41,8 @@ const rankedScorecards = standardCompRank(
 );
 
 export async function getStaticPaths() {
-  const events = await db.query.events.findMany();
+  const database = getDb(Astro.locals);
+  const events = await database.query.events.findMany();
   return events?.map((ev) => ({ params: { id: ev.id } })) ?? [];
 }
 
