@@ -1,5 +1,4 @@
 ---
-export const prerender = true;
 import 'src/styles/global.css';
 import ActiveSessions from 'src/components/homepage/ActiveSessions.astro';
 import UserButton from 'src/components/homepage/UserButton.astro';
@@ -20,7 +19,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=3600'
     ))
   }
 
-  <UserButton slot="header" server:defer>
+  <UserButton slot="header">
     <div
       slot="fallback"
       x-transition
@@ -36,7 +35,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=3600'
     <HeaderTitle title="RUNDOR" />
     <div class="flex overflow-x-scroll">
       <div class="flex flex-nowrap h-26 gap-2">
-        <ActiveSessions server:defer />
+        <ActiveSessions />
         <Events />
       </div>
     </div>

@@ -11,11 +11,20 @@ import Beers from 'src/components/shared/Beers.astro';
 import Ciders from 'src/components/shared/Ciders.astro';
 import ToPar from 'src/components/shared/ToPar.astro';
 import getDb from 'src/db';
-
-const { id } = Astro.params;
-if (!id) throw new Error('Id saknas för runda');
+import type { GetStaticPaths, InferGetStaticParamsType } from 'astro';
 
 const db = getDb(Astro.locals);
+
+export const getStaticPaths = (async () => {
+  // const events = await db.query.events.findMany();
+  const events: any[] = [];
+  return events?.map((ev) => ({ params: { id: ev.id } })) ?? [];
+}) satisfies GetStaticPaths;
+
+type Params = InferGetStaticParamsType<typeof getStaticPaths>;
+
+const { id } = Astro.params as Params;
+if (!id) throw new Error('Id saknas för runda');
 
 const event = await getEventWithLeaderboardData(Number(id), db);
 
@@ -39,12 +48,6 @@ const rankedScorecards = standardCompRank(
   false,
   null
 );
-
-export async function getStaticPaths() {
-  const database = getDb(Astro.locals);
-  const events = await database.query.events.findMany();
-  return events?.map((ev) => ({ params: { id: ev.id } })) ?? [];
-}
 
 Astro.response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=3600');
 ---
