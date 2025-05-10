@@ -69,10 +69,7 @@ export default defineConfig({
 
   output: 'server',
   adapter: vercel({
-    output: 'hybrid',
-    isr: true,
-    // caches all pages on first request and saves for 1 day
-    expiration: 60 * 60 * 24
+    output: 'hybrid'
   }),
 
   session: {
