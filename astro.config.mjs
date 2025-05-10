@@ -7,6 +7,7 @@ import htmx from 'astro-htmx';
 import alpinejs from '@astrojs/alpinejs';
 import tailwindcss from '@tailwindcss/vite';
 import node from '@astrojs/node';
+import vercel from '@astrojs/vercel';
 
 const COLORS = {
   reset: '\x1b[0m',
@@ -45,7 +46,7 @@ const copyLegacyContent = () => ({
   }
 });
 
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.VERCEL;
 const redisUrl = process.env.REDIS_URL || '';
 export default defineConfig({
   vite: {
@@ -67,8 +68,11 @@ export default defineConfig({
   },
 
   output: 'server',
-  adapter: node({
-    mode: 'standalone'
+  adapter: vercel({
+    output: 'hybrid',
+    isr: true,
+    // caches all pages on first request and saves for 1 day
+    expiration: 60 * 60 * 24
   }),
 
   session: {

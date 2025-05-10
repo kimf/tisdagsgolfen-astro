@@ -57,7 +57,7 @@ const title = `${new Date(scoringSession.createdAt || '').toLocaleDateString('sv
       `;
 ---
 
-<AppScreen title={title} skipPadding>
+<AppScreen title={title}>
   <div slot="header">
     <EventPillRow
       special={!!scoringSession.special}
@@ -79,7 +79,7 @@ const title = `${new Date(scoringSession.createdAt || '').toLocaleDateString('sv
                     <h1 class="text-3xl">HÅL {hole.number}</h1>
                     <small>INDEX {hole.index}</small>
                   </header>
-                  <div class="rounded-lg border shadow-xl relative">
+                  <div class="rounded-lg border relative">
                     <table class="w-full text-sm text-left">
                       <thead class="w-full uppercase bg-cyan-950 text-white">
                         <tr>

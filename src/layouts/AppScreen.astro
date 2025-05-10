@@ -2,12 +2,9 @@
 export interface Props {
   title?: string;
   back?: string;
-  hideHeader?: boolean;
-  skipPadding?: boolean;
 }
 
-const { title, back, hideHeader = false, skipPadding = false } = Astro.props;
-import { cx } from 'cva';
+const { title, back } = Astro.props;
 import SharedHead from 'src/components/layouts/SharedHead.astro';
 import Button from 'src/components/ui/button.astro';
 import 'src/styles/global.css';
@@ -21,8 +18,8 @@ import 'src/styles/global.css';
 
   <body class="h-screen w-screen bg-noise-light-gradient-bottom">
     {
-      !hideHeader && (
-        <div class="flex w-full items-center p-4 backdrop-blur-3xl text-black fixed h-16 overflow-hidden z-50 shadow pt-safe-or-20 pb-6">
+      (
+        <div class="flex w-full items-center p-4 backdrop-blur-3xl text-black fixed  overflow-hidden z-50 shadow header-padding-safe">
           {back && (
             <a href={back}>
               <Button intent="link" class="p-4 bg-cyan-50/25 mr-4" slot="footer-left">
@@ -41,18 +38,12 @@ import 'src/styles/global.css';
       )
     }
 
-    <main
-      class={cx(
-        'max-w-screen-xl h-full mx-auto pb-20 px-safe-or-4',
-        hideHeader ? '' : 'pt-safe-plus-30',
-        skipPadding ? '' : 'p-4'
-      )}
-    >
+    <main class="max-w-screen-xl h-full mx-auto main-padding-safe">
       <slot />
     </main>
 
     <footer
-      class="flex w-full z-10 fixed bottom-0 left-0 backdrop-blur bg-gray-200 border-gray-200 p-4 pb-safe"
+      class="flex w-full z-10 fixed bottom-0 left-0 backdrop-blur bg-gray-200 border-gray-200 p-2 footer-padding-safe"
     >
       <slot name="footer-left" />
 

@@ -17,6 +17,7 @@
   "dependencies": {
     "@astrojs/alpinejs": "^0.4.8",
     "@astrojs/node": "^9.2.1",
+    "@astrojs/vercel": "^8.1.4",
     "@conform-to/zod": "^1.5.0",
     "@libsql/client": "^0.15.4",
     "@marcreichel/alpine-auto-animate": "^1.1.0",
