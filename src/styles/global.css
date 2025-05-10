@@ -158,3 +158,36 @@ main {
   white-space: nowrap;
   border-width: 0;
 }
+
+.px-safe-or-4 {
+  padding-right: max(env(safe-area-inset-right), 1rem);
+  padding-left: max(env(safe-area-inset-left), 1rem);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+.pt-safe-or-20 {
+  padding-top: max(env(safe-area-inset-right), 5rem);
+}
+
+.pt-safe-plus-30 {
+  padding-top: calc(env(safe-area-inset-right) + 8rem);
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.h-screen-safe {
+  height: calc(100vh - (env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+  height: -webkit-fill-available;
+}
+
+.inset-safe {
+  top: env(safe-area-inset-top);
+  right: env(safe-area-inset-right);
+  bottom: env(safe-area-inset-bottom);
+  left: env(safe-area-inset-left);
+}

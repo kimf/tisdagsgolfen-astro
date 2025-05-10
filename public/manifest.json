@@ -1,0 +1,38 @@
+{
+  "theme": "#e9e2d5",
+  "background_color": "#e9e2d5",
+  "icons": [
+    {
+      "src": "/manifest/manifest-icon-192.maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/manifest/manifest-icon-192.maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/manifest/manifest-icon-512.maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/manifest/manifest-icon-512.maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "orientation": "portrait",
+  "display": "standalone",
+  "dir": "auto",
+  "lang": "sv-SE",
+  "name": "Tisdagsgolfen",
+  "short_name": "Tisdagsgolfen",
+  "scope": "https://tisdagsgolfen.fransman.se",
+  "start_url": "https://tisdagsgolfen.fransman.se/"
+}
