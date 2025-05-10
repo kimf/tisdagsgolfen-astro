@@ -1,6 +1,12 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
 
+type Runtime = import('@astrojs/cloudflare').Runtime<Env>;
+
+declare namespace App {
+  interface Locals extends Runtime {}
+}
+
 // Declare a module to handle the lack of type definitions
 declare module '@marcreichel/alpine-auto-animate' {
   const AutoAnimate: any;

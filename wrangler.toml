@@ -1,0 +1,18 @@
+compatibility_flags = [ "nodejs_compat" ]
+compatibility_date = "2024-09-23"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tisdagsgolfen-prod-db"
+database_id = "7e5a2289-71e1-491b-b723-6e22a1125b55"
+preview_database_id = "DB"
+migrations_dir  = "./src/db/_drizzle"
+
+[env.preview]
+name = "preview"
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "tisdagsgolfen-preview-db"
+database_id = "857daf10-a740-4b3d-a3d6-501ac6e632df"
+migrations_dir  = "./src/db/_drizzle"
+

@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS "__drizzle_migrations" (
 INSERT INTO __drizzle_migrations VALUES(NULL,'9d43d08076812f2b98ca9e5fd81fa6e56d8036f8e9574691c781a8c78bfd107f',1745241794686);
 INSERT INTO __drizzle_migrations VALUES(NULL,'af1c75c3f471ca4cbfeaeb212e37474ea8a44a30a0c093939691caadb151ca44',1745242160927);
 INSERT INTO __drizzle_migrations VALUES(NULL,'bfa57ca919937bb94e1a070e06054c11317bf793eacb4b4b24cd0c7ca0206df9',1745242195754);
+INSERT INTO __drizzle_migrations VALUES(NULL,'246a8529fcf4b45a5c7781c910c57fa965a4bc7c3d977575c23a3ccfe7ce16da',1746565284942);
 CREATE TABLE IF NOT EXISTS `courses` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`club` text NOT NULL,
@@ -119,6 +120,10 @@ INSERT INTO scorecard_players VALUES(15,1,15,0,-30,0,'2025-05-06 14:23:44');
 INSERT INTO scorecard_players VALUES(16,8,16,0,-30,0,'2025-05-06 14:30:12');
 INSERT INTO scorecard_players VALUES(17,7,17,0,-20,0,'2025-05-06 14:30:12');
 INSERT INTO scorecard_players VALUES(18,2,18,0,0,1,'2025-05-06 14:30:12');
+INSERT INTO scorecard_players VALUES(23,8,23,0,0,0,'2025-05-10 20:56:58');
+INSERT INTO scorecard_players VALUES(24,13,24,0,0,0,'2025-05-10 20:56:58');
+INSERT INTO scorecard_players VALUES(25,10,25,0,100,0,'2025-05-10 20:56:58');
+INSERT INTO scorecard_players VALUES(26,1,26,0,0,0,'2025-05-10 20:56:58');
 CREATE TABLE IF NOT EXISTS `scorecards` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`scoring_session_id` integer NOT NULL,
@@ -137,13 +142,17 @@ CREATE TABLE IF NOT EXISTS `scorecards` (
 	FOREIGN KEY (`scoring_session_id`) REFERENCES `scoring_sessions`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON UPDATE no action ON DELETE no action
 );
-INSERT INTO scorecards VALUES(12,5,1008,31,95,32,0,17,0,18,6,1,0,'2025-05-06 14:23:44');
-INSERT INTO scorecards VALUES(13,5,1008,32,94,32,0,14,0,18,8,1,0,'2025-05-06 14:23:44');
-INSERT INTO scorecards VALUES(14,5,1008,32,94,34,0,13,0,18,9,1,0,'2025-05-06 14:23:44');
-INSERT INTO scorecards VALUES(15,5,1008,30,83,33,0,5,0,18,6,1,0,'2025-05-06 14:23:44');
-INSERT INTO scorecards VALUES(16,6,1008,33,88,33,0,13,0,18,3,1,0,'2025-05-06 14:30:12');
-INSERT INTO scorecards VALUES(17,6,1008,27,103,35,0,18,0,18,13,1,0,'2025-05-06 14:30:12');
-INSERT INTO scorecards VALUES(18,6,1008,34,83,34,0,8,0,18,3,1,0,'2025-05-06 14:30:12');
+INSERT INTO scorecards VALUES(12,5,1008,31,95,32,8,17,0,18,6,1,0,'2025-05-06 14:23:44');
+INSERT INTO scorecards VALUES(13,5,1008,32,94,32,11,14,0,18,8,1,0,'2025-05-06 14:23:44');
+INSERT INTO scorecards VALUES(14,5,1008,32,94,34,11,13,0,18,9,1,0,'2025-05-06 14:23:44');
+INSERT INTO scorecards VALUES(15,5,1008,30,83,33,6,5,0,18,6,1,0,'2025-05-06 14:23:44');
+INSERT INTO scorecards VALUES(16,6,1008,33,88,33,15,13,0,18,3,1,0,'2025-05-06 14:30:12');
+INSERT INTO scorecards VALUES(17,6,1008,27,103,35,4,18,0,18,13,1,0,'2025-05-06 14:30:12');
+INSERT INTO scorecards VALUES(18,6,1008,34,83,34,20,8,0,18,3,1,0,'2025-05-06 14:30:12');
+INSERT INTO scorecards VALUES(23,8,1008,5,9,4,0,12,0,2,-1,1,0,'2025-05-10 20:56:58');
+INSERT INTO scorecards VALUES(24,8,1008,1,5,2,0,7,0,1,1,1,0,'2025-05-10 20:56:58');
+INSERT INTO scorecards VALUES(25,8,1008,5,2,1,0,17,0,1,-3,1,0,'2025-05-10 20:56:58');
+INSERT INTO scorecards VALUES(26,8,1008,1,5,2,0,10,0,1,1,1,0,'2025-05-10 20:56:58');
 CREATE TABLE IF NOT EXISTS `scoring_sessions` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`owner_id` integer NOT NULL,
@@ -157,8 +166,9 @@ CREATE TABLE IF NOT EXISTS `scoring_sessions` (
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP),
 	FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON UPDATE no action ON DELETE no action
 );
-INSERT INTO scoring_sessions VALUES(5,1,1008,0,0,0,'PENDING',18,0,'2025-05-06 14:23:44');
-INSERT INTO scoring_sessions VALUES(6,2,1008,0,0,0,'PENDING',18,0,'2025-05-06 14:30:12');
+INSERT INTO scoring_sessions VALUES(5,1,1008,0,0,0,'CLOSED',18,0,'2025-05-06 14:23:44');
+INSERT INTO scoring_sessions VALUES(6,2,1008,0,0,0,'CLOSED',18,0,'2025-05-06 14:30:12');
+INSERT INTO scoring_sessions VALUES(8,2,1008,0,0,0,'STARTED',2,0,'2025-05-10 20:56:58');
 CREATE TABLE IF NOT EXISTS `seasons` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
@@ -309,15 +319,44 @@ INSERT INTO scores VALUES(334,12,7,18,2,0,1,1,1,0,0,'2025-05-06 17:56:55');
 INSERT INTO scores VALUES(335,13,5,18,2,0,0,2,0,0,0,'2025-05-06 17:56:59');
 INSERT INTO scores VALUES(336,14,10,18,2,0,0,0,5,0,0,'2025-05-06 17:57:03');
 INSERT INTO scores VALUES(337,15,6,18,2,0,0,1,1,0,0,'2025-05-06 17:57:09');
+INSERT INTO scores VALUES(342,23,4,1,2,0,0,2,0,0,0,'2025-05-10 20:57:02');
+INSERT INTO scores VALUES(343,24,5,1,2,0,0,1,1,0,0,'2025-05-10 20:57:06');
+INSERT INTO scores VALUES(344,25,2,1,1,0,1,5,-3,100,0,'2025-05-10 20:57:09');
+INSERT INTO scores VALUES(345,26,5,1,2,0,0,1,1,0,0,'2025-05-10 20:57:12');
+INSERT INTO scores VALUES(348,23,5,2,2,0,1,3,-1,0,0,'2025-05-10 20:57:53');
+CREATE TABLE IF NOT EXISTS `event_sessions` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`event_id` integer NOT NULL,
+	`session_id` integer NOT NULL,
+	`created_at` text DEFAULT (CURRENT_TIMESTAMP),
+	FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`session_id`) REFERENCES `scoring_sessions`(`id`) ON UPDATE no action ON DELETE cascade
+);
+INSERT INTO event_sessions VALUES(1,1,6,'2025-05-06 23:40:27');
+INSERT INTO event_sessions VALUES(2,1,5,'2025-05-06 23:40:27');
+CREATE TABLE IF NOT EXISTS `events` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`season_id` integer NOT NULL,
+	`course_id` integer NOT NULL,
+	`special` integer DEFAULT false,
+	`strokes` integer DEFAULT false,
+	`team_event` integer DEFAULT false,
+	`created_at` text DEFAULT (CURRENT_TIMESTAMP),
+	FOREIGN KEY (`season_id`) REFERENCES `seasons`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON UPDATE no action ON DELETE no action
+);
+INSERT INTO events VALUES(1,1,1008,0,0,0,'2025-05-06 23:40:26');
 DELETE FROM sqlite_sequence;
 INSERT INTO sqlite_sequence VALUES('seasons',1);
 INSERT INTO sqlite_sequence VALUES('profiles',13);
 INSERT INTO sqlite_sequence VALUES('courses',1010);
 INSERT INTO sqlite_sequence VALUES('holes',54);
-INSERT INTO sqlite_sequence VALUES('scoring_sessions',6);
-INSERT INTO sqlite_sequence VALUES('scorecards',18);
-INSERT INTO sqlite_sequence VALUES('scorecard_players',18);
-INSERT INTO sqlite_sequence VALUES('scores',338);
+INSERT INTO sqlite_sequence VALUES('scoring_sessions',8);
+INSERT INTO sqlite_sequence VALUES('scorecards',26);
+INSERT INTO sqlite_sequence VALUES('scorecard_players',26);
+INSERT INTO sqlite_sequence VALUES('scores',348);
+INSERT INTO sqlite_sequence VALUES('events',1);
+INSERT INTO sqlite_sequence VALUES('event_sessions',2);
 CREATE UNIQUE INDEX `course_club_name` ON `courses` (`club`,`name`);
 CREATE UNIQUE INDEX `hole_course_number` ON `holes` (`course_id`,`number`);
 CREATE UNIQUE INDEX `hole_course_index` ON `holes` (`course_id`,`index`);
