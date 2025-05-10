@@ -79,11 +79,6 @@ export default defineConfig({
     }
   }),
 
-  session: {
-    driver: isProd ? 'redis' : 'fs-lite',
-    options: { url: redisUrl }
-  },
-
   prefetch: {
     prefetchAll: true,
     defaultStrategy: 'hover'

@@ -16,3 +16,6 @@ database_name = "tisdagsgolfen-preview-db"
 database_id = "322c64a3-fe96-47dd-abd9-ff1f3c3c5054"
 migrations_dir  = "./src/db/_drizzle"
 
+kv_namespaces = [
+  { binding = "SESSION", id = "4f4c5168780e4d23a5bfa7940642c82a" }
+]
