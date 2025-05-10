@@ -2,13 +2,17 @@
 import { cx, cva } from 'src/components/cva.config';
 import { type VariantProps } from 'cva';
 import type { HTMLAttributes } from 'astro/types';
-import EventPillRow from 'src/components/shared/EventPillRow.astro';
+import Pill from '../ui/Pill.astro';
 
 const eventCardVariants = cva({
-  base: 'block p-4 rounded bg-gradient-to-b from-blue-50 to-blue-100 border-2 border-blue-100 shadow-md box-border',
+  base: 'block p-3 rounded border border-stone-400 shadow-2xl shadow backdrop-blur-sm cursor-pointer duration-100 active:scale-97 focus:outline-none transition-colors active:bg-cyan-50',
   variants: {
     intent: {
-      default: 'w-52 h-24'
+      default: 'w-46 h-24'
+    },
+    live: {
+      false: null,
+      true: ['shadow shadow-green-500 bg-green-100']
     }
   },
   defaultVariants: {
@@ -27,9 +31,9 @@ interface Props extends HTMLAttributes<'div'>, VariantProps<typeof eventCardVari
 const { class: className, intent, live = false, ...props } = Astro.props;
 ---
 
-<div class={cx(eventCardVariants({ intent }), className)} {...props}>
+<div class={cx(eventCardVariants({ intent, live }), className)} {...props}>
   <div class="flex justify-between">
-    <h4 class="m-0 text-lg font-bold text-gray-800">
+    <h4 class="m-0 font-bold text-black">
       {
         new Date(props.date).toLocaleDateString('sv-SE', {
           day: 'numeric',
@@ -38,15 +42,10 @@ const { class: className, intent, live = false, ...props } = Astro.props;
       }
     </h4>
 
-    <EventPillRow
-      special={props.special}
-      strokes={props.strokes}
-      teamEvent={props.teamEvent}
-      live={live}
-    />
+    {live && <Pill intent="live">LIVE</Pill>}
   </div>
 
-  <div class="mt-auto text-gray-800 font-light text-xs mb-4">
+  <div class="text-gray-800 font-light">
     <slot />
   </div>
 </div>

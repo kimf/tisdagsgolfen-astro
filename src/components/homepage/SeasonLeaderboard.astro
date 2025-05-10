@@ -1,6 +1,6 @@
 ---
 import { getEventsWithLeaderboardData } from 'src/db/queries/getEvents';
-import StickyHeader from '../shared/StickyHeader.astro';
+import HeaderTitle from '../shared/HeaderTitle.astro';
 import { getPlayers } from 'src/db/queries/getPlayers';
 import buildLeaderboardItems from 'src/lib/buildLeaderboardItems';
 import standardCompRank from 'src/lib/standardCompRank';
@@ -17,7 +17,7 @@ const leaderboardItems = buildLeaderboardItems(scoringSessions, players);
 const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a, b) => a + b, 0);
 ---
 
-<StickyHeader
+<HeaderTitle
   title={`LEDARTAVLA EFTER ${events.length} ${events.length <= 1 ? 'RUNDA' : 'RUNDOR'}`}
 />
 
@@ -25,24 +25,24 @@ const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a
   <div class="flex flex-col">
     <div
       role="tablist"
-      class="inline-flex flex-wrap justify-center bg-stone-200 rounded p-1 w-full mb-4"
+      class="inline-flex flex-wrap justify-center bg-stone-200 rounded p-1 w-full mb-4 sticky top-16 backdrop-blur-sm z-100"
       x-auto-animate
     >
       <template x-for="(tab, index) in tabs" :key="index">
         <button
           :id="`tab-${index}`"
-          class="flex-1 uppercase vcr h-8 px-4 rounded font-bold whitespace-nowrap transition-all duration-150 ease-in-out"
-          :class={`currentTab === tab.name ? 'text-slate-900 bg-gradient-to-b from-cyan-50 to-cyan-200 border-blue-100 shadow-md box-border' : 'text-slate-600 hover:text-slate-900 '`}
+          class="cursor-pointer flex-1 uppercase vcr h-8 px-4 rounded font-bold whitespace-nowrap transition-all duration-150 ease-in-out active:text-slate-500 active:bg-gray-200"
+          :class={`currentTab === tab.name ? 'text-slate-900 bg-black  text-white border-blue-100 box-border' : 'text-slate-600 hover:text-slate-900 '`}
           @click={`changeTab(tab.name)`}
           x-text="tab.title"></button>
       </template>
     </div>
 
-    <table class="w-full text-left text-gray-600">
+    <table class="w-full text-left text-slate-700">
       <tbody x-ref="list" x-auto-animate.linear>
         <template x-for="item in sortedItems" :key="item.id">
           <tr
-            class="border-b border-gray-200 odd:bg-whit even:bg-gray-50 ranked"
+            class="border-b border-gray-200 odd:bg-white/50 even:bg-gray-50 ranked backdrop-blur-sm"
             :data-rank="item.rank"
           >
             <td class="p-2 text-center content-start font-bold vcr" x-text="item.rank"></td>
@@ -53,7 +53,7 @@ const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a
                   class="size-12"
                 />
                 <div class="flex gap-1 flex-col justify-between">
-                  <div class="uppercase font-bold vcr text-lg tracking-tight" x-text="item.shortName"></div>
+                  <div class="uppercase font-bold text-lg tracking-tight text-black" x-text="item.shortName"></div>
                   <div class="flex text-xs tracking-tighter">
                     <span x-text="`${item.events} ${item.events === 1 ? 'runda' : 'rundor'}`"
                     ></span>
@@ -69,7 +69,7 @@ const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a
               </div>
             </td>
 
-            <td class="vcr uppercase  text-xs tracking-tighter">
+            <td class="uppercase text-xs tracking-tighter">
               <div class="flex gap-2 flex-col justify-between">
                 <div>
                   <span x-text="item.rankSummary" x-show={`currentTab == 'rank'`}></span>
@@ -84,7 +84,7 @@ const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a
             </td>
 
 
-            <td class="text-right vcr text-lg font-bold ml-auto pr-2 uppercase">
+            <td class="text-right vcr text-lg font-extrabold text-black ml-auto pr-2 uppercase">
               <span x-text="item.points" x-show={`currentTab == 'rank'`}></span>
               <span x-text="item.strokes" x-show={`currentTab == 'scratch'`}></span>
               <span x-text="`${item.totalFines} kr`" x-show={`currentTab == 'kr'`}></span>

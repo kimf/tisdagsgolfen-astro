@@ -1,7 +1,7 @@
 ---
 import { Font } from 'astro:assets';
 import { Head } from 'astro-capo';
-
+import { ClientRouter } from 'astro:transitions';
 export interface Props {
   title?: string;
 }
@@ -26,8 +26,10 @@ const { title } = Astro.props;
   <Font cssVariable="--font-mono" preload />
 
   <title>{title ? `${title} - ` : ''}Tisdagsgolfen</title>
-  <meta name="theme-color" content="#f3f3f398" />
+  <meta name="theme-color" content="rgb(239, 240, 230)" />
   <link rel="icon" type="image/x-icon" href="/favicon.png" />
 
   <slot name="head" />
+
+  <ClientRouter />
 </Head>

@@ -1,5 +1,4 @@
 ---
-import Loader from 'src/assets/images/grid.svg';
 import 'src/styles/embla.css';
 import ScoreForm from 'src/components/scoring/ScoreForm.astro';
 import ScoreRow from 'src/components/scoring/ScoreRow.astro';
@@ -51,7 +50,7 @@ if (!currentHole) {
 const holesCount = scoringSession.course.holesCount;
 ---
 
-<AppScreen hideHeader>
+<AppScreen hideHeader skipPadding>
   <div class="p-4" hx-swap-oob="false">
     <div class="flex items-center justify-between">
       <h2 class="mb-2">
@@ -78,8 +77,8 @@ const holesCount = scoringSession.course.holesCount;
         {
           scoringSession.course.holes.map((hole) => (
             <div class="embla__slide" id={`hole_${hole.id}`}>
-              <div class="embla__slide__inner">
-                <header class="flex justify-between items-center p-4 rounded-t-lg">
+              <div class="embla__slide__inner p-4">
+                <header class="flex justify-between items-center p-4">
                   <small>PAR {hole.par}</small>
                   <h1>HÅL {hole.number}</h1>
                   <small>INDEX {hole.index}</small>
@@ -88,7 +87,7 @@ const holesCount = scoringSession.course.holesCount;
                   <table class="w-full text-sm text-left">
                     <thead class="w-full uppercase bg-cyan-950 text-white">
                       <tr>
-                        <th class="p-2 pl-4 text-left vcr w-[36%]">Spelare</th>
+                        <th class="p-2 pl-4 text-left vcr w-[36%] rounded-tl-md">Spelare</th>
                         <th
                           class={`p-2 text-center vcr ${scoringSession.strokes ? 'font-bold' : ''}`}
                         >
@@ -97,7 +96,7 @@ const holesCount = scoringSession.course.holesCount;
                         <th class="p-2 text-center vcr">Puttar</th>
                         {!scoringSession.special && <th class="p-2 text-center vcr">💸</th>}
                         <th
-                          class={`p-2 text-center vcr ${scoringSession.strokes ? '' : 'font-bold'}`}
+                          class={`p-2 text-center vcr  rounded-tr-md ${scoringSession.strokes ? '' : 'font-bold'}`}
                         >
                           Poäng
                         </th>
@@ -157,11 +156,12 @@ const holesCount = scoringSession.course.holesCount;
       <Button intent="link" size="sm">
         <a href={`/scoring/${id}/menu`}>MENY</a>
       </Button>
-      <Button intent="link" size="sm">
-        <a href={`/scoring/${id}/leaderboard`}>LEDARTAVLA</a>
-      </Button>
-      <Loader class="htmx-indicator" width="20" height="20" />
     </div>
+  </Fragment>
+  <Fragment slot="footer-right">
+    <Button intent="link" size="sm">
+      <a href={`/scoring/${id}/leaderboard`}>LEDARTAVLA</a>
+    </Button>
   </Fragment>
 </AppScreen>
 

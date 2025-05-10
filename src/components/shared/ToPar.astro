@@ -4,8 +4,8 @@ interface Props {
   color?: string;
 }
 const { toPar, color } = Astro.props;
-const textColor = color || '$text';
-const toParColor = toPar === 0 ? textColor : toPar > 0 ? textColor : 'red';
+const textColor = color || 'black';
+const toParColor = toPar === 0 ? textColor : toPar > 0 ? 'black' : 'red';
 ---
 
 <span style={{ color: toParColor }} class="text-[12px] vcr">

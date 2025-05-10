@@ -4,7 +4,7 @@ import ActiveSessions from 'src/components/homepage/ActiveSessions.astro';
 import UserButton from 'src/components/homepage/UserButton.astro';
 import Button from 'src/components/ui/button.astro';
 import Link from 'src/assets/icons/link.svg';
-import StickyHeader from 'src/components/shared/StickyHeader.astro';
+import HeaderTitle from 'src/components/shared/HeaderTitle.astro';
 import AppScreen from 'src/layouts/AppScreen.astro';
 import Events from 'src/components/homepage/Events.astro';
 import SeasonLeaderboard from 'src/components/homepage/SeasonLeaderboard.astro';
@@ -19,23 +19,6 @@ import SeasonLeaderboard from 'src/components/homepage/SeasonLeaderboard.astro';
     ))
   }
 
-  <!-- {
-    [
-      '2013-hakan.png',
-      '2014-daniel.png',
-      '2015-patrik.jpg',
-      '2016-niklas.jpg',
-      '2017-tobbe.jpg',
-      '2018-tobbe.jpg',
-      '2019-niklas.jpg',
-      '2020-tobbe.jpg',
-      '2022-khalex.jpg',
-      '2024-tobbe.jpg'
-    ].map((img) => (
-      <link rel="preload" as="image" href={`/images/winnerphotos/${img}`} slot="head" />
-    ))
-  } -->
-
   <UserButton slot="header">
     <div
       slot="fallback"
@@ -49,21 +32,21 @@ import SeasonLeaderboard from 'src/components/homepage/SeasonLeaderboard.astro';
   </UserButton>
 
   <div class="w-full main-section min-h-26 relative">
-    <StickyHeader title="RUNDOR" />
-    <div class="flex overflow-x-scroll hide-scrollbar">
-      <div class="flex flex-nowrap h-26">
+    <HeaderTitle title="RUNDOR" />
+    <div class="flex overflow-x-scroll">
+      <div class="flex flex-nowrap h-26 gap-2">
         <ActiveSessions />
         <Events />
       </div>
     </div>
   </div>
-  <div class="w-full main-section">
+  <div class="w-full main-section mt-4">
     <SeasonLeaderboard seasonId={1} />
   </div>
 
   <Button intent="link" slot="footer-right">
     <a href="/years" class="flex">
-      HISTORIK
+      TIDIGARE ÅR
       <Link class="size-5" />
     </a>
   </Button>

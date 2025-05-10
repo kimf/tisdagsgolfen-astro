@@ -24,11 +24,11 @@ const props = oob ? { 'hx-swap-oob': 'true' } : {};
 ---
 
 <tr
-  class="odd:bg-white even:bg-gray-50 border-b border-gray-200 score-row"
+  class="odd:bg-white even:bg-gray-50 border-b border-gray-500 score-row last:border-b-0"
   id={`scorecardRow-${scorecardId}-hole-${hole.id}`}
   {...props}
 >
-  <td class="text-left vcr w-[36%] h-24 border-r border-b">
+  <td class="text-left vcr w-[36%] h-24 border-r border-gray-500 rounded-bl-md">
     <div class="flex flex-col gap-2 w-full h-full p-4">
       <div class="flex flex-row gap-3 vcr uppercase font-bold">
         {name}
@@ -45,7 +45,7 @@ const props = oob ? { 'hx-swap-oob': 'true' } : {};
       </div>
     </div>
   </td>
-  <td class="w-[16%] p-2 text-center vcr border-r border-b">
+  <td class="w-[16%] p-2 text-center vcr border-gray-500 border-r">
     <div
       class="w-full min-h-20 content-center"
       x-on:click={`openScoring(${hole.par}, ${hole.index}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecardId}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
@@ -77,15 +77,15 @@ const props = oob ? { 'hx-swap-oob': 'true' } : {};
       {!score && <span>✏️</span>}
     </div>
   </td>
-  <td class="w-[16%] p-2 text-center vcr border-r border-b">
+  <td class="w-[16%] p-2 text-center vcr border-r border-gray-500">
     {score?.putts}
   </td>
   <td
-    class={`w-[16%] p-2 text-center vcr border-r border-b ${score?.fines ? '' : 'text-foreground/60'}`}
+    class={`w-[16%] p-2 text-center vcr border-r border-gray-500 ${score?.fines ? '' : 'text-foreground/60'}`}
   >
     {score ? (score.fines ? score.fines : 0) : ''}
   </td>
-  <td class="w-[16%] p-2 text-center vcr border-b">
+  <td class="w-[16%] p-2 text-center vcr border-gray-500 rounded-br-md">
     {score?.points}
   </td>
 </tr>

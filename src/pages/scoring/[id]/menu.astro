@@ -16,9 +16,9 @@ const canFinish = scoringSession.scorecards.every(
 );
 ---
 
-<AppScreen title="Meny" back={`/scoring/${id}`}>
+<AppScreen title="Meny" back transition="fade">
   <div class="flex flex-col gap-4">
-    <a href="/"><Button size="block">Gå till startsidan</Button></a>
+    <a href="/"><Button size="block" data-astro-history="replace">Gå till startsidan</Button></a>
     <a href={`/scoring/${id}/changesetup`}>
       <Button size="block"> Ändra spelare, och slag </Button>
     </a>

@@ -1,6 +1,7 @@
 ---
 import { getEvents } from 'src/db/queries/getEvents';
 import EventCard from 'src/components/homepage/EventCard.astro';
+import Link from 'src/assets/icons/link.svg';
 
 const events = await getEvents(1);
 ---
@@ -14,10 +15,17 @@ const events = await getEvents(1);
         strokes={!!event.strokes}
         teamEvent={!!event.teamEvent}
       >
-        <div class="flex flex-col justify-between text-xs">
-          <h5>{event.course.name}</h5>
+        <div class="uppercase text-sm flex justify-between">
+          {event.course.name}
+          <Link class="size-5 absolute bottom-2 right-2" />
         </div>
       </EventCard>
     </a>
   ))
 }
+
+<script>
+  export default {
+    hydrate: 'load' // Ensures Alpine.js is loaded when hydrated
+  };
+</script>

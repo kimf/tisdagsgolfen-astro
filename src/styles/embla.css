@@ -45,13 +45,13 @@
   touch-action: manipulation;
   position: absolute;
   z-index: 1;
-  bottom: 10px;
+  bottom: 20px;
   border: 0;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   justify-content: center;
   align-items: center;
-  fill: #1bcacd;
+  fill: #333;
   padding: 0;
 }
 
@@ -66,9 +66,9 @@
 }
 
 .embla__button--prev {
-  left: -6px;
+  left: 12px;
 }
 
 .embla__button--next {
-  right: -6px;
+  right: 12px;
 }

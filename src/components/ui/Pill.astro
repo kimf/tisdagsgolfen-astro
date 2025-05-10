@@ -4,10 +4,10 @@ import { type VariantProps } from 'cva';
 import type { HTMLAttributes } from 'astro/types';
 
 const pillVariants = cva({
-  base: 'rounded-sm text-xs whitespace-nowrap text-uppercase px-1.5 py-0.25 border-1 subpixel-antialiased tracking-tighter',
+  base: 'text-xs whitespace-nowrap text-uppercase pt-1 h-6 px-2 border-1 subpixel-antialiased tracking-tighter rounded-xs shadow-lg inline-flex',
   variants: {
     intent: {
-      default: 'bg-purple-100 text-purple-700',
+      default: 'bg-cyan-100 text-cyan-700',
       live: 'bg-red-100 text-red-700 animate-pulse',
       teamEvent: 'bg-emerald-100 text-emerald-700',
       special: 'bg-amber-100 text-amber-700'
@@ -24,5 +24,7 @@ const { class: className, intent, ...props } = Astro.props;
 ---
 
 <span class={cx(pillVariants({ intent }), className)} {...props}>
-  <slot />
+  <span class="text-light font-mono text-xs uppercase">
+    <slot />
+  </span>
 </span>

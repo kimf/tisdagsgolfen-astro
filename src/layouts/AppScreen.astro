@@ -1,27 +1,36 @@
 ---
 export interface Props {
   title?: string;
-  back?: string;
+  back?: boolean;
+  transition?: 'fade' | 'none' | 'slide';
   hideHeader?: boolean;
+  skipPadding?: boolean;
 }
 
-const { title, back, hideHeader = false } = Astro.props;
+const { title, back = false, hideHeader = false, skipPadding = false, transition } = Astro.props;
+import { cx } from 'cva';
 import SharedHead from 'src/components/layouts/SharedHead.astro';
 import Button from 'src/components/ui/button.astro';
 import 'src/styles/global.css';
 ---
 
 <!doctype html>
-<html lang="sv">
+<html
+  lang="sv"
+  class="text-xs sm:text-base"
+  transition:name="root"
+  transition:animate={transition ?? 'none'}
+>
   <SharedHead title={title}>
     <slot name="head" slot="head" />
   </SharedHead>
-  <body id="main" class="antialiased h-screen w-screen">
+
+  <body class="h-screen w-screen bg-noise-light-gradient-bottom">
     {
       !hideHeader && (
-        <div class="flex w-full items-center p-4 bg-gray-200 border-gray-200">
+        <div class="flex w-full items-center p-4 backdrop-blur-3xl text-black fixed h-16 overflow-hidden z-100 shadow">
           {back && (
-            <a href={back} data-astro-prefetch="false">
+            <a href="/" data-astro-prefetch="false" @click="history.back()">
               <Button intent="link" class="p-4 bg-cyan-50/25 mr-4" slot="footer-left">
                 {' '}
                 &larr;
@@ -42,12 +51,19 @@ import 'src/styles/global.css';
       )
     }
 
-    <main class="max-w-screen-xl h-full mx-auto p-4 pb-20">
+    <main
+      class={cx(
+        'max-w-screen-xl h-full mx-auto pb-20',
+        hideHeader ? '' : 'pt-20',
+        skipPadding ? '' : 'p-4'
+      )}
+      transition:animate={transition ?? 'slide'}
+    >
       <slot />
     </main>
 
     <footer
-      class="flex w-full z-1 fixed bottom-0 left-0 backdrop-blur bg-gray-200 border-gray-200 h-12 p-2"
+      class="flex w-full z-10 fixed bottom-0 left-0 backdrop-blur bg-gray-200 border-gray-200 h-12 p-2"
     >
       <slot name="footer-left" />
 
@@ -55,5 +71,17 @@ import 'src/styles/global.css';
         <slot name="footer-right" />
       </div>
     </footer>
+
+    <script>
+      import Alpine from 'alpinejs';
+      document.addEventListener('astro:after-preparation', () => {
+        Alpine.stopObservingMutations();
+      });
+      document.addEventListener('astro:page-load', () => {
+        document.dispatchEvent(new Event('alpine:init'));
+        Alpine.initTree(document.documentElement);
+        Alpine.startObservingMutations();
+      });
+    </script>
   </body>
 </html>

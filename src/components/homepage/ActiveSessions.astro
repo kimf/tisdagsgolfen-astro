@@ -3,6 +3,7 @@ import { getaActiveSessions } from 'src/db/queries/getActiveSessions';
 import type { ActiveSession } from 'src/db/queries/getActiveSessions';
 import Button from 'src/components/ui/button.astro';
 import EventCard from 'src/components/homepage/EventCard.astro';
+import Link from 'src/assets/icons/link.svg';
 
 const userId = await Astro.session?.get('userId');
 const scoringSessions = await getaActiveSessions();
@@ -43,19 +44,17 @@ const flattenedSessions = groupedSessions.flatMap((gs) => gs.map((s) => s));
     >
       <div id={`sesh.${sesh.id}`} class="flex justify-between">
         {userId && sesh.ownerId === Number(userId) && (
-          <Button size="sm" intent="default">
+          <Button size="xs" intent="default" class="absolute bottom-2 left-2">
             <a href={`/scoring/${sesh.id}`} class="btn">
               {sesh.state === 'PENDING' ? 'REDIGERA' : 'FORTSÄTT'}
             </a>
           </Button>
         )}
-        <Button intent="link" size="sm">
-          <a href={`/scoring/${sesh.id}/leaderboard`} class="btn">
-            LEDARTAVLA
-          </a>
-        </Button>
+        <a href={`/scoring/${sesh.id}/leaderboard`} class="absolute bottom-2 right-2">
+          <Link class="size-5" />
+        </a>
         {userId && sesh.ownerId !== Number(userId) && (
-          <Button>
+          <Button size="xs" class="absolute bottom-2 left-2">
             <a href={`/scoring/new?joinId=${sesh.id}`} class="btn">
               FÖR SCORE
             </a>

@@ -10,16 +10,16 @@ interface Props {
 const { special, id } = Astro.props;
 ---
 
-<div class="relative z-20">
+<div class="relative top-0 left-0 h-screen w-screen">
   <div
-    class="fixed inset-0 bg-gray-900/95 w-screen backdrop-blur-xl h-screen"
+    class="fixed bg-black/97 w-screen h-screen z-50 top-0 left-0"
     x-show="isScoring"
     x-transition.opacity
     x-cloak
   >
   </div>
   <div
-    class="fixed inset-0 z-20 w-screen h-screen overflow-y-auto"
+    class="fixed inset-0 z-100 w-screen h-screen overflow-y-auto"
     x-show="isScoring"
     x-cloak
     x-transition:enter="transition ease-out duration-300"
@@ -33,7 +33,7 @@ const { special, id } = Astro.props;
       class="flex min-h-screen items-center justify-center p-4 text-center sm:items-center sm:p-0"
     >
       <div
-        class="transform w-full overflow-hidden rounded-lg bg-background text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+        class="transform w-full overflow-hidden rounded-lg bg-background text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg bg-white"
       >
         <form
           hx-post={`/scoring/${id}/postscore`}
@@ -41,9 +41,9 @@ const { special, id } = Astro.props;
           hx-swap="none"
           @htmx:after-request="hideForm()"
         >
-          <header class="flex justify-between p-4 bg-black">
+          <header class="flex justify-between p-4 bg-cyan-800">
             <h2 x-text="playerName" class="text-white vcr"></h2>
-            <Button size="icon" x-on:click="hideForm()">X</Button>
+            <Button size="icon" @click="hideForm()">X</Button>
           </header>
 
           <input class="sr-only" name="special" value={special ? '1' : '0'} />
@@ -64,7 +64,7 @@ const { special, id } = Astro.props;
                 >
                   &minus;
                 </Button>
-                <h2 x-text="strokes" class="w-10 text-center"></h2>
+                <h2 x-text="strokes" class="w-20 text-center text-2xl"></h2>
                 <Button intent="inline" @click="changeStrokes(strokes + 1)"> &plus; </Button>
               </div>
             </div>
@@ -78,7 +78,7 @@ const { special, id } = Astro.props;
                 <Button intent="inline" @click="putts--" x-bind:disabled="putts === 0">
                   &minus;
                 </Button>
-                <h2 x-text="putts" class="w-10 text-center"></h2>
+                <h2 x-text="putts" class="w-20 text-center text-2xl"></h2>
                 <Button
                   intent="inline"
                   @click="putts++"
@@ -98,7 +98,7 @@ const { special, id } = Astro.props;
                 <Button intent="inline" @click="beers--" x-bind:disabled="beers === 0">
                   &minus;
                 </Button>
-                <h2 x-text="beers" class="w-10 text-center"></h2>
+                <h2 x-text="beers" class="w-20 text-center text-2xl"></h2>
                 <Button intent="inline" @click="beers++"> &plus; </Button>
               </div>
             </div>
@@ -112,7 +112,7 @@ const { special, id } = Astro.props;
                 <Button intent="inline" @click="ciders--" x-bind:disabled="ciders === 0">
                   &minus;
                 </Button>
-                <h2 x-text="ciders" class="w-10 text-center"></h2>
+                <h2 x-text="ciders" class="w-20 text-center text-2xl"></h2>
                 <Button intent="inline" @click="ciders++"> &plus; </Button>
               </div>
             </div>

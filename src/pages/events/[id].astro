@@ -36,49 +36,58 @@ const rankedScorecards = standardCompRank(
 );
 ---
 
-<AppScreen title={title} back="/">
-  <EventPillRow special={!!event.special} strokes={!!event.strokes} teamEvent={!!event.teamEvent} />
-
-  <table class="w-full text-left text-gray-600 mt-4">
-    <thead class="uppercase bg-background">
-      <th class="p-2 text-center vcr">#</th>
-      <th class="p-2 vcr">Spelare</th>
-      <th class="p-2 text-center vcr">SLAG</th>
-      <th class="p-2 text-center vcr">POÄNG</th>
-      <th class="p-2 text-center vcr">+/-</th>
-      {!event.special && <th class="p-2 text-center vcr">💸</th>}
-      <th class="p-2 text-center vcr">P</th>
-    </thead>
-    <tbody>
-      {
-        rankedScorecards.map((scorecard) => (
-          <tr class="border-b border-gray-200 odd:bg-white even:bg-gray-50">
-            <td class="p-2 text-center vcr">{scorecard.rank}</td>
-            <td class="px-2 py-1 flex flex-col vcr uppercase">
-              {scorecard.players.map((p) => (
-                <div>
-                  {shortName(p.player.fullName)}
-                  <div class="text-xs">
-                    <Beers beers={p.beers || 0} />
-                    <Ciders ciders={p.ciders || 0} />
+<AppScreen title="VECKORESULTAT" back>
+  <div class="flex flex-col gap-6">
+    <table class="w-full text-left text-slate-700">
+      <thead class="uppercase bg-stone-800 text-white">
+        <th class="p-2 text-center vcr">#</th>
+        <th class="p-2 vcr">Spelare</th>
+        <th class="p-2 text-center vcr">SLAG</th>
+        <th class="p-2 text-center vcr">POÄNG</th>
+        <th class="p-2 text-center vcr">+/-</th>
+        {!event.special && <th class="p-2 text-center vcr">💸</th>}
+        <th class="p-2 text-center vcr">P</th>
+      </thead>
+      <tbody>
+        {
+          rankedScorecards.map((scorecard) => (
+            <tr class="border-b border-gray-200 odd:bg-white even:bg-gray-50">
+              <td class="p-2 text-center vcr">{scorecard.rank}</td>
+              <td class="px-2 py-1 flex flex-col vcr uppercase">
+                {scorecard.players.map((p) => (
+                  <div class="font-bold text-black">
+                    {shortName(p.player.fullName)}
+                    <div class="text-xs">
+                      <Beers beers={p.beers || 0} />
+                      <Ciders ciders={p.ciders || 0} />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </td>
-            <td class="p-2 text-center vcr">{scorecard.strokes}</td>
-            <td class="p-2 text-center vcr">{scorecard.points}</td>
-            <td class="p-2 font-bold text-center vcr">
-              <ToPar toPar={scorecard.toPar || 0} />
-            </td>
-            {!event.special && (
-              <td class="p-2 text-center vcr">
-                {scorecard.players.reduce((a, b) => a + (b.fines ?? 0), 0)}
+                ))}
               </td>
-            )}
-            <td class="p-2 text-center vcr">{scorecard.weekPoints}</td>
-          </tr>
-        ))
-      }
-    </tbody>
-  </table>
+              <td class="p-2 text-center vcr">{scorecard.strokes}</td>
+              <td class="p-2 text-center vcr">{scorecard.points}</td>
+              <td class="p-2 font-bold text-center vcr">
+                <ToPar toPar={scorecard.toPar || 0} />
+              </td>
+              {!event.special && (
+                <td class="p-2 text-center vcr">
+                  {scorecard.players.reduce((a, b) => a + (b.fines ?? 0), 0)}
+                </td>
+              )}
+              <td class="p-2 text-center vcr font-extrabold text-black">{scorecard.weekPoints}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+
+    <div class="flex items-center justify-between">
+      <h2 class="mb-2">{title}</h2>
+      <EventPillRow
+        special={!!event.special}
+        strokes={!!event.strokes}
+        teamEvent={!!event.teamEvent}
+      />
+    </div>
+  </div>
 </AppScreen>
