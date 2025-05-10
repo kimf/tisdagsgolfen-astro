@@ -12,7 +12,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "knip": "knip",
-    "pwaassets": "npx pwa-asset-generator public/images/logo.png public/manifest -i index.html -m public/manifest.json  -b 'rgb(25,84,144)' -t png --portrait-only"
+    "pwaassets": "npx pwa-asset-generator public/images/logo.png public/manifest -i index.html -m public/manifest.json  -b 'rgb(25,84,144)' -t png --portrait-only",
+    "postinstall": "npm run db:migrate"
   },
   "dependencies": {
     "@astrojs/alpinejs": "^0.4.8",
@@ -23,6 +24,7 @@
     "@marcreichel/alpine-auto-animate": "^1.1.0",
     "@playform/compress": "^0.1.9",
     "@tailwindcss/vite": "^4.1.5",
+    "@vercel/speed-insights": "^1.2.0",
     "alpinejs": "^3.14.9",
     "astro": "^5.7.10",
     "astro-capo": "^0.0.1",
