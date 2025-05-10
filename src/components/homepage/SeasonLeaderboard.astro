@@ -3,13 +3,16 @@ import { getEventsWithLeaderboardData } from 'src/db/queries/getEvents';
 import HeaderTitle from '../shared/HeaderTitle.astro';
 import { getPlayers } from 'src/db/queries/getPlayers';
 import buildLeaderboardItems from 'src/lib/buildLeaderboardItems';
+import getDb from 'src/db';
 export interface Props {
   seasonId: number;
 }
 
+const db = getDb(Astro.locals)
+
 const { seasonId } = Astro.props;
-const players = await getPlayers();
-const events = await getEventsWithLeaderboardData(Number(seasonId));
+const players = await getPlayers(db);
+const events = await getEventsWithLeaderboardData(Number(seasonId), db);
 
 const scoringSessions = events.flatMap((event) => event.eventSessions.flatMap((es) => es.session));
 const leaderboardItems = buildLeaderboardItems(scoringSessions, players);

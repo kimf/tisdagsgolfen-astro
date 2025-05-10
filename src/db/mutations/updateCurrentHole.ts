@@ -1,8 +1,12 @@
 import { eq } from 'drizzle-orm';
-import db from 'src/db';
+import { type Database } from 'src/db';
 import { scoringSessions } from 'src/db/schema';
 
-export async function updateCurrentHole(scoringSessionId: number, holeNumber: number) {
+export async function updateCurrentHole(
+  scoringSessionId: number,
+  holeNumber: number,
+  db: Database
+) {
   return db
     .update(scoringSessions)
     .set({ currentHole: holeNumber })

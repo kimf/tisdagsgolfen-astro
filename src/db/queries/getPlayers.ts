@@ -1,6 +1,6 @@
-import db from 'src/db';
+import type { Database } from 'src/db';
 
-export async function getPlayers() {
+export async function getPlayers(db: Database) {
   return await db.query.profiles.findMany();
 }
 

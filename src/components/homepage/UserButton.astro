@@ -4,7 +4,7 @@ import db from 'src/db';
 import Button from '../ui/button.astro';
 const userId = await Astro.session?.get('userId');
 const player = userId
-  ? await db.query.profiles.findFirst({
+  ? await db(Astro.locals).query.profiles.findFirst({
       where: (p, { eq }) => eq(p.id, Number(userId))
     })
   : undefined;

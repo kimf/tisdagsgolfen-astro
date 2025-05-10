@@ -3,10 +3,6 @@
 
 type Runtime = import('@astrojs/cloudflare').Runtime<Env>;
 
-declare namespace App {
-  interface Locals extends Runtime {}
-}
-
 // Declare a module to handle the lack of type definitions
 declare module '@marcreichel/alpine-auto-animate' {
   const AutoAnimate: any;
@@ -32,4 +28,5 @@ declare namespace App {
   interface SessionData {
     userId: string;
   }
+  interface Locals extends Runtime {}
 }

@@ -3,7 +3,7 @@ import db from 'src/db';
 import { courses } from 'src/db/schema';
 import Radio from '../ui/radio.astro';
 
-const dbCourses = await db.query.courses.findMany({
+const dbCourses = await db(Astro.locals).query.courses.findMany({
   orderBy: courses.eventsCount
 });
 ---

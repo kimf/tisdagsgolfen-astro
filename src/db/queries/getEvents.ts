@@ -1,6 +1,6 @@
-import db from 'src/db';
+import { type Database } from 'src/db';
 
-export async function getEvents(seasonId: number) {
+export async function getEvents(seasonId: number, db: Database) {
   return await db.query.events.findMany({
     where: (events, { eq }) => eq(events.seasonId, seasonId),
     with: {
@@ -11,7 +11,7 @@ export async function getEvents(seasonId: number) {
 
 export type Events = NonNullable<Awaited<ReturnType<typeof getEvents>>>;
 
-export async function getEventWithLeaderboardData(eventId: number) {
+export async function getEventWithLeaderboardData(eventId: number, db: Database) {
   return await db.query.events.findFirst({
     where: (events, { eq }) => eq(events.id, eventId),
     with: {
@@ -36,7 +36,7 @@ export type EventWithLeaderboard = NonNullable<
   Awaited<ReturnType<typeof getEventWithLeaderboardData>>
 >;
 
-export async function getEventsWithLeaderboardData(seasonId: number) {
+export async function getEventsWithLeaderboardData(seasonId: number, db: Database) {
   return await db.query.events.findMany({
     where: (events, { eq }) => eq(events.seasonId, seasonId),
     with: {

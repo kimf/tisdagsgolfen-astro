@@ -1,6 +1,6 @@
 ---
 import AppScreen from 'src/layouts/AppScreen.astro';
-import db from 'src/db';
+import getDb from 'src/db';
 
 import Settings from 'src/components/newscoringsession/Settings.astro';
 import CourseSelector from 'src/components/newscoringsession/CourseSelector.astro';
@@ -8,6 +8,8 @@ import TeamSetup from 'src/components/newscoringsession/TeamSetup.astro';
 import PlayerSetup from 'src/components/newscoringsession/PlayerSetup.astro';
 import Button from 'src/components/ui/button.astro';
 import { createScoringSession } from 'src/db/mutations/createScoringSession';
+
+const db = getDb(Astro.locals);
 
 if (Astro.request.method === 'POST') {
   try {
@@ -20,7 +22,7 @@ if (Astro.request.method === 'POST') {
       throw new Error('Logga in för att skapa scoringSession');
     }
 
-    const createdId = await createScoringSession(Number(userId), formData);
+    const createdId = await createScoringSession(Number(userId), formData, db);
 
     return Astro.redirect(`/scoring/${createdId}`);
   } catch (e) {

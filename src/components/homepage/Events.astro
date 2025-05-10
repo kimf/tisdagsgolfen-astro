@@ -2,8 +2,9 @@
 import { getEvents } from 'src/db/queries/getEvents';
 import EventCard from 'src/components/homepage/EventCard.astro';
 import Link from 'src/assets/icons/link.svg';
+import getDb from 'src/db';
 
-const events = await getEvents(1);
+const events = await getEvents(1, getDb(Astro.locals));
 ---
 
 {

@@ -1,6 +1,6 @@
-import db from 'src/db';
+import { type Database } from 'src/db';
 
-export async function getScoringSession(scoringSessionId: number) {
+export async function getScoringSession(scoringSessionId: number, db: Database) {
   return await db.query.scoringSessions.findFirst({
     where: (scoringSessions, { eq }) => eq(scoringSessions.id, scoringSessionId),
     with: {
@@ -25,7 +25,10 @@ export async function getScoringSession(scoringSessionId: number) {
 }
 export type ScoringSessionWithAllData = NonNullable<Awaited<ReturnType<typeof getScoringSession>>>;
 
-export async function getLeaderboardForScoringSession(scoringSession: MinimalScoringSession) {
+export async function getLeaderboardForScoringSession(
+  scoringSession: MinimalScoringSession,
+  db: Database
+) {
   return await db.query.scoringSessions.findMany({
     where: (ss, { and, eq, ne }) =>
       and(
@@ -53,7 +56,7 @@ export type LeaderboardScorecard = NonNullable<
   Awaited<ReturnType<typeof getLeaderboardForScoringSession>>[number]['scorecards'][number]
 >;
 
-export async function getMinimalScoringSession(id: number) {
+export async function getMinimalScoringSession(id: number, db: Database) {
   return await db.query.scoringSessions.findFirst({
     where: (scoringSessions, { eq }) => eq(scoringSessions.id, id),
     with: {

@@ -13,8 +13,8 @@
     "db:migrate:prod": "wrangler d1 migrations apply tisdagsgolfen-prod-db --remote",
     "db:migrate:preview": "wrangler d1 migrations apply --env preview tisdagsgolfen-preview-db --remote",
     "db:studio:local": "LOCAL_DB_PATH=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) drizzle-kit studio",
-    "db:studio:preview": "source .drizzle.env && DB_ID='7e5a2289-71e1-491b-b723-6e22a1125b55' drizzle-kit studio",
-    "db:studio:prod": "source .drizzle.env && DB_ID='857daf10-a740-4b3d-a3d6-501ac6e632df' drizzle-kit studio",
+    "db:studio:preview": "source .drizzle.env && DB_ID='322c64a3-fe96-47dd-abd9-ff1f3c3c5054' drizzle-kit studio",
+    "db:studio:prod": "source .drizzle.env && DB_ID='6f0c2a6c-0965-4c76-bbb1-008e160199ba' drizzle-kit studio",
     "knip": "knip",
     "pwaassets": "npx pwa-asset-generator public/images/logo.png public/manifest -i index.html -m public/manifest.json  -b 'rgb(25,84,144)' -t png --portrait-only"
   },

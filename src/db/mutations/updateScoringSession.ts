@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import db from 'src/db';
+import { type Database } from 'src/db';
 import { scorecards, scores } from 'src/db/schema';
 import { calculateExtraStrokes } from 'src/lib/calculateExtraStrokes';
 import { extractScorecards } from 'src/lib/formDataExtractors';
@@ -7,10 +7,14 @@ import { getScoringSession } from '../queries/getScoringSession';
 import { calculatePoints } from 'src/lib/calculatePoints';
 import { calculateEarnings } from 'src/lib/calculateEarnings';
 
-export async function updateScoringSession(scoringSessionId: number, formData: FormData) {
+export async function updateScoringSession(
+  scoringSessionId: number,
+  formData: FormData,
+  db: Database
+) {
   const cards = extractScorecards(formData);
 
-  const scoringSession = await getScoringSession(scoringSessionId);
+  const scoringSession = await getScoringSession(scoringSessionId, db);
   if (!scoringSession) {
     throw new Error('No such scoring session');
   }

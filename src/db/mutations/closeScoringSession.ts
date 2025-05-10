@@ -3,17 +3,17 @@ import {
   getMinimalScoringSession
 } from '../queries/getScoringSession';
 import { setEventPoints } from 'src/lib/setEventPoints.ts';
-import db from 'src/db';
+import { type Database } from 'src/db';
 import { eq } from 'drizzle-orm';
 import { events, eventSessions, scorecards, scoringSessions } from '../schema';
 
-export async function closeScoringSession(scoringSessionId: number) {
-  const scoringSession = await getMinimalScoringSession(scoringSessionId);
+export async function closeScoringSession(scoringSessionId: number, db: Database) {
+  const scoringSession = await getMinimalScoringSession(scoringSessionId, db);
   if (!scoringSession) {
     throw new Error('Hittade ingen scoring session');
   }
 
-  const leaderboards = await getLeaderboardForScoringSession(scoringSession);
+  const leaderboards = await getLeaderboardForScoringSession(scoringSession, db);
   if (leaderboards.length === 0) {
     throw new Error('Hittade ingen data att visa');
   }

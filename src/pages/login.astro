@@ -1,7 +1,7 @@
 ---
 import HeaderTitle from 'src/components/shared/HeaderTitle.astro';
 import Button from 'src/components/ui/button.astro';
-import db from 'src/db';
+import getDb from 'src/db';
 import AppScreen from 'src/layouts/AppScreen.astro';
 import { shortName } from 'src/lib/formatters';
 
@@ -33,6 +33,8 @@ if (Astro.request.method === 'POST') {
     }
   }
 }
+
+const db = getDb(Astro.locals);
 
 const players = await db.query.profiles.findMany({
   orderBy: (p, { desc }) => [desc(p.avatarUrl)]

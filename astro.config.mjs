@@ -68,7 +68,15 @@ export default defineConfig({
 
   output: 'server',
   adapter: cloudflare({
-    platformProxy: { enabled: true }
+    runtime: {
+      mode: 'local',
+      type: 'pages',
+      bindings: {
+        DB: {
+          type: 'd1'
+        }
+      }
+    }
   }),
 
   session: {
@@ -106,11 +114,6 @@ export default defineConfig({
 
   env: {
     schema: {
-      DATABASE_URL: envField.string({ context: 'server', access: 'secret' }),
-      TURSO_AUTH_TOKEN: envField.string({
-        context: 'server',
-        access: 'secret'
-      }),
       USER_PASSWORD: envField.string({ context: 'server', access: 'secret' }),
       REDIS_URL: envField.string({ context: 'server', access: 'secret' })
     }

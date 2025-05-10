@@ -23,14 +23,11 @@ import {
   eventSesssionsRelations
 } from './schema';
 
-const url = import.meta.env.DB;
-
-console.log(url);
-
-if (!url) {
-  console.error('DB is not set');
-  throw new Error('DB is not set');
-}
+// const url = import.meta.env.DATABASE_URL;
+// if (!url) {
+//   console.error('DB is not set');
+//   throw new Error('DB is not set');
+// }
 
 // let authToken = '';
 // if (import.meta.env.PROD) {
@@ -44,28 +41,31 @@ if (!url) {
 
 // const turso = createClient({ url, authToken });
 
-const db = drizzle(import.meta.env.DB, {
-  schema: {
-    courses,
-    coursesRelations,
-    holes,
-    holesRelations,
-    profiles,
-    profilesRelations,
-    scores,
-    scoresRelations,
-    scorecardPlayers,
-    scorecardPlayersRelations,
-    scorecards,
-    scorecardsRelations,
-    scoringSessions,
-    scoringSessionRelations,
-    seasons,
-    events,
-    eventsRelations,
-    eventSessions,
-    eventSesssionsRelations
-  }
-});
+const getDb = (locals: App.Locals) => {
+  return drizzle(locals.runtime.env.DB, {
+    schema: {
+      courses,
+      coursesRelations,
+      holes,
+      holesRelations,
+      profiles,
+      profilesRelations,
+      scores,
+      scoresRelations,
+      scorecardPlayers,
+      scorecardPlayersRelations,
+      scorecards,
+      scorecardsRelations,
+      scoringSessions,
+      scoringSessionRelations,
+      seasons,
+      events,
+      eventsRelations,
+      eventSessions,
+      eventSesssionsRelations
+    }
+  });
+};
 
-export default db;
+export type Database = ReturnType<typeof getDb>;
+export default getDb;

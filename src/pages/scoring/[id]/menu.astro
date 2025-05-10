@@ -3,10 +3,12 @@ import AppScreen from 'src/layouts/AppScreen.astro';
 
 import { getScoringSession } from 'src/db/queries/getScoringSession';
 import Button from 'src/components/ui/button.astro';
+import getDb from 'src/db';
 
 const { id } = Astro.params;
 if (!id) throw new Error('Id saknas för runda');
-const scoringSession = await getScoringSession(Number(id));
+const db = getDb(Astro.locals);
+const scoringSession = await getScoringSession(Number(id), db);
 if (!scoringSession) {
   throw new Error('No such scoring session');
 }

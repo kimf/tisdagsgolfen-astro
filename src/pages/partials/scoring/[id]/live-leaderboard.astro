@@ -11,18 +11,21 @@ import Beers from 'src/components/shared/Beers.astro';
 import Ciders from 'src/components/shared/Ciders.astro';
 import ToPar from 'src/components/shared/ToPar.astro';
 import Button from 'src/components/ui/button.astro';
+import getDb from 'src/db';
 
 const { id } = Astro.params;
 const userId = await Astro.session?.get('userId');
 if (!id) throw new Error('Id saknas för runda');
 
-const scoringSession = await getMinimalScoringSession(Number(id));
+const db = getDb(Astro.locals);
+
+const scoringSession = await getMinimalScoringSession(Number(id), db);
 
 if (!scoringSession) {
   throw new Error('Hittade ingen scoring session');
 }
 
-const leaderboards = await getLeaderboardForScoringSession(scoringSession);
+const leaderboards = await getLeaderboardForScoringSession(scoringSession, db);
 
 if (leaderboards.length === 0) {
   throw new Error('Hittade ingen data att visa');

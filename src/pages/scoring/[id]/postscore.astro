@@ -2,12 +2,13 @@
 export const partial = true;
 
 import ScoreRow from 'src/components/scoring/ScoreRow.astro';
-import ToPar from 'src/components/shared/ToPar.astro';
-import db from 'src/db';
+import getDb from 'src/db';
 import { scores } from 'src/db/schema';
 import { calculateEarnings } from 'src/lib/calculateEarnings';
 import { calculatePoints } from 'src/lib/calculatePoints';
 import { shortName } from 'src/lib/formatters';
+
+const db = getDb(Astro.locals);
 
 const { id } = Astro.params;
 const userId = await Astro.session?.get('userId');

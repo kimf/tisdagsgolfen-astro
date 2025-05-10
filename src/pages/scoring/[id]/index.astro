@@ -9,6 +9,7 @@ import { deleteScoringSession } from 'src/db/mutations/deleteScoringSession';
 import { shortName } from 'src/lib/formatters';
 import AppScreen from 'src/layouts/AppScreen.astro';
 import Button from 'src/components/ui/button.astro';
+import getDb from 'src/db';
 
 const { id, number } = Astro.params;
 const userId = await Astro.session?.get('userId');
@@ -16,14 +17,16 @@ const userId = await Astro.session?.get('userId');
 if (!userId) throw new Error('Logga in för att föra score');
 if (!id) throw new Error('Id saknas för runda');
 
-const scoringSession = await getScoringSession(parseInt(id, 10));
+const db = getDb(Astro.locals);
+
+const scoringSession = await getScoringSession(parseInt(id, 10), db);
 
 if (!scoringSession) {
   throw new Error('Hittade ingen scoring session');
 }
 
 if (Astro.request.method === 'DELETE') {
-  await deleteScoringSession(Number(id));
+  await deleteScoringSession(Number(id), db);
 
   return new Response(null, {
     status: 204,
@@ -39,7 +42,7 @@ if (number) {
   const holeNumber = parseInt(number, 10);
   if (holeNumber !== scoringSession.currentHole) {
     currentHoleNr = holeNumber;
-    await updateCurrentHole(scoringSession.id, holeNumber);
+    await updateCurrentHole(scoringSession.id, holeNumber, db);
   }
 }
 

@@ -5,6 +5,7 @@ import { shortName } from 'src/lib/formatters';
 import AppScreen from 'src/layouts/AppScreen.astro';
 import Button from 'src/components/ui/button.astro';
 import Quantity from 'src/components/ui/quantity.astro';
+import getDb from 'src/db';
 
 const { id } = Astro.params;
 const userId = await Astro.session?.get('userId');
@@ -12,7 +13,9 @@ const userId = await Astro.session?.get('userId');
 if (!userId) throw new Error('Logga in för att föra score');
 if (!id) throw new Error('Id saknas för runda');
 
-const scoringSession = await getScoringSession(parseInt(id, 10));
+const db = getDb(Astro.locals);
+
+const scoringSession = await getScoringSession(parseInt(id, 10), db);
 
 if (!scoringSession) {
   throw new Error('Hittade ingen scoring session');
@@ -29,7 +32,7 @@ if (Astro.request.method === 'POST') {
     throw new Error('Du kan bara ändra din egen runda');
   }
 
-  await updateScoringSession(Number(id), formData);
+  await updateScoringSession(Number(id), formData, db);
   return Astro.redirect(`/scoring/${id}`);
 }
 ---
