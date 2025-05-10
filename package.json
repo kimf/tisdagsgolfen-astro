@@ -11,7 +11,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "knip": "knip"
+    "knip": "knip",
+    "pwaassets": "npx pwa-asset-generator public/images/logo.png public/manifest -i index.html -m public/manifest.json  -b 'rgb(25,84,144)' -t png --portrait-only"
   },
   "dependencies": {
     "@astrojs/alpinejs": "^0.4.8",

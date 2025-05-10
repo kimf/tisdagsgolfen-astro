@@ -1,6 +1,16 @@
 {
   "theme": "#e9e2d5",
-  "background_color": "#e9e2d5",
+  "background_color": "rgb(25,84,144)",
+  "orientation": "portrait",
+  "display": "standalone",
+  "dir": "auto",
+  "lang": "sv-SE",
+  "name": "Tisdagsgolfen",
+  "short_name": "Tisdagsgolfen",
+  "id": "/",
+  "start_url": "https://tisdagsgolfen.fransman.se",
+  "description": "A golf league for a me and my friends",
+  "author": "Kim Fransman",
   "icons": [
     {
       "src": "/manifest/manifest-icon-192.maskable.png",
@@ -27,12 +37,48 @@
       "purpose": "maskable"
     }
   ],
-  "orientation": "portrait",
-  "display": "standalone",
-  "dir": "auto",
-  "lang": "sv-SE",
-  "name": "Tisdagsgolfen",
-  "short_name": "Tisdagsgolfen",
-  "scope": "https://tisdagsgolfen.fransman.se",
-  "start_url": "https://tisdagsgolfen.fransman.se/"
+  "screenshots": [
+    {
+      "src": "/manifest/screenshots/1.png",
+      "sizes": "640x1387",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tisdagsgolfen"
+    },
+    {
+      "src": "/manifest/screenshots/2.png",
+      "sizes": "640x1387",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Ledartavla"
+    },
+    {
+      "src": "/manifest/screenshots/3.png",
+      "sizes": "640x1387",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Scoring"
+    },
+    {
+      "src": "/manifest/screenshots/4.png",
+      "sizes": "640x1387",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Scoring"
+    },
+    {
+      "src": "/manifest/screenshots/5.png",
+      "sizes": "640x1387",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tidigare år"
+    },
+    {
+      "src": "/manifest/screenshots/desktop.png",
+      "sizes": "640x383",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Tisdagsgolfen"
+    }
+  ]
 }
