@@ -1,4 +1,6 @@
 ---
+export const prerender = true;
+
 import EventPillRow from 'src/components/shared/EventPillRow.astro';
 import { shortName } from 'src/lib/formatters';
 import AppScreen from 'src/layouts/AppScreen.astro';
@@ -8,6 +10,7 @@ import type { LeaderboardScorecard } from 'src/db/queries/getScoringSession';
 import Beers from 'src/components/shared/Beers.astro';
 import Ciders from 'src/components/shared/Ciders.astro';
 import ToPar from 'src/components/shared/ToPar.astro';
+import db from 'src/db';
 
 const { id } = Astro.params;
 if (!id) throw new Error('Id saknas för runda');
@@ -34,6 +37,11 @@ const rankedScorecards = standardCompRank(
   false,
   null
 );
+
+export async function getStaticPaths() {
+  const events = await db.query.events.findMany();
+  return events?.map((ev) => ({ params: { id: ev.id } })) ?? [];
+}
 ---
 
 <AppScreen title="VECKORESULTAT" back="/">

@@ -1,4 +1,5 @@
 ---
+export const prerender = true;
 import 'src/styles/global.css';
 import ActiveSessions from 'src/components/homepage/ActiveSessions.astro';
 import UserButton from 'src/components/homepage/UserButton.astro';
@@ -19,7 +20,7 @@ import SeasonLeaderboard from 'src/components/homepage/SeasonLeaderboard.astro';
     ))
   }
 
-  <UserButton slot="header">
+  <UserButton slot="header" server:defer>
     <div
       slot="fallback"
       x-transition
@@ -35,7 +36,7 @@ import SeasonLeaderboard from 'src/components/homepage/SeasonLeaderboard.astro';
     <HeaderTitle title="RUNDOR" />
     <div class="flex overflow-x-scroll">
       <div class="flex flex-nowrap h-26 gap-2">
-        <ActiveSessions />
+        <ActiveSessions server:defer />
         <Events />
       </div>
     </div>
