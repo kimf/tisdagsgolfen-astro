@@ -1,4 +1,5 @@
 ---
+import getDb from 'src/db';
 import { closeScoringSession } from 'src/db/mutations/closeScoringSession';
 
 const { id } = Astro.params;
@@ -7,8 +8,10 @@ const userId = await Astro.session?.get('userId');
 if (!userId) throw new Error('Logga in för att stänga runda');
 if (!id) throw new Error('Id saknas för runda');
 
+const db = getDb(Astro.locals);
+
 if (Astro.request.method === 'POST' && userId === '2') {
-  await closeScoringSession(Number(id));
+  await closeScoringSession(Number(id), db);
   return new Response(null, {
     status: 204,
     statusText: 'No Content',

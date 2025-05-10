@@ -10,12 +10,14 @@ import type { LeaderboardScorecard } from 'src/db/queries/getScoringSession';
 import Beers from 'src/components/shared/Beers.astro';
 import Ciders from 'src/components/shared/Ciders.astro';
 import ToPar from 'src/components/shared/ToPar.astro';
-import db from 'src/db';
+import getDb from 'src/db';
 
 const { id } = Astro.params;
 if (!id) throw new Error('Id saknas för runda');
 
-const event = await getEventWithLeaderboardData(Number(id));
+const db = getDb(Astro.locals);
+
+const event = await getEventWithLeaderboardData(Number(id), db);
 
 if (!event) {
   throw new Error('Hittade ingen runda');
