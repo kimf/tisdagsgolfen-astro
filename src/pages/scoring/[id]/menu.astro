@@ -19,7 +19,7 @@ const canFinish = scoringSession.scorecards.every(
 ---
 
 <AppScreen title="Meny" back={`/scoring/${id}`}>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-4 p-4">
     <a href="/"><Button size="block" data-astro-history="replace">Gå till startsidan</Button></a>
     <a href={`/scoring/${id}/changesetup`}>
       <Button size="block"> Ändra spelare, och slag </Button>
@@ -33,15 +33,15 @@ const canFinish = scoringSession.scorecards.every(
     >
       Markera runda som klar</Button
     >
+    {
+      !canFinish && (
+        <div class="p-4 my-4 bg-orange-100 text-yellow-800 border rounded">
+          Du har inte fyllt i score för alla spelare och hål!
+        </div>
+      )
+    }
   </div>
-  {
-    !canFinish && (
-      <div class="p-4 my-4 bg-orange-100 text-yellow-800 border rounded">
-        Du har inte fyllt i score för alla spelare och hål!
-      </div>
-    )
-  }
-  <div class="mt-20">
+  <div class="mt-20 p-4">
     <Button
       size="block"
       intent="destructive"

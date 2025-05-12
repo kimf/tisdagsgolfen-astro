@@ -38,20 +38,24 @@ if (Astro.request.method === 'POST') {
 ---
 
 <AppScreen title="Ändra runda" back={`/scoring/${id}`}>
-  <form method="POST">
-    {
-      scoringSession.scorecards.map((scorecard, index) => (
-        <div class="flex gap-2 p-4 border-b mb-2">
-          <h3>{scorecard.players.map((player) => shortName(player.player.fullName)).join(', ')}</h3>
-          <div class="ml-auto">
-            <Quantity
-              value={scorecard.givenStrokes || 0}
-              name={`scorecards[${scorecard.id}]['strokes']`}
-            />
+  <div class="p-4">
+    <form method="POST">
+      {
+        scoringSession.scorecards.map((scorecard, index) => (
+          <div class="flex gap-2 p-4 border-b mb-2">
+            <h3>
+              {scorecard.players.map((player) => shortName(player.player.fullName)).join(', ')}
+            </h3>
+            <div class="ml-auto">
+              <Quantity
+                value={scorecard.givenStrokes || 0}
+                name={`scorecards[${scorecard.id}]['strokes']`}
+              />
+            </div>
           </div>
-        </div>
-      ))
-    }
-    <Button type="submit" size="block">SPARA</Button>
-  </form>
+        ))
+      }
+      <Button class="mt-8" type="submit" size="block">SPARA</Button>
+    </form>
+  </div>
 </AppScreen>

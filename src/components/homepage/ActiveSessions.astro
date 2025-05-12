@@ -30,8 +30,10 @@ const scoringSession = ownedScoringSession || scoringSessions[0];
 
 {
   userId && !ownedScoringSession && groupedSessions.length === 0 && (
-    <Button class="absolute right-0 top-3" size="sm">
-      <a href="/scoring/new">NY RUNDA</a>
+    <Button class="absolute right-4 top-2" size="sm">
+      <a href="/scoring/new" data-astro-prefetch="true">
+        NY RUNDA
+      </a>
     </Button>
   )
 }

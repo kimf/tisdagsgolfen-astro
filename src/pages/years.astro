@@ -6,12 +6,6 @@ import Link from 'src/assets/icons/link.svg';
 import HeaderTitle from 'src/components/shared/HeaderTitle.astro';
 import Button from 'src/components/ui/button.astro';
 
-Astro.response.headers.set(
-  'Cache-Control',
-  'public, max-age=0, s-maxage=31536000, must-revalidate'
-);
-Astro.response.headers.set('E-tag', 'v1');
-
 type HistoryItem = {
   year: string;
   winner: string;
@@ -101,7 +95,7 @@ const historyItems: HistoryItem[] = [
 ---
 
 <AppScreen title="Historik" back="/">
-  <div class="overflow-y-scroll h-full pb-50">
+  <div class="overflow-y-scroll h-full p-4">
     {
       historyItems.map((item) => (
         <div class="mb-12">
@@ -117,7 +111,12 @@ const historyItems: HistoryItem[] = [
             />
           )}
 
-          <a href={`/${item.year}`} class="inline-flex gap-2 py-2 text-sm" target="_blank">
+          <a
+            href={`/${item.year}`}
+            class="inline-flex gap-2 py-2 text-sm"
+            target="_blank"
+            data-astro-prefetch="tap"
+          >
             <Button>
               Ledartavla och rundor <Link class="size-5" />
             </Button>
