@@ -68,12 +68,11 @@ export default defineConfig({
   adapter: cloudflare(),
 
   prefetch: {
-    prefetchAll: true,
-    defaultStrategy: 'hover'
+    prefetchAll: false,
+    defaultStrategy: 'load'
   },
 
   experimental: {
-    clientPrerender: true,
     fonts: [
       {
         provider: 'local',
