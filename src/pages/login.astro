@@ -21,7 +21,7 @@ if (Astro.request.method === 'POST') {
     const password = formData.get('password');
 
     // Replace with your actual password check logic
-    if (password === import.meta.env.USER_PASSWORD) {
+    if (password === Astro.locals.runtime.env.USER_PASSWORD) {
       await Astro.session?.set('userId', String(userId));
       return Astro.redirect('/');
     } else {

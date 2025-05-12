@@ -45,8 +45,6 @@ const copyLegacyContent = () => ({
   }
 });
 
-const isProd = process.env.NODE_ENV === 'production';
-const redisUrl = process.env.REDIS_URL || '';
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()]
@@ -67,17 +65,7 @@ export default defineConfig({
   },
 
   output: 'server',
-  adapter: cloudflare({
-    runtime: {
-      mode: 'local',
-      type: 'pages',
-      bindings: {
-        DB: {
-          type: 'd1'
-        }
-      }
-    }
-  }),
+  adapter: cloudflare(),
 
   prefetch: {
     prefetchAll: true,
@@ -105,12 +93,5 @@ export default defineConfig({
         cssVariable: '--font-mono'
       }
     ]
-  },
-
-  env: {
-    schema: {
-      USER_PASSWORD: envField.string({ context: 'server', access: 'secret' }),
-      REDIS_URL: envField.string({ context: 'server', access: 'secret' })
-    }
   }
 });

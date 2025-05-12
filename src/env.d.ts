@@ -8,17 +8,6 @@ declare module '@marcreichel/alpine-auto-animate' {
   const AutoAnimate: any;
   export default AutoAnimate;
 }
-interface ImportMetaEnv {
-  readonly DATABASE_URL: string;
-  readonly REDIS_URL: string;
-  readonly TURSO_AUTH_TOKEN: string;
-  readonly USER_PASSWORD: string;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
-
 interface Window {
   Alpine: import('alpinejs').Alpine;
   teamForm: (courseId: number, specialWeek: number, teamEvent: number, strokes: number) => void;
