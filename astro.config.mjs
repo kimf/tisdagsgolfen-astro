@@ -27,7 +27,7 @@ const copyLegacyContent = () => ({
   hooks: {
     'astro:build:done': async () => {
       const legacyDir = path.join(process.cwd(), '_legacy');
-      const publicDir = path.join(process.cwd(), './dist/client');
+      const publicDir = path.join(process.cwd(), './dist');
 
       try {
         if (fsExtra.pathExistsSync(legacyDir)) {
