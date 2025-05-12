@@ -1,5 +1,7 @@
 import { defineAction } from 'astro:actions';
+
 import { z } from 'astro:schema';
+import getDb from 'src/db';
 import { updateCurrentHole } from 'src/db/mutations/updateCurrentHole';
 
 export const server = {
@@ -8,8 +10,9 @@ export const server = {
       scoringSessionId: z.number(),
       currentHole: z.number()
     }),
-    handler: async (input) => {
-      await updateCurrentHole(input.scoringSessionId, input.currentHole);
+    handler: async (input, context) => {
+      const db = getDb(context.locals);
+      await updateCurrentHole(input.scoringSessionId, input.currentHole, db);
     }
   })
 };

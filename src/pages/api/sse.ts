@@ -1,3 +1,4 @@
+export const prererender = false;
 import type { APIRoute } from 'astro';
 import { eq } from 'drizzle-orm';
 import db from 'src/db';
