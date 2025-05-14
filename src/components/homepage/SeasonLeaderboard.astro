@@ -62,7 +62,6 @@ const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a
                     <div class="pl-1">
                       &bull; ∅
                       <span x-text="item.average" x-show={`currentTab == 'rank'`}></span>
-                      <span x-text="item.averageStrokes" x-show={`currentTab == 'scratch'`}></span>
                       <span x-text="item.averageFines" x-show={`currentTab == 'kr'`}></span>
                       <small x-show={`currentTab == 'kr'`}>kr</small>
                     </div>
@@ -88,7 +87,7 @@ const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a
 
             <td class="text-right vcr text-lg font-extrabold text-black ml-auto pr-2 uppercase">
               <span x-text="item.points" x-show={`currentTab == 'rank'`}></span>
-              <span x-text="item.strokes" x-show={`currentTab == 'scratch'`}></span>
+              <span x-text="item.averageStrokes" x-show={`currentTab == 'scratch'`}></span>
               <span x-text="`${item.totalFines} kr`" x-show={`currentTab == 'kr'`}></span>
             </td>
           </tr>

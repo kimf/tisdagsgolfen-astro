@@ -106,9 +106,7 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
     const points_array = playerRegularPointsArray.filter((p): p is number => p !== null);
     const special_array = playerSpecialPointsArray.filter((p): p is number => p !== null);
 
-    const emptyStrokes =
-      strokes_array.length < 5 ? [...Array(5 - strokes_array.length)].map((_) => 0) : [];
-    const scratchSummary = `${[...strokes_array, ...emptyStrokes].join(', ')}`;
+    const scratchSummary = strokes_array.join(', ');
 
     const emptyPoints =
       points_array.length < 5 ? [...Array(5 - points_array.length)].map((_) => 0) : [];

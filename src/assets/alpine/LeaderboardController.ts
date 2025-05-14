@@ -36,7 +36,7 @@ document.addEventListener('alpine:init', () => {
       if (newTab === 'kr') {
         this.sortedItems = standardCompRank(this.items, 'totalFines', true, null);
       } else if (newTab === 'scratch') {
-        this.sortedItems = standardCompRank(this.items, 'strokes', true, null);
+        this.sortedItems = standardCompRank(this.items, 'averageStrokes', true, null);
       } else {
         this.sortedItems = standardCompRank(this.items, 'points', false, 'average');
       }
