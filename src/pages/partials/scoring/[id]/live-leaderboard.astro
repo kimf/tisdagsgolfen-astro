@@ -50,6 +50,8 @@ const canCloseWeek =
     : false;
 
 // Astro.response.headers.set('HX-Trigger', 'score-updated');
+
+const strokes = scoringSession.strokes;
 ---
 
 <main class="p-4">
@@ -80,7 +82,7 @@ const canCloseWeek =
         {!scoringSession.special && <th class="p-2 text-center vcr">💸</th>}
         <th class="p-2 text-center vcr">Hål</th>
         <th class="p-2 text-center vcr">Slag</th>
-        <th class="p-2 text-center vcr">Poäng</th>
+        {!strokes && <th class="p-2 text-center vcr">Poäng</th>}
         <th class="p-2 text-center vcr">+/-</th>
       </tr>
     </thead>
@@ -106,7 +108,9 @@ const canCloseWeek =
             )}
             <td class="p-2 text-center vcr">{scorecard.through}</td>
             <td class="p-2 text-center vcr">{scorecard.strokes}</td>
-            <td class="p-2 text-center vcr text-black font-bold">{scorecard.points}</td>
+            {!strokes && (
+              <td class="p-2 text-center vcr text-black font-bold">{scorecard.points}</td>
+            )}
             <td class="p-2 font-extrabold text-center vcr">
               <ToPar toPar={scorecard.toPar || 0} />
             </td>

@@ -4,10 +4,11 @@ import Quantity from '../ui/quantity.astro';
 
 interface Props {
   special: boolean;
+  teamEvent: boolean;
   id: number;
 }
 
-const { special, id } = Astro.props;
+const { special, teamEvent, id } = Astro.props;
 ---
 
 <div class="relative top-0 left-0 h-full w-full">
@@ -94,33 +95,45 @@ const { special, id } = Astro.props;
             )
           }
 
-          <div class="flex p-4 gap-2 border-b">
-            <h2>ÖL</h2>
-            <div class="ml-auto">
-              <input name="beers" x-model="beers" class="sr-only" />
-              <div class="flex items-center justify-between gap-0">
-                <Button intent="inline" @click="beers--" x-bind:disabled="beers === 0">
-                  &minus;
-                </Button>
-                <h2 x-text="beers" class="w-20 text-center text-2xl"></h2>
-                <Button intent="inline" @click="beers++"> &plus; </Button>
-              </div>
-            </div>
-          </div>
+          {
+            !teamEvent && (
+              <>
+                <div class="flex p-4 gap-2 border-b">
+                  <h2>ÖL</h2>
+                  <div class="ml-auto">
+                    <input name="beers" x-model="beers" class="sr-only" />
+                    <div class="flex items-center justify-between gap-0">
+                      <Button intent="inline" @click="beers--" x-bind:disabled="beers === 0">
+                        &minus;
+                      </Button>
+                      <h2 x-text="beers" class="w-20 text-center text-2xl" />
+                      <Button intent="inline" @click="beers++">
+                        {' '}
+                        &plus;{' '}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
 
-          <div class="flex p-4 gap-2 border-b">
-            <h2>CIDER</h2>
-            <div class="ml-auto">
-              <input name="ciders" x-model="ciders" class="sr-only" />
-              <div class="flex items-center justify-between gap-0">
-                <Button intent="inline" @click="ciders--" x-bind:disabled="ciders === 0">
-                  &minus;
-                </Button>
-                <h2 x-text="ciders" class="w-20 text-center text-2xl"></h2>
-                <Button intent="inline" @click="ciders++"> &plus; </Button>
-              </div>
-            </div>
-          </div>
+                <div class="flex p-4 gap-2 border-b">
+                  <h2>CIDER</h2>
+                  <div class="ml-auto">
+                    <input name="ciders" x-model="ciders" class="sr-only" />
+                    <div class="flex items-center justify-between gap-0">
+                      <Button intent="inline" @click="ciders--" x-bind:disabled="ciders === 0">
+                        &minus;
+                      </Button>
+                      <h2 x-text="ciders" class="w-20 text-center text-2xl" />
+                      <Button intent="inline" @click="ciders++">
+                        {' '}
+                        &plus;{' '}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )
+          }
 
           <footer class="flex justify-between p-4 bg-gray-200">
             <Button size="block" type="submit">Spara</Button>

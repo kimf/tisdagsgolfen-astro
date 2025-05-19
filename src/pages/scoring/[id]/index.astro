@@ -127,7 +127,11 @@ const title = `${new Date(scoringSession.createdAt || '').toLocaleDateString('sv
           }
         </div>
       </div>
-      <ScoreForm special={!!scoringSession.special} id={scoringSession.id} />
+      <ScoreForm
+        special={!!scoringSession.special}
+        id={scoringSession.id}
+        teamEvent={!!scoringSession.teamEvent}
+      />
     </div>
     <div class="fixed bottom-20 w-full">
       <button
