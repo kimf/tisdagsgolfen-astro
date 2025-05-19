@@ -78,14 +78,12 @@ const holeData = await db.query.holes.findFirst({
 ---
 
 <ScoreRow
-  score={score}
+  hole={holeData!}
+  scorecardId={scorecard.id}
+  holesCount={scorecard.course.holesCount}
   givenStrokes={scorecard.givenStrokes || 0}
   name={scorecard.players.map((player) => shortName(player.player.fullName)).join(', ')}
-  scorecardId={scorecard.id}
-  hole={holeData!}
-  holesCount={scorecard.course.holesCount}
-  oob
+  score={score}
+  special={!!scorecard.scoringSession.special}
+  strokes={!!scorecard.scoringSession.strokes}
 />
-<!-- <div id={`toPar-${scorecard.id}`} hx-swap-oob="true">
-  <ToPar toPar={scorecard.toPar || 0} />
-</div> -->

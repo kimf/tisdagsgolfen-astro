@@ -11,10 +11,22 @@ interface Props {
   hole: Hole;
   holesCount: number;
   givenStrokes: number;
+  special: boolean | null;
+  strokes: boolean | null;
   oob?: boolean;
 }
 
-const { score, scorecardId, name, givenStrokes, hole, holesCount, oob = false } = Astro.props;
+const {
+  score,
+  scorecardId,
+  name,
+  givenStrokes,
+  hole,
+  holesCount,
+  special,
+  strokes,
+  oob = false
+} = Astro.props;
 const extraStrokes = calculateExtraStrokes(hole.index, givenStrokes || 0, holesCount);
 
 const beers = score && score.beers > 0 ? Array.from({ length: score.beers }, (_, i) => i + 1) : [];
@@ -45,47 +57,55 @@ const props = oob ? { 'hx-swap-oob': 'true' } : {};
       </div>
     </div>
   </td>
-  <td class="w-[16%] p-2 text-center vcr border-gray-500 border-r">
-    <div
-      class="w-full min-h-20 content-center"
-      x-on:click={`openScoring(${hole.par}, ${hole.index}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecardId}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
-    >
-      {
-        score && (
-          <span
-            class={`inline-block ${
-              score?.strokes === hole.par - 1
-                ? // birdie
-                  'border border-foreground/20 px-4 py-2.5 rounded-full'
-                : // eagle
-                  score?.strokes === hole.par - 2
-                  ? 'border-4 border-double border-foreground/20 px-4 py-2.5 rounded-full'
-                  : // bogey
-                    score?.strokes === hole.par + 1
-                    ? 'border border-foreground/20 px-4 py-2'
-                    : // double or more
-                      score && score.strokes > hole.par + 1
-                      ? 'border-4 border-double border-foreground/20 px-4 py-2'
-                      : ''
-            }`}
-          >
-            {score?.strokes}
-          </span>
-        )
-      }
-
-      {!score && <span>✏️</span>}
-    </div>
-  </td>
-  <td class="w-[16%] p-2 text-center vcr border-r border-gray-500">
-    {score?.putts}
-  </td>
   <td
-    class={`w-[16%] p-2 text-center vcr border-r border-gray-500 ${score?.fines ? '' : 'text-foreground/60'}`}
+    class={`w-[16%] p-2 text-center vcr  border-gray-500 ${special ? '' : 'border-r'}`}
+    <div
+    class="w-full min-h-20 content-center"
+    x-on:click={`openScoring(${hole.par}, ${hole.index}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecardId}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
   >
-    {score ? (score.fines ? score.fines : 0) : ''}
+    {
+      score && (
+        <span
+          class={`inline-block ${
+            score?.strokes === hole.par - 1
+              ? // birdie
+                'border border-foreground/20 px-4 py-2.5 rounded-full'
+              : // eagle
+                score?.strokes === hole.par - 2
+                ? 'border-4 border-double border-foreground/20 px-4 py-2.5 rounded-full'
+                : // bogey
+                  score?.strokes === hole.par + 1
+                  ? 'border border-foreground/20 px-4 py-2'
+                  : // double or more
+                    score && score.strokes > hole.par + 1
+                    ? 'border-4 border-double border-foreground/20 px-4 py-2'
+                    : ''
+          }`}
+        >
+          {score?.strokes}
+        </span>
+      )
+    }
+
+    {!score && <span>✏️</span>}
   </td>
-  <td class="w-[16%] p-2 text-center vcr border-gray-500 rounded-br-md">
-    {score?.points}
-  </td>
+  {!special && <td class="w-[16%] p-2 text-center vcr border-r border-gray-500">{score?.putts}</td>}
+
+  {
+    !special && (
+      <td
+        class={`w-[16%] p-2 text-center vcr border-r border-gray-500 ${score?.fines ? '' : 'text-foreground/60'}`}
+      >
+        {score ? (score.fines ? score.fines : 0) : ''}
+      </td>
+    )
+  }
+
+  {
+    !strokes && (
+      <td class="w-[16%] p-2 text-center vcr border-gray-500 border-l rounded-br-md">
+        {score?.points}
+      </td>
+    )
+  }
 </tr>

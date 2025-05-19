@@ -92,19 +92,20 @@ const title = `${new Date(scoringSession.createdAt || '').toLocaleDateString('sv
                           >
                             Slag
                           </th>
-                          <th class="p-2 text-center vcr">Puttar</th>
+                          {!scoringSession.special && <th class="p-2 text-center vcr">Puttar</th>}
                           {!scoringSession.special && <th class="p-2 text-center vcr">💸</th>}
-                          <th
-                            class={`p-2 text-center vcr  rounded-tr-md ${scoringSession.strokes ? '' : 'font-bold'}`}
-                          >
-                            Poäng
-                          </th>
+                          {!scoringSession.strokes && (
+                            <th
+                              class={`p-2 text-center vcr rounded-tr-md ${scoringSession.strokes ? '' : 'font-bold'}`}
+                            >
+                              Poäng
+                            </th>
+                          )}
                         </tr>
                       </thead>
                       <tbody id="tbody">
                         {scoringSession.scorecards.map((scorecard) => (
                           <ScoreRow
-                            hole={currentHole}
                             scorecardId={scorecard.id}
                             holesCount={holesCount}
                             givenStrokes={scorecard.givenStrokes || 0}
@@ -113,6 +114,8 @@ const title = `${new Date(scoringSession.createdAt || '').toLocaleDateString('sv
                               .join(', ')}
                             hole={hole}
                             score={scorecard.scores.find((s) => s.hole === hole.number)}
+                            special={!!scoringSession.special}
+                            strokes={!!scoringSession.strokes}
                           />
                         ))}
                       </tbody>
