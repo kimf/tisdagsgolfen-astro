@@ -35,7 +35,7 @@ if (leaderboards.length === 0) {
 const scorecards = leaderboards.flatMap((session) => session.scorecards);
 
 const rankedScorecards = scoringSession.strokes
-  ? standardCompRank(scorecards, 'toPar', false, null)
+  ? standardCompRank(scorecards, 'toPar', true, null)
   : standardCompRank(
       scorecards.map((s) => ({ ...s, toPar: (s.through ?? 0) * 2 - (s.points ?? 0) })),
       'toPar',

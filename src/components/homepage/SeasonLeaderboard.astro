@@ -60,7 +60,7 @@ const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a
                     <span x-text="`${item.events} ${item.events === 1 ? 'runda' : 'rundor'}`"
                     ></span>
                     <div class="pl-1">
-                      &bull; ∅
+                      <span x-show={`currentTab != 'scratch'`}>&bull; ∅</span>
                       <span x-text="item.average" x-show={`currentTab == 'rank'`}></span>
                       <span x-text="item.averageFines" x-show={`currentTab == 'kr'`}></span>
                       <small x-show={`currentTab == 'kr'`}>kr</small>

@@ -12,7 +12,7 @@ export function setEventPoints(
   scorecards: LeaderboardScorecard[]
 ): RankedScorecard[] {
   const rankedScorecards = strokes
-    ? standardCompRank(scorecards, 'toPar', false, null)
+    ? standardCompRank(scorecards, 'toPar', true, null)
     : standardCompRank(
         scorecards.map((s) => ({ ...s, toPar: (s.through ?? 0) * 2 - (s.points ?? 0) })),
         'toPar',
