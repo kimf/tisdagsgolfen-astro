@@ -17,7 +17,7 @@ export async function getEventWithLeaderboardData(eventId: number, db: Database)
     with: {
       course: true,
       eventSessions: {
-        orderBy: (eventSessions, { asc }) => [asc(eventSessions.id)],
+        orderBy: (eventSessions, { asc }) => [asc(eventSessions.createdAt)],
         with: {
           session: {
             with: {
