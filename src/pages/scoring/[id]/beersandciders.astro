@@ -1,0 +1,37 @@
+---
+import { extractBeersAndCidersForPlayers } from 'src/lib/formDataExtractors';
+export const partial = true;
+import getDb from 'src/db';
+import { scorecardPlayers } from 'src/db/schema';
+import { and, eq } from 'drizzle-orm';
+
+const db = getDb(Astro.locals);
+
+const { id } = Astro.params;
+const userId = await Astro.session?.get('userId');
+
+if (!userId) throw new Error('Logga in för att föra score');
+if (!id) throw new Error('Id saknas för runda');
+
+const formData = await Astro.request.formData();
+
+const players = extractBeersAndCidersForPlayers(formData);
+console.log(players);
+players?.forEach(async (player) => {
+  const res = await db
+    .update(scorecardPlayers)
+    .set({
+      beers: player.beers,
+      ciders: player.ciders
+    })
+    .where(
+      and(
+        eq(scorecardPlayers.scorecardId, player.scorecardId),
+        eq(scorecardPlayers.playerId, player.id)
+      )
+    );
+  console.log(res);
+});
+
+Astro.response.headers.set('HX-Trigger', 'score-updated');
+---

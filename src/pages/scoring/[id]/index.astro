@@ -55,9 +55,11 @@ const holesCount = scoringSession.course.holesCount;
 const title = `${new Date(scoringSession.createdAt || '').toLocaleDateString('sv-SE', {
   day: 'numeric',
   month: 'short'
-})} -
-        ${scoringSession.course.name}
-      `;
+})} - ${scoringSession.course.name}`;
+
+const players = scoringSession.scorecards
+  .flatMap((s) => s.players)
+  .filter((player, index, self) => index === self.findIndex((p) => p.id === player.id));
 ---
 
 <AppScreen title={title}>
@@ -116,6 +118,16 @@ const title = `${new Date(scoringSession.createdAt || '').toLocaleDateString('sv
                             score={scorecard.scores.find((s) => s.hole === hole.number)}
                             special={!!scoringSession.special}
                             strokes={!!scoringSession.strokes}
+                            players={
+                              scoringSession.teamEvent
+                                ? (scorecard.players.map((player) => ({
+                                    id: player.id,
+                                    name: shortName(player.player.fullName),
+                                    beers: player.beers,
+                                    ciders: player.ciders
+                                  })) as PlayerWithBeersAndCiders[])
+                                : null
+                            }
                           />
                         ))}
                       </tbody>
@@ -133,6 +145,101 @@ const title = `${new Date(scoringSession.createdAt || '').toLocaleDateString('sv
         teamEvent={!!scoringSession.teamEvent}
       />
     </div>
+
+    {
+      scoringSession.teamEvent && (
+        <div
+          class="pb-30 p-6 absolute bottom-0 w-full items-center justify-center"
+          x-data="{ open: false }"
+        >
+          <form
+            hx-post={`/scoring/${id}/beersandciders`}
+            x-show="open"
+            x-cloak
+            hx-indicator="body"
+            hx-swap="none"
+            @htmx:after-request="open = false"
+          >
+            <table class="w-full">
+              <thead class="w-full uppercase bg-cyan-950 text-white">
+                <tr>
+                  <th class="p-2 pl-4 text-left vcr w-[36%]">Spelare</th>
+                  <th>Öl</th>
+                  <th>Cider</th>
+                </tr>
+              </thead>
+              <tbody>
+                {players.map((player) => (
+                  <tr
+                    class="border-b border-gray-200 odd:bg-white even:bg-gray-50"
+                    x-data={`{beers: ${player.beers}, ciders: ${player.ciders}}`}
+                  >
+                    <td class="p-4">{shortName(player.player.fullName)}</td>
+                    <td class="w-40">
+                      <div class="p-4">
+                        <input
+                          name={`player[${player.scorecardId}][${player.playerId}][beers]`}
+                          x-model="beers"
+                          class="sr-only"
+                        />
+                        <div class="flex items-center justify-between gap-0">
+                          <Button
+                            size="sm"
+                            intent="inline"
+                            @click="beers--"
+                            x-bind:disabled="beers === 0"
+                          >
+                            &minus;
+                          </Button>
+                          <h3 x-text="beers" class="w-10 text-center text-2xl" />
+                          <Button size="sm" intent="inline" @click="beers++">
+                            {' '}
+                            &plus;{' '}
+                          </Button>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="w-40">
+                      <div class="p-4">
+                        <input
+                          name={`player[${player.scorecardId}][${player.playerId}][ciders]`}
+                          x-model="ciders"
+                          class="sr-only"
+                        />
+                        <div class="flex items-center justify-between gap-0">
+                          <Button
+                            size="sm"
+                            intent="inline"
+                            @click="ciders--"
+                            x-bind:disabled="ciders === 0"
+                          >
+                            &minus;
+                          </Button>
+                          <h3 x-text="ciders" class="w-10 text-center text-2xl" />
+                          <Button size="sm" intent="inline" @click="ciders++">
+                            {' '}
+                            &plus;{' '}
+                          </Button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div class="w-full text-center">
+              <Button type="submit" class="mx-auto mt-4">
+                SPARA ÖL & CIDER
+              </Button>
+            </div>
+          </form>
+          <Button class="ml-4 mb-4 mx-auto" x-on:click="open = ! open" x-show="!open">
+            ÖL & CIDER
+          </Button>
+        </div>
+      )
+    }
+
     <div class="fixed bottom-20 w-full">
       <button
         :disabled="!prev"

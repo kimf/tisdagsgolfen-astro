@@ -61,7 +61,8 @@ const props = oob ? { 'hx-swap-oob': 'true' } : {};
     class={`w-[16%] p-2 text-center vcr  border-gray-500 ${special ? '' : 'border-r'}`}
     <div
     class="w-full min-h-20 content-center"
-    x-on:click={`openScoring(${hole.par}, ${hole.index}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecardId}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
+    x-on:click={`openScoring(
+      ${hole.par}, ${hole.index}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecardId}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
   >
     {
       score && (

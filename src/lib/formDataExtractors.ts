@@ -62,3 +62,39 @@ export function extractScorecards(formData: FormData | null) {
   }
   return scorecards;
 }
+
+export function extractBeersAndCidersForPlayers(formData: FormData | null) {
+  if (!formData) {
+    return null;
+  }
+
+  interface PlayerEntry {
+    id: number;
+    scorecardId: number;
+    beers?: number;
+    ciders?: number;
+  }
+
+  const playersMap: Record<string, PlayerEntry> = {};
+
+  for (const [key, val] of formData.entries()) {
+    const match = key.match(/^player\[(\d+)\]\[(\d+)\]\[(\w+)\]$/);
+    if (!match) continue;
+
+    const [, scorecardId, playerId, type] = match;
+    const pid = Number(playerId);
+    const sid = Number(scorecardId);
+    const value = Number(val);
+
+    const drinkType = type as 'beers' | 'ciders';
+    const mapKey = `${pid}-${sid}`;
+
+    if (!playersMap[mapKey]) {
+      playersMap[mapKey] = { id: pid, scorecardId: sid };
+    }
+    playersMap[mapKey][drinkType] = value;
+  }
+  const players: PlayerEntry[] = Object.values(playersMap);
+
+  return players;
+}

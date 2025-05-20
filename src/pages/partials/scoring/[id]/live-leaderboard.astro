@@ -93,7 +93,7 @@ const strokes = scoringSession.strokes;
             <td class="p-2 text-center vcr">{scorecard.rank}</td>
             <td class="p-2 flex flex-col vcr uppercase">
               {scorecard.players.map((p) => (
-                <div class="text-black font-bold">
+                <div class="text-black font-bold flex gap-2">
                   {shortName(p.player.fullName)}
                   <Beers beers={p.beers || 0} />
                   <Ciders ciders={p.ciders || 0} />

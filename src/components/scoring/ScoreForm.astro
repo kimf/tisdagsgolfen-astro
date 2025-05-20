@@ -48,6 +48,7 @@ const { special, teamEvent, id } = Astro.props;
           </header>
 
           <input class="sr-only" name="special" value={special ? '1' : '0'} />
+          <input class="sr-only" name="teamEvent" value={teamEvent ? '1' : '0'} />
           <input class="sr-only" name="par" x-model="par" />
           <input class="sr-only" name="hole" x-model="number" />
           <input class="sr-only" name="scorecard_id" x-model="scorecardId" />
