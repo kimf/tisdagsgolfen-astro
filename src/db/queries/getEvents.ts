@@ -3,6 +3,7 @@ import { type Database } from 'src/db';
 export async function getEvents(seasonId: number, db: Database) {
   return await db.query.events.findMany({
     where: (events, { eq }) => eq(events.seasonId, seasonId),
+    orderBy: (events, { desc }) => [desc(events.createdAt)],
     with: {
       course: true
     }
@@ -17,7 +18,7 @@ export async function getEventWithLeaderboardData(eventId: number, db: Database)
     with: {
       course: true,
       eventSessions: {
-        orderBy: (eventSessions, { asc }) => [asc(eventSessions.createdAt)],
+        orderBy: (eventSessions, { asc }) => [asc(eventSessions.id)],
         with: {
           session: {
             with: {
