@@ -88,9 +88,9 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
 
     const totalFines = fines - beers * 50 - ciders * 25;
 
-    const averageFines = Math.abs(totalFines / events);
+    const averageFines = Math.abs(totalFines / events).toFixed(2);
 
-    const finesSummary = `${fines > 0 ? '+' : ''}${fines.toFixed(2)} kr`;
+    const finesSummary = `${fines > 0 ? '+' : ''}${fines} kr`;
     const beersString = beers === 0 ? null : beers > 1 ? `${beers}x🍺` : '🍺';
     const cidersString = ciders === 0 ? null : ciders > 1 ? `${ciders}x🥤` : '🥤';
     const beersAndCidersSummary = [
