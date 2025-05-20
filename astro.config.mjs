@@ -65,18 +65,7 @@ export default defineConfig({
   },
 
   output: 'server',
-  adapter: cloudflare({}),
-
-  session: {
-    cookie: {
-      name: 'session-cookie',
-      secure: true,
-      httpOnly: true,
-      sameSite: 'none',
-      maxAge: 60 * 60 * 24 * 365 // 1 year
-    },
-    ttl: 60 * 60 * 24 * 365 // 1 year
-  },
+  adapter: cloudflare(),
 
   prefetch: {
     prefetchAll: false,
