@@ -31,8 +31,14 @@ const date =
 const title = `${date} - ${event.course.name}`;
 
 const scorecards = event.eventSessions.flatMap((es) => es.session.scorecards);
+
+// TODO: Should probably save this correctly from the beginning instead
+const fixedToParScorecards = event.strokes
+  ? scorecards
+  : scorecards.map((s) => ({ ...s, toPar: (s.through ?? 0) * 2 - (s.points ?? 0) }));
+
 const rankedScorecards = standardCompRank(
-  scorecards as LeaderboardScorecard[],
+  fixedToParScorecards as LeaderboardScorecard[],
   'weekPoints',
   false,
   null
