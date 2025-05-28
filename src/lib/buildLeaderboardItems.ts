@@ -9,12 +9,12 @@ export type LeaderboardItem = {
   id: number;
   points: number;
   strokes: number;
-  average: number;
-  averageStrokes: number;
+  average: string;
+  averageStrokes: string;
   beers: number;
   ciders: number;
   fines: number;
-  averageFines: number;
+  averageFines: string;
   totalFines: number;
   events: number;
   strokes_array: number[];
@@ -122,15 +122,17 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
       points: [...playerRegularPointsArray, ...playerSpecialPointsArray]
         .filter((p): p is number => p !== null)
         .reduce((a, b) => a + b, 0),
-      average: allPlayerRegularScorecards.length
+      average: (allPlayerRegularScorecards.length
         ? allPlayerRegularScorecards.reduce((a, b) => a + (b.points ?? 0), 0) /
           allPlayerRegularScorecards.length
-        : 0,
+        : 0
+      ).toFixed(1),
       strokes: playerStrokesArray.filter((p): p is number => p !== null).reduce((a, b) => a + b, 0),
-      averageStrokes: allPlayerRegularScorecards.length
+      averageStrokes: (allPlayerRegularScorecards.length
         ? allPlayerRegularScorecards.reduce((a, b) => a + (b.strokes ?? 0), 0) /
           allPlayerRegularScorecards.length
-        : 0,
+        : 0
+      ).toFixed(1),
       beers,
       ciders,
       fines,
