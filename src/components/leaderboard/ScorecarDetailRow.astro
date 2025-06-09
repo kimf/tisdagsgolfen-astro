@@ -1,0 +1,44 @@
+---
+import type { ScorecardWithPlayersAndScores } from 'src/db/queries/getEvents';
+import type { Hole } from 'src/db/schema/hole';
+
+export interface Props {
+  scorecard: ScorecardWithPlayersAndScores;
+  firstNine?: boolean;
+  strokes?: boolean;
+  holes: Hole[];
+  cellClass?: string;
+  sumClass?: string;
+}
+
+const { firstNine = false, strokes = false, scorecard, holes } = Astro.props;
+
+const scores = scorecard.scores.filter((s) => (firstNine ? s.hole <= 9 : s.hole > 9));
+
+const par = holes.reduce((acc, cur) => acc + (cur.par || 0), 0);
+
+const sum = strokes
+  ? par + scores.reduce((acc, cur) => acc + (cur.toPar || 0), 0)
+  : scores.reduce((acc, cur) => acc + (cur.points || 0), 0);
+---
+
+<tr class="border-gray-300">
+  {
+    holes.map((hole) => {
+      return (
+        <Fragment>
+          <td class="p-2 text-center vcr font-extrabold text-black border-l-2 border-slate-200 bg-gray-100">
+            {(strokes
+              ? hole.par + (scorecard.scores?.find((s) => s.hole === hole.number)?.toPar || 0)
+              : scorecard.scores?.find((s) => s.hole === hole.number)?.points) || '-'}
+          </td>
+          {(hole.number === 9 || hole.number === 18) && (
+            <td class="p-2 text-center vcr font-extrabold text-black border-l-2 border-slate-200 bg-gray-100">
+              {sum}
+            </td>
+          )}
+        </Fragment>
+      );
+    })
+  }
+</tr>

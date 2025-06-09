@@ -15,7 +15,8 @@ const players = await getPlayers(db);
 const events = await getEventsWithLeaderboardData(Number(seasonId), db);
 
 const scoringSessions = events.flatMap((event) => event.eventSessions.flatMap((es) => es.session));
-const leaderboardItems = buildLeaderboardItems(scoringSessions, players);
+// Explicitly cast scoringSessions to the expected type to resolve type mismatch
+const leaderboardItems = buildLeaderboardItems(scoringSessions as Parameters<typeof buildLeaderboardItems>[0], players);
 const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a, b) => a + b, 0);
 ---
 

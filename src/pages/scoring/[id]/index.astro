@@ -118,16 +118,6 @@ const players = scoringSession.scorecards
                             score={scorecard.scores.find((s) => s.hole === hole.number)}
                             special={!!scoringSession.special}
                             strokes={!!scoringSession.strokes}
-                            players={
-                              scoringSession.teamEvent
-                                ? (scorecard.players.map((player) => ({
-                                    id: player.id,
-                                    name: shortName(player.player.fullName),
-                                    beers: player.beers,
-                                    ciders: player.ciders
-                                  })) as PlayerWithBeersAndCiders[])
-                                : null
-                            }
                           />
                         ))}
                       </tbody>

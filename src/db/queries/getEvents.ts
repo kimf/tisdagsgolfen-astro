@@ -16,14 +16,19 @@ export async function getEventWithLeaderboardData(eventId: number, db: Database)
   return await db.query.events.findFirst({
     where: (events, { eq }) => eq(events.id, eventId),
     with: {
-      course: true,
+      course: {
+        with: { holes: true }
+      },
       eventSessions: {
         orderBy: (eventSessions, { asc }) => [asc(eventSessions.id)],
         with: {
           session: {
             with: {
               scorecards: {
-                with: { players: { with: { player: true } } }
+                with: {
+                  players: { with: { player: true } },
+                  scores: true
+                }
               }
             }
           }
@@ -37,6 +42,11 @@ export type EventWithLeaderboard = NonNullable<
   Awaited<ReturnType<typeof getEventWithLeaderboardData>>
 >;
 
+export type ScorecardWithPlayersAndScores = NonNullable<
+  EventWithLeaderboard['eventSessions'][number]['session']['scorecards'][number]
+>;
+export type CourseWithHoles = NonNullable<EventWithLeaderboard['course']>;
+
 export async function getEventsWithLeaderboardData(seasonId: number, db: Database) {
   return await db.query.events.findMany({
     where: (events, { eq }) => eq(events.seasonId, seasonId),
@@ -48,7 +58,9 @@ export async function getEventsWithLeaderboardData(seasonId: number, db: Databas
           session: {
             with: {
               scorecards: {
-                with: { players: { with: { player: true } } }
+                with: {
+                  players: { with: { player: true } }
+                }
               }
             }
           }

@@ -3,7 +3,8 @@ export const partial = true;
 
 import {
   getMinimalScoringSession,
-  getLeaderboardForScoringSession
+  getLeaderboardForScoringSession,
+  getScoringSession
 } from 'src/db/queries/getScoringSession';
 import EventPillRow from 'src/components/shared/EventPillRow.astro';
 import standardCompRank from 'src/lib/standardCompRank';
@@ -12,6 +13,10 @@ import Beers from 'src/components/shared/Beers.astro';
 import Ciders from 'src/components/shared/Ciders.astro';
 import ToPar from 'src/components/shared/ToPar.astro';
 import Button from 'src/components/ui/button.astro';
+import HoleInfo from 'src/components/leaderboard/HoleInfo.astro';
+import HoleNumberHeader from 'src/components/leaderboard/HoleNumberHeader.astro';
+import ScoreCardDetailsStrokesRow from 'src/components/leaderboard/ScoreCardDetailsStrokesRow.astro';
+import ScorecarDetailRow from 'src/components/leaderboard/ScorecarDetailRow.astro';
 import getDb from 'src/db';
 
 const { id } = Astro.params;
@@ -20,7 +25,7 @@ if (!id) throw new Error('Id saknas för runda');
 
 const db = getDb(Astro.locals);
 
-const scoringSession = await getMinimalScoringSession(Number(id), db);
+const scoringSession = await getScoringSession(Number(id), db);
 
 if (!scoringSession) {
   throw new Error('Hittade ingen scoring session');
@@ -52,6 +57,10 @@ const canCloseWeek =
 // Astro.response.headers.set('HX-Trigger', 'score-updated');
 
 const strokes = scoringSession.strokes;
+
+const holes = scoringSession.course.holes.sort((a, b) => a.number - b.number);
+const firstNineHoles = holes.filter((h) => h.number <= 9);
+const secondNineHoles = holes.filter((h) => h.number > 9);
 ---
 
 <main class="p-4">
@@ -74,7 +83,7 @@ const strokes = scoringSession.strokes;
     />
   </div>
 
-  <table class="w-full text-left text-slate-700 mt-4">
+  <table class="w-full text-left text-slate-700 mt-4" x-data={`{scorecardId: null}`}>
     <thead class="uppercase bg-stone-800 text-white">
       <tr>
         <th class="p-2 text-center vcr">#</th>
@@ -86,35 +95,75 @@ const strokes = scoringSession.strokes;
         <th class="p-2 text-center vcr">+/-</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody x-auto-animate.linear>
       {
         rankedScorecards.map((scorecard) => (
-          <tr class="border-b border-gray-200 odd:bg-white even:bg-gray-50">
-            <td class="p-2 text-center vcr">{scorecard.rank}</td>
-            <td class="p-2 flex flex-col vcr uppercase">
-              {scorecard.players.map((p) => (
-                <div class="text-black font-bold flex gap-2">
-                  {shortName(p.player.fullName)}
-                  <Beers beers={p.beers || 0} />
-                  <Ciders ciders={p.ciders || 0} />
-                </div>
-              ))}
-              <small>{scorecard.givenStrokes} Slag</small>
-            </td>
-            {!scoringSession.special && (
-              <td class="p-2 text-center vcr">
-                {scorecard.players.reduce((a, b) => a + (b.fines ?? 0), 0)}
+          <>
+            <tr
+              class="border-b border-gray-200 odd:bg-white even:bg-gray-50"
+              @click={`scorecardId === ${scorecard.id} ? scorecardId = null : scorecardId = ${scorecard.id}`}
+            >
+              <td class="p-2 text-center vcr">{scorecard.rank}</td>
+              <td class="p-2 flex flex-col vcr uppercase">
+                {scorecard.players.map((p) => (
+                  <div class="text-black font-bold flex gap-2">
+                    {shortName(p.player.fullName)}
+                    <Beers beers={p.beers || 0} />
+                    <Ciders ciders={p.ciders || 0} />
+                  </div>
+                ))}
+                <small>{scorecard.givenStrokes} Slag</small>
               </td>
-            )}
-            <td class="p-2 text-center vcr">{scorecard.through}</td>
-            <td class="p-2 text-center vcr">{scorecard.strokes}</td>
-            {!strokes && (
-              <td class="p-2 text-center vcr text-black font-bold">{scorecard.points}</td>
-            )}
-            <td class="p-2 font-extrabold text-center vcr">
-              <ToPar toPar={scorecard.toPar || 0} />
-            </td>
-          </tr>
+              {!scoringSession.special && (
+                <td class="p-2 text-center vcr">
+                  {scorecard.players.reduce((a, b) => a + (b.fines ?? 0), 0)}
+                </td>
+              )}
+              <td class="p-2 text-center vcr">{scorecard.through}</td>
+              <td class="p-2 text-center vcr">{scorecard.strokes}</td>
+              {!strokes && (
+                <td class="p-2 text-center vcr text-black font-bold">{scorecard.points}</td>
+              )}
+              <td class="p-2 font-extrabold text-center vcr">
+                <ToPar toPar={scorecard.toPar || 0} />
+              </td>
+            </tr>
+            <tr class="bg-slate-100 w-full" x-show={`scorecardId == ${scorecard.id}`} x-cloak>
+              <td colspan="7" class="w-full overflow-x-scroll pb-8">
+                <table class="w-full text-left text-slate-700 text-xs bg-white p-1">
+                  <tbody class="uppercase bg-white text-slate-500 text-xs align-bottom">
+                    <HoleNumberHeader holes={firstNineHoles} />
+                    <HoleInfo holes={firstNineHoles} />
+                    <ScoreCardDetailsStrokesRow
+                      scorecard={scorecard}
+                      course={scoringSession.course}
+                      firstNine
+                    />
+                    <ScorecarDetailRow
+                      holes={firstNineHoles}
+                      scorecard={scorecard}
+                      strokes
+                      firstNine
+                    />
+                    <ScorecarDetailRow holes={firstNineHoles} scorecard={scorecard} firstNine />
+
+                    <tr>
+                      <td colspan="10" class="p-1 bg-slate-300" />
+                    </tr>
+
+                    <HoleNumberHeader holes={secondNineHoles} />
+                    <HoleInfo holes={secondNineHoles} />
+                    <ScoreCardDetailsStrokesRow
+                      course={scoringSession.course}
+                      scorecard={scorecard}
+                    />
+                    <ScorecarDetailRow holes={secondNineHoles} strokes scorecard={scorecard} />
+                    <ScorecarDetailRow holes={secondNineHoles} scorecard={scorecard} />
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </>
         ))
       }
     </tbody>

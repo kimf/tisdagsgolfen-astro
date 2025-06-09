@@ -1,0 +1,29 @@
+---
+export interface Props {
+  holes: { number: number; par: number }[];
+}
+
+const { holes } = Astro.props;
+---
+
+<tr class="border-b-2 border-gray-300">
+  {
+    holes.map((hole) => (
+      <Fragment>
+        <td class="p-2 text-center vcr text-gray-700 bg-gray-50 font-bold">{hole.par}</td>
+
+        {hole.number === 9 ? (
+          <td class="p-2 text-center vcr font-bold border-l-2 border-slate-200 bg-gray-100">
+            {holes.filter((s) => s.number <= 9).reduce((acc, cur) => acc + (cur.par || 0), 0)}
+          </td>
+        ) : null}
+
+        {hole.number === 18 ? (
+          <td class="p-2 text-center vcr font-bold border-l-2 border-slate-200 bg-gray-100">
+            {holes.filter((s) => s.number > 9).reduce((acc, cur) => acc + (cur.par || 0), 0)}
+          </td>
+        ) : null}
+      </Fragment>
+    ))
+  }
+</tr>

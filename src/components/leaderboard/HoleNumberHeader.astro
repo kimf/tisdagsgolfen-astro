@@ -1,0 +1,19 @@
+---
+export interface Props {
+  holes: { number: number; par: number }[];
+}
+
+const { holes } = Astro.props;
+---
+
+<tr>
+  {
+    holes.map((hole) => (
+      <Fragment>
+        <th class="p-2 text-center vcr">{hole.number}</th>
+        {hole.number == 9 && <th class="p-2 text-center vcr">UT</th>}
+        {hole.number == 18 && <th class="p-2 text-center vcr">IN</th>}
+      </Fragment>
+    ))
+  }
+</tr>

@@ -1,0 +1,81 @@
+---
+import type { CourseWithHoles, ScorecardWithPlayersAndScores } from 'src/db/queries/getEvents';
+import StrokeDots from '../shared/StrokeDots.astro';
+
+export interface Props {
+  course: CourseWithHoles;
+  scorecard: ScorecardWithPlayersAndScores;
+  firstNine?: boolean;
+}
+
+const { scorecard, course, firstNine = false } = Astro.props;
+
+function getScoreBg(strokes: number | undefined, par: number | undefined): string {
+  if (strokes === undefined || par === undefined) return '';
+  if (strokes < par) return 'bg-red-500/50'; // Birdie or better
+  if (strokes === par) return 'bg-blue-700/50'; // Par
+  if (strokes === par + 1) return 'bg-green-800/50'; // Bogey
+  if (strokes === par + 2) return 'bg-teal-950/50'; // Double bogey
+  return 'bg-black'; // Triple bogey or worse
+}
+
+const allHoles = course.holes.sort((a, b) => a.number - b.number);
+const holes = firstNine
+  ? allHoles.filter((h) => h.number <= 9)
+  : allHoles.filter((h) => h.number > 9);
+---
+
+<tr>
+  {
+    holes.map((hole) => {
+      const score = scorecard.scores?.find((s) => s.hole === hole.number)?.strokes;
+      return (
+        <Fragment>
+          <td class="p-1 text-center align-text-top vcr font-bold text-white">
+            <span
+              class={`inline-block ${
+                score === hole.par - 1
+                  ? // birdie
+                    'border border-foreground/20 px-2 py-1 rounded-full'
+                  : // eagle
+                    score === hole.par - 2
+                    ? 'border-4 border-double border-foreground/20 px-2 py-1.5 rounded-full'
+                    : // bogey
+                      score === hole.par + 1
+                      ? 'border border-foreground/20 px-2 py-1'
+                      : // double or more
+                        score && score > hole.par + 1
+                        ? 'border-4 border-double border-foreground/20 px-2 py-1'
+                        : 'px-2 py-1'
+              } ${getScoreBg(score, hole.par)}`}
+            >
+              {score}
+            </span>
+            <div class="scale-75 flex justify-center items-end">
+              <StrokeDots
+                givenStrokes={scorecard.givenStrokes || 0}
+                holeIndex={hole.index}
+                holesCount={course.holesCount}
+                horizontal
+              />
+            </div>
+          </td>
+          {hole.number === 9 ? (
+            <td class="p-1 text-center align-text-top vcr font-extrabold text-black border-l-2 border-slate-200 bg-gray-100">
+              {scorecard.scores
+                .filter((s) => s.hole <= 9)
+                .reduce((acc, cur) => acc + (cur.strokes || 0), 0)}
+            </td>
+          ) : null}
+          {hole.number === 18 ? (
+            <td class="p-1 text-center vcr align-text-top font-extrabold text-black border-l-2 border-slate-200 bg-gray-100">
+              {scorecard.scores
+                .filter((s) => s.hole > 9)
+                .reduce((acc, cur) => acc + (cur.strokes || 0), 0)}
+            </td>
+          ) : null}
+        </Fragment>
+      );
+    })
+  }
+</tr>

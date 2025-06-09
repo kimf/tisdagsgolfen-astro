@@ -2,14 +2,20 @@
 import EventPillRow from 'src/components/shared/EventPillRow.astro';
 import { shortName } from 'src/lib/formatters';
 import AppScreen from 'src/layouts/AppScreen.astro';
-import { getEventWithLeaderboardData } from 'src/db/queries/getEvents';
+import {
+  getEventWithLeaderboardData,
+  type ScorecardWithPlayersAndScores
+} from 'src/db/queries/getEvents';
 import standardCompRank from 'src/lib/standardCompRank';
 import type { LeaderboardScorecard } from 'src/db/queries/getScoringSession';
 import Beers from 'src/components/shared/Beers.astro';
 import Ciders from 'src/components/shared/Ciders.astro';
 import ToPar from 'src/components/shared/ToPar.astro';
 import getDb from 'src/db';
-
+import HoleInfo from 'src/components/leaderboard/HoleInfo.astro';
+import HoleNumberHeader from 'src/components/leaderboard/HoleNumberHeader.astro';
+import ScoreCardDetailsStrokesRow from 'src/components/leaderboard/ScoreCardDetailsStrokesRow.astro';
+import ScorecarDetailRow from 'src/components/leaderboard/ScorecarDetailRow.astro';
 const db = getDb(Astro.locals);
 
 const { id } = Astro.params;
@@ -38,58 +44,19 @@ const fixedToParScorecards = event.strokes
   : scorecards.map((s) => ({ ...s, toPar: (s.through ?? 0) * 2 - (s.points ?? 0) }));
 
 const rankedScorecards = standardCompRank(
-  fixedToParScorecards as LeaderboardScorecard[],
+  fixedToParScorecards as ScorecardWithPlayersAndScores[],
   'weekPoints',
   false,
   null
 );
+
+const holes = event.course.holes.sort((a, b) => a.number - b.number);
+const firstNineHoles = holes.filter((h) => h.number <= 9);
+const secondNineHoles = holes.filter((h) => h.number > 9);
 ---
 
 <AppScreen title="VECKORESULTAT" back="/">
   <div class="flex flex-col gap-6 p-4 pt-0">
-    <table class="w-full text-left text-slate-700">
-      <thead class="uppercase bg-stone-800 text-white">
-        <th class="p-2 text-center vcr">#</th>
-        <th class="p-2 vcr">Spelare</th>
-        <th class="p-2 text-center vcr">SLAG</th>
-        <th class="p-2 text-center vcr">POÄNG</th>
-        <th class="p-2 text-center vcr">+/-</th>
-        {!event.special && <th class="p-2 text-center vcr">💸</th>}
-        <th class="p-2 text-center vcr">P</th>
-      </thead>
-      <tbody>
-        {
-          rankedScorecards.map((scorecard) => (
-            <tr class="border-b border-gray-200 odd:bg-white even:bg-gray-50">
-              <td class="p-2 text-center vcr">{scorecard.rank}</td>
-              <td class="px-2 py-1 flex flex-col vcr uppercase">
-                {scorecard.players.map((p) => (
-                  <div class="font-bold text-black">
-                    {shortName(p.player.fullName)}
-                    <div class="text-xs">
-                      <Beers beers={p.beers || 0} />
-                      <Ciders ciders={p.ciders || 0} />
-                    </div>
-                  </div>
-                ))}
-              </td>
-              <td class="p-2 text-center vcr">{scorecard.strokes}</td>
-              <td class="p-2 text-center vcr">{scorecard.points}</td>
-              <td class="p-2 font-bold text-center vcr">
-                <ToPar toPar={scorecard.toPar || 0} />
-              </td>
-              {!event.special && (
-                <td class="p-2 text-center vcr">
-                  {scorecard.players.reduce((a, b) => a + (b.fines ?? 0), 0)}
-                </td>
-              )}
-              <td class="p-2 text-center vcr font-extrabold text-black">{scorecard.weekPoints}</td>
-            </tr>
-          ))
-        }
-      </tbody>
-    </table>
-
     <div class="flex items-center justify-between">
       <h2 class="mb-2">{title}</h2>
       <EventPillRow
@@ -98,5 +65,90 @@ const rankedScorecards = standardCompRank(
         teamEvent={!!event.teamEvent}
       />
     </div>
+
+    <table class="w-full text-left text-slate-700" x-data={`{scorecardId: null}`}>
+      <thead class="uppercase bg-stone-800 text-white">
+        <tr>
+          <th class="p-2 text-center vcr">#</th>
+          <th class="p-2 vcr">Spelare</th>
+          <th class="p-2 text-center vcr">SLAG</th>
+          <th class="p-2 text-center vcr">POÄNG</th>
+          <th class="p-2 text-center vcr">+/-</th>
+          {!event.special && <th class="p-2 text-center vcr">💸</th>}
+          <th class="p-2 text-center vcr">P</th>
+        </tr>
+      </thead>
+      <tbody x-auto-animate.linear>
+        {
+          rankedScorecards.map((scorecard) => (
+            <>
+              <tr
+                class="border-b border-gray-200 odd:bg-white even:bg-gray-50"
+                @click={`scorecardId === ${scorecard.id} ? scorecardId = null : scorecardId = ${scorecard.id}`}
+              >
+                <td class="p-2 text-center vcr">{scorecard.rank}</td>
+                <td class="px-2 py-1 flex flex-col vcr uppercase">
+                  {scorecard.players.map((p) => (
+                    <div class="font-bold text-black">
+                      {shortName(p.player.fullName)}
+                      <div class="text-xs">
+                        <Beers beers={p.beers || 0} />
+                        <Ciders ciders={p.ciders || 0} />
+                      </div>
+                    </div>
+                  ))}
+                </td>
+                <td class="p-2 text-center vcr">{scorecard.strokes}</td>
+                <td class="p-2 text-center vcr">{scorecard.points}</td>
+                <td class="p-2 font-bold text-center vcr">
+                  <ToPar toPar={scorecard.toPar || 0} />
+                </td>
+                {!event.special && (
+                  <td class="p-2 text-center vcr">
+                    {scorecard.players.reduce((a, b) => a + (b.fines ?? 0), 0)}
+                  </td>
+                )}
+                <td class="p-2 text-center vcr font-extrabold text-black">
+                  {scorecard.weekPoints}
+                </td>
+              </tr>
+
+              <tr class="bg-slate-100 w-full" x-show={`scorecardId == ${scorecard.id}`} x-cloak>
+                <td colspan="7" class="w-full overflow-x-scroll pb-8">
+                  <table class="w-full text-left text-slate-700 text-xs bg-white p-1">
+                    <tbody class="uppercase bg-white text-slate-500 text-xs align-bottom">
+                      <HoleNumberHeader holes={firstNineHoles} />
+                      <HoleInfo holes={firstNineHoles} />
+                      <ScoreCardDetailsStrokesRow
+                        scorecard={scorecard}
+                        course={event.course}
+                        firstNine
+                      />
+                      <ScorecarDetailRow
+                        holes={firstNineHoles}
+                        scorecard={scorecard}
+                        strokes
+                        firstNine
+                      />
+                      <ScorecarDetailRow holes={firstNineHoles} scorecard={scorecard} firstNine />
+
+                      <tr>
+                        <td colspan="10" class="p-1 bg-slate-300" />
+                      </tr>
+
+                      <HoleNumberHeader holes={secondNineHoles} />
+                      <HoleInfo holes={secondNineHoles} />
+                      <ScoreCardDetailsStrokesRow course={event.course} scorecard={scorecard} />
+                      <ScorecarDetailRow holes={secondNineHoles} strokes scorecard={scorecard} />
+                      <ScorecarDetailRow holes={secondNineHoles} scorecard={scorecard} />
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </>
+          ))
+        }
+      </tbody>
+    </table>
   </div>
 </AppScreen>
