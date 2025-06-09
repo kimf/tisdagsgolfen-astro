@@ -6,6 +6,7 @@ pages_build_output_dir = "./dist"
 
 [vars]
 USER_PASSWORD = 'password'
+NODE_VERSION = '24.0.1'
 
 [[d1_databases]]
 binding = "DB"
