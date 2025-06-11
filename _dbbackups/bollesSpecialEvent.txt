@@ -1,0 +1,69 @@
+
+// const getNewPoints = (points: number) => {
+//   if (points === 0) return -3;
+//   if (points === 1) return 0;
+//   if (points === 2) return 1;
+//   if (points === 3) return 3;
+//   if (points === 4) return 5;
+//   if (points === 5) return 8;
+//   throw new Error('no point reference');
+// };
+
+// const teams = [
+//   [1, 11],
+//   [10, 5],
+//   [2, 7],
+//   [13, 14]
+// ];
+
+// teams.forEach((team) => {
+//   const newScorecard: number[] = [];
+//   const teamScorecards = scorecards.filter((s) =>
+//     team.includes(s.players.flatMap((p) => p.playerId)[0])
+//   );
+
+//   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 17, 18].forEach((holeNum) => {
+//     const points: number[] = [];
+
+//     teamScorecards.forEach((scorecard) => {
+//       const scoreForHole = scorecard.scores.find((s) => s.hole === holeNum);
+//       if (scoreForHole) {
+//         const newPoints = getNewPoints(scoreForHole?.points);
+//         points.push(newPoints);
+//       }
+//     });
+//     const sumPoints = points.reduce((acc, val) => acc + val, 0);
+//     newScorecard.push(sumPoints);
+//   });
+
+//   const newTotalPoints = newScorecard.reduce((acc, val) => acc + val, 0);
+//   // console.log(
+//   //   teamScorecards[0].players[0].player.fullName.split(' ')[0],
+//   //   ',',
+//   //   teamScorecards[0].scores.map((s) => s.points).join(', '),
+//   //   teamScorecards[0].points
+//   // );
+//   // console.log(
+//   //   teamScorecards[1].players[0].player.fullName.split(' ')[0],
+//   //   ',',
+//   //   teamScorecards[1].scores.map((s) => s.points).join(', '),
+//   //   teamScorecards[1].points
+//   // );
+//   // console.log(
+//   //   teamScorecards
+//   //     .map((s) => s.players.map((p) => p.player.fullName.split(' ')[0]).join(', '))
+//   //     .join('&'),
+//   //   ',',
+//   //   newScorecard.join(', '),
+//   //   ',',
+//   //   newTotalPoints
+//   // );
+
+//   const sqlString = `INSERT INTO scorecards
+//     (scoring_session_id, course_id, points, strokes, putts, given_strokes, team_index, through, to_par, current_hole, created_at)
+//     VALUES
+//     (${teamScorecards[0].scoringSessionId}, ${teamScorecards[0].courseId}, ${newTotalPoints}, ${teamScorecards[0].strokes! + teamScorecards[1].strokes!}, ${teamScorecards[0].putts! + teamScorecards[1].putts!}, ${teamScorecards[0].givenStrokes! + teamScorecards[1].givenStrokes!}, 0, 18, ${36 - newTotalPoints}, 18, '2025-05-10 22:22:22')`;
+//   console.log(sqlString);
+
+//   console.log(`INSERT INTO scorecard_players`);
+// });

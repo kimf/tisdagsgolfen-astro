@@ -1,5 +1,5 @@
 compatibility_flags = [ "nodejs_compat" ]
-compatibility_date = "2024-09-23"
+compatibility_date = "2025-05-05"
 
 name = "tisdagsgolfen-astro"
 pages_build_output_dir = "./dist"
