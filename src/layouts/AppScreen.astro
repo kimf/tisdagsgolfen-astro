@@ -16,7 +16,7 @@ import 'src/styles/global.css';
     <slot name="head" slot="head" />
   </SharedHead>
 
-  <body class="h-screen w-screen bg-noise-light-gradient-bottom">
+  <body class="min-h-screen w-screen bg-noise-light-gradient-bottom">
     {
       (
         <div class="flex w-full items-center p-4 backdrop-blur-3xl text-black fixed  overflow-hidden z-50 shadow header-padding-safe">
@@ -38,7 +38,7 @@ import 'src/styles/global.css';
       )
     }
 
-    <main class="max-w-screen-xl h-full mx-auto main-padding-safe">
+    <main class="max-w-screen-xl min-h-full mx-auto main-padding-safe pb-20">
       <slot />
     </main>
 
