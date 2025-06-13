@@ -27,7 +27,7 @@ const {
   strokes,
   oob = false
 } = Astro.props;
-const extraStrokes = calculateExtraStrokes(hole.index, givenStrokes || 0, holesCount);
+const extraStrokes = calculateExtraStrokes(hole.hcp, givenStrokes || 0, holesCount);
 
 const beers = score && score.beers > 0 ? Array.from({ length: score.beers }, (_, i) => i + 1) : [];
 const ciders =
@@ -46,7 +46,7 @@ const props = oob ? { 'hx-swap-oob': 'true' } : {};
         {name}
 
         <StrokeDots
-          holeIndex={hole?.index || 0}
+          holeIndex={hole?.hcp || 0}
           givenStrokes={givenStrokes || 0}
           holesCount={holesCount}
         />
@@ -62,7 +62,7 @@ const props = oob ? { 'hx-swap-oob': 'true' } : {};
     <div
     class="w-full min-h-20 content-center"
     x-on:click={`openScoring(
-      ${hole.par}, ${hole.index}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecardId}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
+      ${hole.par}, ${hole.hcp}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecardId}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
   >
     {
       score && (

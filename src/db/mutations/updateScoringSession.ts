@@ -36,7 +36,7 @@ export async function updateScoringSession(
         throw new Error('No such hole');
       }
       const extraStrokes = calculateExtraStrokes(
-        hole.index,
+        hole.hcp,
         scorecard.strokes || 0,
         scoringSession.course.holesCount
       );

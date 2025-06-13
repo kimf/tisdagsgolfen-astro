@@ -11,7 +11,7 @@ document.addEventListener('alpine:init', () => {
     isScoring: false,
     playerName: '',
     par: 0,
-    index: 0,
+    hcp: 0,
     number: 0,
     givenStrokes: 0,
     scorecardId: 0,
@@ -33,7 +33,6 @@ document.addEventListener('alpine:init', () => {
 
       this.embla.on('settle', () => {
         const scrollIndex = this.embla?.selectedScrollSnap();
-        console.log(scrollIndex);
         actions.setCurrentHole({ scoringSessionId, currentHole: Number(scrollIndex) + 1 });
       });
     },
@@ -63,7 +62,7 @@ document.addEventListener('alpine:init', () => {
 
     openScoring(
       par: number,
-      index: number,
+      hcp: number,
       number: number,
       playerName: string,
       givenStrokes: number,
@@ -74,7 +73,7 @@ document.addEventListener('alpine:init', () => {
       ciders: number
     ) {
       this.par = par;
-      this.index = index;
+      this.hcp = hcp;
       this.number = number;
       this.playerName = playerName;
       this.givenStrokes = givenStrokes;

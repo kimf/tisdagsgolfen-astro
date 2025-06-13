@@ -11,7 +11,7 @@ NODE_VERSION = '24.1.0'
 [[d1_databases]]
 binding = "DB"
 database_name = "tisdagsgolfen-prod-db"
-database_id = "6f0c2a6c-0965-4c76-bbb1-008e160199ba"
+database_id = "c979a651-83ef-4b03-af44-8497e28b4222"
 preview_database_id = "DB"
 migrations_dir  = "./src/db/_drizzle"
 
