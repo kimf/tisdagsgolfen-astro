@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1745241794686,
-      "tag": "0000_real_ultimo",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1745242160927,
-      "tag": "0001_score-triggers",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1745242195754,
-      "tag": "0002_seed-data",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1746565284942,
-      "tag": "0003_greedy_mandrill",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1749849024302,
-      "tag": "0004_salty_komodo",
+      "when": 1749849714894,
+      "tag": "0000_petite_sharon_ventura",
       "breakpoints": true
     }
   ]

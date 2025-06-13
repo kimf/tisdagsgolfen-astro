@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "4d4b10e9-46de-4176-9a21-9679a6ebfa05",
+  "id": "9a50069f-4f1b-4eda-9c54-0c9f3efb6e96",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "courses": {
@@ -75,6 +75,162 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "event_sessions": {
+      "name": "event_sessions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "event_id": {
+          "name": "event_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "session_id": {
+          "name": "session_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(CURRENT_TIMESTAMP)"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "event_sessions_event_id_events_id_fk": {
+          "name": "event_sessions_event_id_events_id_fk",
+          "tableFrom": "event_sessions",
+          "tableTo": "events",
+          "columnsFrom": [
+            "event_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "event_sessions_session_id_scoring_sessions_id_fk": {
+          "name": "event_sessions_session_id_scoring_sessions_id_fk",
+          "tableFrom": "event_sessions",
+          "tableTo": "scoring_sessions",
+          "columnsFrom": [
+            "session_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "events": {
+      "name": "events",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "season_id": {
+          "name": "season_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "course_id": {
+          "name": "course_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "special": {
+          "name": "special",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "strokes": {
+          "name": "strokes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "team_event": {
+          "name": "team_event",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(CURRENT_TIMESTAMP)"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "events_season_id_seasons_id_fk": {
+          "name": "events_season_id_seasons_id_fk",
+          "tableFrom": "events",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "season_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "events_course_id_courses_id_fk": {
+          "name": "events_course_id_courses_id_fk",
+          "tableFrom": "events",
+          "tableTo": "courses",
+          "columnsFrom": [
+            "course_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "holes": {
       "name": "holes",
       "columns": {
@@ -85,8 +241,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "index": {
-          "name": "index",
+        "hcp": {
+          "name": "hcp",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -131,11 +287,11 @@
           ],
           "isUnique": true
         },
-        "hole_course_index": {
-          "name": "hole_course_index",
+        "hole_course_hcp": {
+          "name": "hole_course_hcp",
           "columns": [
             "course_id",
-            "index"
+            "hcp"
           ],
           "isUnique": true
         }
@@ -459,6 +615,132 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "scores": {
+      "name": "scores",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "scorecard_id": {
+          "name": "scorecard_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "strokes": {
+          "name": "strokes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "hole": {
+          "name": "hole",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "putts": {
+          "name": "putts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "beers": {
+          "name": "beers",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "extra_strokes": {
+          "name": "extra_strokes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "points": {
+          "name": "points",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "to_par": {
+          "name": "to_par",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "fines": {
+          "name": "fines",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "ciders": {
+          "name": "ciders",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(CURRENT_TIMESTAMP)"
+        }
+      },
+      "indexes": {
+        "scores_scorecard_id_hole": {
+          "name": "scores_scorecard_id_hole",
+          "columns": [
+            "scorecard_id",
+            "hole"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "scores_scorecard_id_scorecards_id_fk": {
+          "name": "scores_scorecard_id_scorecards_id_fk",
+          "tableFrom": "scores",
+          "tableTo": "scorecards",
+          "columnsFrom": [
+            "scorecard_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "scoring_sessions": {
       "name": "scoring_sessions",
       "columns": {
@@ -618,132 +900,6 @@
         }
       },
       "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "scores": {
-      "name": "scores",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "scorecard_id": {
-          "name": "scorecard_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "strokes": {
-          "name": "strokes",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "hole": {
-          "name": "hole",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "putts": {
-          "name": "putts",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "beers": {
-          "name": "beers",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "extra_strokes": {
-          "name": "extra_strokes",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "points": {
-          "name": "points",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "to_par": {
-          "name": "to_par",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "fines": {
-          "name": "fines",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "ciders": {
-          "name": "ciders",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "(CURRENT_TIMESTAMP)"
-        }
-      },
-      "indexes": {
-        "scores_scorecard_id_hole": {
-          "name": "scores_scorecard_id_hole",
-          "columns": [
-            "scorecard_id",
-            "hole"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {
-        "scores_scorecard_id_scorecards_id_fk": {
-          "name": "scores_scorecard_id_scorecards_id_fk",
-          "tableFrom": "scores",
-          "tableTo": "scorecards",
-          "columnsFrom": [
-            "scorecard_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
