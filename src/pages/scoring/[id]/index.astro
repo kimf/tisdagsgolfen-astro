@@ -57,7 +57,12 @@ const title = `${new Date(scoringSession.createdAt || '').toLocaleDateString('sv
   month: 'short'
 })} - ${scoringSession.course.name}`;
 
-const players = scoringSession.scorecards
+const scorecards =
+  scoringSession.eventType === 'team_w_individual'
+    ? scoringSession.scorecards.filter((s) => s.individualForTeamWIndividual)
+    : scoringSession.scorecards;
+
+const players = scorecards
   .flatMap((s) => s.players)
   .filter((player, index, self) => index === self.findIndex((p) => p.id === player.id));
 ---
@@ -66,8 +71,8 @@ const players = scoringSession.scorecards
   <div slot="header">
     <EventPillRow
       special={!!scoringSession.special}
-      strokes={!!scoringSession.strokes}
-      teamEvent={!!scoringSession.teamEvent}
+      eventType={scoringSession.eventType}
+      scoringType={scoringSession.scoringType}
     />
   </div>
 
@@ -90,23 +95,19 @@ const players = scoringSession.scorecards
                         <tr>
                           <th class="p-2 pl-4 text-left vcr w-[36%] rounded-tl-md">Spelare</th>
                           <th
-                            class={`p-2 text-center vcr ${scoringSession.strokes ? 'font-bold' : ''}`}
+                            class={`p-2 text-center vcr ${scoringSession.scoringType === 'strokes' ? 'font-bold' : ''}`}
                           >
                             Slag
                           </th>
                           {!scoringSession.special && <th class="p-2 text-center vcr">Puttar</th>}
                           {!scoringSession.special && <th class="p-2 text-center vcr">💸</th>}
-                          {!scoringSession.strokes && (
-                            <th
-                              class={`p-2 text-center vcr rounded-tr-md ${scoringSession.strokes ? '' : 'font-bold'}`}
-                            >
-                              Poäng
-                            </th>
+                          {scoringSession.scoringType !== 'strokes' && (
+                            <th class="p-2 text-center vcr rounded-tr-md">Poäng</th>
                           )}
                         </tr>
                       </thead>
                       <tbody id="tbody">
-                        {scoringSession.scorecards.map((scorecard) => (
+                        {scorecards.map((scorecard) => (
                           <ScoreRow
                             scorecardId={scorecard.id}
                             holesCount={holesCount}
@@ -117,7 +118,7 @@ const players = scoringSession.scorecards
                             hole={hole}
                             score={scorecard.scores.find((s) => s.hole === hole.number)}
                             special={!!scoringSession.special}
-                            strokes={!!scoringSession.strokes}
+                            strokes={scoringSession.scoringType === 'strokes'}
                           />
                         ))}
                       </tbody>
@@ -132,12 +133,12 @@ const players = scoringSession.scorecards
       <ScoreForm
         special={!!scoringSession.special}
         id={scoringSession.id}
-        teamEvent={!!scoringSession.teamEvent}
+        teamEvent={scoringSession.eventType === 'team'}
       />
     </div>
 
     {
-      scoringSession.teamEvent && (
+      scoringSession.eventType === 'team' && (
         <div
           class="pb-30 p-6 absolute bottom-0 w-full items-center justify-center"
           x-data="{ open: false }"

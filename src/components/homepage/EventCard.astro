@@ -22,9 +22,6 @@ const eventCardVariants = cva({
 
 interface Props extends HTMLAttributes<'div'>, VariantProps<typeof eventCardVariants> {
   date: string;
-  special: boolean;
-  strokes: boolean;
-  teamEvent: boolean;
   live?: boolean;
 }
 

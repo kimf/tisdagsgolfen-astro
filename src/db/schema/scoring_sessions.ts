@@ -11,8 +11,8 @@ const scoringSessions = sqliteTable('scoring_sessions', {
     .references(() => courses.id)
     .notNull(),
   special: integer('special', { mode: 'boolean' }).default(false),
-  strokes: integer('strokes', { mode: 'boolean' }).default(false),
-  teamEvent: integer('team_event', { mode: 'boolean' }).default(false),
+  eventType: text('event_type').default('individual').notNull(),
+  scoringType: text('scoring_type').default('stableford').notNull(),
   state: text('state').default('STARTED'),
   currentHole: integer('current_hole', { mode: 'number' }).default(1),
   partOfFinal: integer('part_of_final', { mode: 'boolean' }).default(false),

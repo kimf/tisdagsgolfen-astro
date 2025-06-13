@@ -10,7 +10,7 @@ declare module '@marcreichel/alpine-auto-animate' {
 }
 interface Window {
   Alpine: import('alpinejs').Alpine;
-  teamForm: (courseId: number, specialWeek: number, teamEvent: number, strokes: number) => void;
+  teamForm: (courseId: number, specialWeek: number, eventType: string, scoringType: string) => void;
 }
 
 declare namespace App {

@@ -13,8 +13,8 @@ const events = sqliteTable('events', {
     .references(() => courses.id)
     .notNull(),
   special: integer('special', { mode: 'boolean' }).default(false),
-  strokes: integer('strokes', { mode: 'boolean' }).default(false),
-  teamEvent: integer('team_event', { mode: 'boolean' }).default(false),
+  eventType: text('event_type').default('individual').notNull(),
+  scoringType: text('scoring_type').default('stableford').notNull(),
 
   createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`)
 });

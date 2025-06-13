@@ -5,9 +5,10 @@ import type { HTMLAttributes } from 'astro/types';
 export interface Props {
   id: string;
   label: string;
+  description?: string;
 }
 
-const { id, label } = Astro.props;
+const { id, label, description } = Astro.props;
 
 const labelVariants = cva({
   base: 'inline-flex items-center justify-between w-full  bg-white border-2 border-gray-200 cursor-pointer rounded-xs active:scale-99 peer-checked:bg-cyan-50 peer-checked:active:scale-100 peer-checked:border-cyan-600 peer-checked:text-cyan-600',
@@ -28,8 +29,11 @@ const { class: className, size, ...props } = Astro.props;
 ---
 
 <label for={id} class={cx(labelVariants({ size }), className)} {...props}>
-  <div class="flex items-center justify-between w-full h-8">
-    <div>{label}</div>
+  <div class="flex items-center justify-between w-full min-h-8">
+    <div class="flex flex-col">
+      {label}
+      {description && <small>{description}</small>}
+    </div>
     <slot />
   </div>
 </label>

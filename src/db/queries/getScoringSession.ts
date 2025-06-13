@@ -34,8 +34,8 @@ export async function getLeaderboardForScoringSession(
       and(
         eq(ss.courseId, scoringSession.courseId),
         eq(ss.special, !!scoringSession.special),
-        eq(ss.teamEvent, !!scoringSession.teamEvent),
-        eq(ss.strokes, !!scoringSession.strokes),
+        eq(ss.eventType, scoringSession.eventType ?? 'individual'),
+        eq(ss.scoringType, scoringSession.scoringType ?? 'stableford'),
         eq(ss.partOfFinal, !!scoringSession.partOfFinal),
         ne(ss.state, 'CLOSED')
       ),

@@ -5,10 +5,11 @@ export interface Props {
   name: string;
   label: string;
   value: string | number;
+  description?: string;
   xModel?: string;
 }
 
-const { name, label, value, xModel } = Astro.props;
+const { name, label, value, description, xModel } = Astro.props;
 const id = `${value}_${xModel}`;
 ---
 
@@ -22,5 +23,5 @@ const id = `${value}_${xModel}`;
     class="peer sr-only"
     required
   />
-  <Label id={id} label={label} />
+  <Label id={id} label={label} description={description} />
 </div>

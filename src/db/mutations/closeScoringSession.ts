@@ -22,7 +22,7 @@ export async function closeScoringSession(scoringSessionId: number, db: Database
 
   const withEventPoints = setEventPoints(
     !!scoringSession.special,
-    !!scoringSession.strokes,
+    scoringSession.scoringType === 'strokes',
     leaderBoardFlattened
   );
 
@@ -33,8 +33,8 @@ export async function closeScoringSession(scoringSessionId: number, db: Database
     .values({
       courseId: scoringSession.courseId,
       special: scoringSession.special,
-      strokes: scoringSession.strokes,
-      teamEvent: scoringSession.teamEvent,
+      strokes: scoringSession.scoringType === 'strokes',
+      teamEvent: scoringSession.eventType !== 'individual',
       seasonId: 1
     })
     .returning({ id: events.id });

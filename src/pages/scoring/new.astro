@@ -49,7 +49,7 @@ if (joinId) {
     <form
       class="flex flex-col gap-4"
       method="POST"
-      x-data={`teamForm(${joinSession?.courseId}, ${joinSession?.special}, ${joinSession?.teamEvent}, ${joinSession?.strokes})`}
+      x-data={`teamForm(${joinSession?.courseId}, ${joinSession?.special}, ${joinSession?.eventType}, ${joinSession?.scoringType})`}
     >
       <Settings />
       <CourseSelector />
@@ -61,4 +61,4 @@ if (joinId) {
     </form>
   </div>
 </AppScreen>
-<script src="src/assets/alpine//NewScoringSessionController.ts"></script>
+<script src="src/assets/alpine/NewScoringSessionController.ts"></script>

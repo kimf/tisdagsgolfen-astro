@@ -10,7 +10,7 @@ export interface Props {
 const { allPlayers } = Astro.props;
 ---
 
-<div x-show="!(specialWeek && teamEvent)">
+<div x-show="!(specialWeek && isTeamEvent())">
   <h2 class="flex justify-between">Spelare</h2>
   <div class="flex flex-col gap-2 pt-4">
     {
@@ -22,7 +22,7 @@ const { allPlayers } = Astro.props;
           label={shortName(player.fullName)}
           size="lg"
         >
-          <template x-if={`!teamEvent && hasSelectedPlayer(${player.id})`}>
+          <template x-if={`!isTeamEvent() && hasSelectedPlayer(${player.id})`}>
             <Quantity value={10} name={`players[${index}]['strokes']`} />
           </template>
         </Checkbox>

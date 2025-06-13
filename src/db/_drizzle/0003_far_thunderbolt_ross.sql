@@ -1,0 +1,1 @@
+ALTER TABLE `scorecards` ADD `individual_for_team_w_individual` integer DEFAULT false;

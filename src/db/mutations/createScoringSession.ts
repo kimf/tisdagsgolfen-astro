@@ -4,8 +4,8 @@ import type { Database } from 'src/db';
 
 export async function createScoringSession(userId: number, formData: FormData, db: Database) {
   const isSpecial = formData.get('specialweek') === 'on';
-  const isTeamEvent = isSpecial && formData.get('teamevent') === 'on';
-  const isStrokes = formData.get('strokes') === 'on';
+  const eventType = formData.get('event_type') || 'individual';
+  const scoringType = formData.get('scoring_type') || 'stableford';
   const courseId = Number(formData.get('course'));
 
   const scoringSesh = await db
@@ -14,8 +14,8 @@ export async function createScoringSession(userId: number, formData: FormData, d
       ownerId: userId,
       courseId,
       special: isSpecial,
-      strokes: isStrokes,
-      teamEvent: isTeamEvent
+      eventType,
+      scoringType
     })
     .returning({ id: scoringSessions.id });
 
@@ -28,7 +28,10 @@ export async function createScoringSession(userId: number, formData: FormData, d
     teamIndex?: number;
   }[];
 
-  if (isTeamEvent) {
+  if (eventType === 'team_w_individual') {
+    // TODO: DO WE NEED SCORECARDS FOR ALL PLAYERS ??
+    scorecardValues = [];
+  } else if (eventType === 'team') {
     const teams = extractTeams(formData);
     if (!teams) {
       throw new Error('No teams');

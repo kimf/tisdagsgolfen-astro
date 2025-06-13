@@ -4,10 +4,27 @@ import Pill from 'src/components/ui/Pill.astro';
 interface Props {
   live?: boolean;
   special: boolean;
-  teamEvent: boolean;
-  strokes: boolean;
+  eventType: string;
+  scoringType: string;
 }
-const { live, special, teamEvent, strokes } = Astro.props;
+const { live, special, eventType, scoringType } = Astro.props;
+
+export const getScoringTypeString = (key: string) => {
+  switch (key) {
+    case 'strokes':
+      return 'SLAG';
+    case 'stableford':
+      return 'POÄNG';
+    case 'modified':
+      return 'MODIFIERAD';
+    case 'irish':
+      return 'IRISH';
+    case 'bolle':
+      return 'BOLLES SPECIAL';
+    default:
+      return 'OKÄNT';
+  }
+};
 ---
 
 <div class="flex gap-0.5 mb-2">
@@ -15,10 +32,11 @@ const { live, special, teamEvent, strokes } = Astro.props;
     special && (
       <Fragment>
         <Pill intent="special">SPECIAL</Pill>
-        {teamEvent && <Pill intent="teamEvent">LAG</Pill>}
+        {eventType === 'team' && <Pill intent="teamEvent">LAG</Pill>}
+        {eventType === 'team_w_individual' && <Pill intent="teamEvent">LAG (MED IND.)</Pill>}
       </Fragment>
     )
   }
-  <Pill>{strokes ? 'SLAG' : 'POÄNG'}</Pill>
+  <Pill>{getScoringTypeString(scoringType)}</Pill>
   {live && <Pill intent="live">LIVE</Pill>}
 </div>

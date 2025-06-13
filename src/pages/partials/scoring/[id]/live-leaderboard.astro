@@ -5,7 +5,7 @@ import {
   getLeaderboardForScoringSession,
   getScoringSession
 } from 'src/db/queries/getScoringSession';
-import EventPillRow from 'src/components/shared/EventPillRow.astro';
+import EventPillRow, { getScoringTypeString } from 'src/components/shared/EventPillRow.astro';
 import standardCompRank from 'src/lib/standardCompRank';
 import { shortName } from 'src/lib/formatters';
 import Beers from 'src/components/shared/Beers.astro';
@@ -37,16 +37,25 @@ if (leaderboards.length === 0) {
   throw new Error('Hittade ingen data att visa');
 }
 
-const scorecards = leaderboards.flatMap((session) => session.scorecards);
+const allScorecards = leaderboards.flatMap((session) => session.scorecards);
 
-const rankedScorecards = scoringSession.strokes
-  ? standardCompRank(scorecards, 'toPar', true, null)
-  : standardCompRank(
-      scorecards.map((s) => ({ ...s, toPar: (s.through ?? 0) * 2 - (s.points ?? 0) })),
-      'toPar',
-      true,
-      null
-    );
+const scorecards = allScorecards.filter((s) => !s.individualForTeamWIndividual);
+const individualScorecards = allScorecards.filter((s) => s.individualForTeamWIndividual);
+
+const rankedScorecards =
+  scoringSession.scoringType === 'strokes'
+    ? standardCompRank(scorecards, 'toPar', true, null)
+    : standardCompRank(
+        scorecards.map((s) => ({ ...s, toPar: (s.through ?? 0) * 2 - (s.points ?? 0) })),
+        'toPar',
+        true,
+        null
+      );
+
+const individualRankedScorecards =
+  scoringSession.eventType === 'team_w_individual'
+    ? standardCompRank(individualScorecards, 'points', false, null)
+    : [];
 
 const canCloseWeek =
   userId === '2'
@@ -56,15 +65,15 @@ const canCloseWeek =
 
 // Astro.response.headers.set('HX-Trigger', 'score-updated');
 
-const strokes = scoringSession.strokes;
+const strokes = scoringSession.scoringType === 'strokes';
 
 const holes = scoringSession.course.holes.sort((a, b) => a.number - b.number);
 const firstNineHoles = holes.filter((h) => h.number <= 9);
 const secondNineHoles = holes.filter((h) => h.number > 9);
 ---
 
-<main class="p-4">
-  <div class="flex items-center justify-between">
+<main class="p-4" x-data=`{currentTab: 'regular', scorecardId: null}`>
+  <div class="flex items-center justify-between" >
     <h3 class="mb-2">
       {
         new Date(scoringSession.createdAt || '').toLocaleDateString('sv-SE', {
@@ -77,104 +86,214 @@ const secondNineHoles = holes.filter((h) => h.number > 9);
 
     <EventPillRow
       special={!!scoringSession.special}
-      strokes={!!scoringSession.strokes}
-      teamEvent={!!scoringSession.teamEvent}
+      eventType={scoringSession.eventType}
+      scoringType={scoringSession.scoringType}
       live
     />
   </div>
 
-  <table class="w-full text-left text-slate-700 mt-4" x-data={`{scorecardId: null}`}>
-    <thead class="uppercase bg-stone-800 text-white">
-      <tr>
-        <th class="p-2 text-center vcr">#</th>
-        <th class="p-2 vcr">Spelare</th>
-        {!scoringSession.special && <th class="p-2 text-center vcr">💸</th>}
-        <th class="p-2 text-center vcr">Hål</th>
-        <th class="p-2 text-center vcr">Slag</th>
-        {!strokes && <th class="p-2 text-center vcr">Poäng</th>}
-        <th class="p-2 text-center vcr">+/-</th>
-      </tr>
-    </thead>
-    <tbody x-auto-animate.linear>
-      {
-        rankedScorecards.map((scorecard) => (
-          <>
-            <tr
-              class="border-b border-gray-200 odd:bg-white even:bg-gray-50"
-              @click={`scorecardId === ${scorecard.id} ? scorecardId = null : scorecardId = ${scorecard.id}`}
-            >
-              <td class="p-2 text-center vcr">{scorecard.rank}</td>
-              <td class="p-2 flex flex-col vcr uppercase">
-                {scorecard.players.map((p) => (
-                  <div class="text-black font-bold flex gap-2">
-                    <div class="flex items-center">
-                      {shortName(p.player.fullName)}
-                      {p.player.guest && (
-                        <Pill intent="guest" class="h-4 px-1 py-0 ml-2">
-                          GÄST
-                        </Pill>
-                      )}
-                    </div>
-                    <Beers beers={p.beers || 0} />
-                    <Ciders ciders={p.ciders || 0} />
-                  </div>
-                ))}
-                <small>{scorecard.givenStrokes} Slag</small>
-              </td>
-              {!scoringSession.special && (
-                <td class="p-2 text-center vcr">
-                  {scorecard.players.reduce((a, b) => a + (b.fines ?? 0), 0)}
-                </td>
-              )}
-              <td class="p-2 text-center vcr">{scorecard.through}</td>
-              <td class="p-2 text-center vcr">{scorecard.strokes}</td>
-              {!strokes && (
-                <td class="p-2 text-center vcr text-black font-bold">{scorecard.points}</td>
-              )}
-              <td class="p-2 font-extrabold text-center vcr">
-                <ToPar toPar={scorecard.toPar || 0} />
-              </td>
-            </tr>
-            <tr class="bg-slate-100 w-full" x-show={`scorecardId == ${scorecard.id}`} x-cloak>
-              <td colspan="7" class="w-full overflow-x-scroll pb-8">
-                <table class="w-full text-left text-slate-700 text-xs bg-white p-1">
-                  <tbody class="uppercase bg-white text-slate-500 text-xs align-bottom">
-                    <HoleNumberHeader holes={firstNineHoles} />
-                    <HoleInfo holes={firstNineHoles} />
-                    <ScoreCardDetailsStrokesRow
-                      scorecard={scorecard}
-                      course={scoringSession.course}
-                      firstNine
-                    />
-                    <ScorecarDetailRow
-                      holes={firstNineHoles}
-                      scorecard={scorecard}
-                      strokes
-                      firstNine
-                    />
-                    <ScorecarDetailRow holes={firstNineHoles} scorecard={scorecard} firstNine />
+  {scoringSession.eventType === 'team_w_individual' && (
+      <div
+        role="tablist"
+        class="inline-flex flex-wrap justify-center bg-stone-200 rounded p-1 w-full mb-4 sticky top-16 backdrop-blur-sm z-100"
+        x-auto-animate
+      >
+        <button
+          id="`tab-teams"
+          class="cursor-pointer flex-1 uppercase vcr h-8 px-4 rounded font-bold whitespace-nowrap transition-all duration-150 ease-in-out active:text-slate-500 active:bg-gray-200"
+          :class={`currentTab === 'regular' ? 'text-slate-900 bg-black  text-white border-blue-100 box-border' : 'text-slate-600 hover:text-slate-900 '`}
+          @click={`currentTab = 'regular'`}>{getScoringTypeString(scoringSession.scoringType)}</button>
 
-                    <tr>
-                      <td colspan="10" class="p-1 bg-slate-300" />
-                    </tr>
+        <button
+          id="`tab-teams"
+          class="cursor-pointer flex-1 uppercase vcr h-8 px-4 rounded font-bold whitespace-nowrap transition-all duration-150 ease-in-out active:text-slate-500 active:bg-gray-200"
+          :class={`currentTab === 'individual' ? 'text-slate-900 bg-black  text-white border-blue-100 box-border' : 'text-slate-600 hover:text-slate-900 '`}
+          @click={`currentTab = 'individual'`}>Individuellt</button>
+      </div>
+    )}
 
-                    <HoleNumberHeader holes={secondNineHoles} />
-                    <HoleInfo holes={secondNineHoles} />
-                    <ScoreCardDetailsStrokesRow
-                      course={scoringSession.course}
-                      scorecard={scorecard}
-                    />
-                    <ScorecarDetailRow holes={secondNineHoles} strokes scorecard={scorecard} />
-                    <ScorecarDetailRow holes={secondNineHoles} scorecard={scorecard} />
-                  </tbody>
-                </table>
-              </td>
+
+    <div x-show="currentTab === 'regular'">
+      <table class="w-full text-left text-slate-700 mt-4">
+        <thead class="uppercase bg-stone-800 text-white">
+          <tr>
+            <th class="p-2 text-center vcr">#</th>
+            <th class="p-2 vcr">Spelare</th>
+            {!scoringSession.special && <th class="p-2 text-center vcr">💸</th>}
+            <th class="p-2 text-center vcr">Hål</th>
+            <th class="p-2 text-center vcr">Slag</th>
+            {!strokes && <th class="p-2 text-center vcr">Poäng</th>}
+            <th class="p-2 text-center vcr">+/-</th>
+          </tr>
+        </thead>
+        <tbody x-auto-animate.linear>
+          {
+            rankedScorecards.map((scorecard) => (
+              <>
+                <tr
+                  class="border-b border-gray-200 odd:bg-white even:bg-gray-50"
+                  @click={`scorecardId === ${scorecard.id} ? scorecardId = null : scorecardId = ${scorecard.id}`}
+                >
+                  <td class="p-2 text-center vcr">{scorecard.rank}</td>
+                  <td class="p-2 flex flex-col vcr uppercase">
+                    {scorecard.players.map((p) => (
+                      <div class="text-black font-bold flex gap-2">
+                        <div class="flex items-center">
+                          {shortName(p.player.fullName)}
+                          {p.player.guest && (
+                            <Pill intent="guest" class="h-4 px-1 py-0 ml-2">
+                              GÄST
+                            </Pill>
+                          )}
+                        </div>
+                        <Beers beers={p.beers || 0} />
+                        <Ciders ciders={p.ciders || 0} />
+                      </div>
+                    ))}
+                    <small>{scorecard.givenStrokes} Slag</small>
+                  </td>
+                  {!scoringSession.special && (
+                    <td class="p-2 text-center vcr">
+                      {scorecard.players.reduce((a, b) => a + (b.fines ?? 0), 0)}
+                    </td>
+                  )}
+                  <td class="p-2 text-center vcr">{scorecard.through}</td>
+                  <td class="p-2 text-center vcr">{scorecard.strokes}</td>
+                  {!strokes && (
+                    <td class="p-2 text-center vcr text-black font-bold">{scorecard.points}</td>
+                  )}
+                  <td class="p-2 font-extrabold text-center vcr">
+                    <ToPar toPar={scorecard.toPar || 0} />
+                  </td>
+                </tr>
+                <tr class="bg-slate-100 w-full" x-show={`scorecardId == ${scorecard.id}`} x-cloak>
+                  <td colspan="7" class="w-full overflow-x-scroll pb-8">
+                    <table class="w-full text-left text-slate-700 text-xs bg-white p-1">
+                      <tbody class="uppercase bg-white text-slate-500 text-xs align-bottom">
+                        <HoleNumberHeader holes={firstNineHoles} />
+                        <HoleInfo holes={firstNineHoles} />
+                        <ScoreCardDetailsStrokesRow
+                          scorecard={scorecard}
+                          course={scoringSession.course}
+                          firstNine
+                        />
+                        <ScorecarDetailRow
+                          holes={firstNineHoles}
+                          scorecard={scorecard}
+                          strokes
+                          firstNine
+                        />
+                        <ScorecarDetailRow holes={firstNineHoles} scorecard={scorecard} firstNine />
+
+                        <tr>
+                          <td colspan="10" class="p-1 bg-slate-300" />
+                        </tr>
+
+                        <HoleNumberHeader holes={secondNineHoles} />
+                        <HoleInfo holes={secondNineHoles} />
+                        <ScoreCardDetailsStrokesRow
+                          course={scoringSession.course}
+                          scorecard={scorecard}
+                        />
+                        <ScorecarDetailRow holes={secondNineHoles} strokes scorecard={scorecard} />
+                        <ScorecarDetailRow holes={secondNineHoles} scorecard={scorecard} />
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+
+    {scoringSession.eventType === 'team_w_individual' && (
+      <div x-show="currentTab === 'individual'">
+        <table class="w-full text-left text-slate-700">
+          <thead class="uppercase bg-stone-800 text-white">
+            <tr>
+              <th class="p-2 text-center vcr">#</th>
+              <th class="p-2 vcr">Spelare</th>
+              <th class="p-2 text-center vcr">SLAG</th>
+              <th class="p-2 text-center vcr">POÄNG</th>
+              <th class="p-2 text-center vcr">+/-</th>
             </tr>
-          </>
-        ))
-      }
-    </tbody>
-  </table>
+          </thead>
+          <tbody x-auto-animate.linear>
+            {
+              individualRankedScorecards.map((scorecard) => (
+                <>
+                  <tr
+                    class="border-b border-gray-200 odd:bg-white even:bg-gray-50"
+                    @click={`scorecardId === ${scorecard.id} ? scorecardId = null : scorecardId = ${scorecard.id}`}
+                  >
+                    <td class="p-2 text-center vcr">{scorecard.rank}</td>
+                    <td class="px-2 py-1 flex flex-col vcr uppercase">
+                      {scorecard.players.map((p) => (
+                        <div class="font-bold text-black">
+                          <div class="flex items-center">
+                            {shortName(p.player.fullName)}
+                            {p.player.guest && (
+                              <Pill intent="guest" class="h-4 px-1 py-0 ml-2">
+                                GÄST
+                              </Pill>
+                            )}
+                          </div>
+                          <div class="text-xs">
+                            <Beers beers={p.beers || 0} />
+                            <Ciders ciders={p.ciders || 0} />
+                          </div>
+                        </div>
+                      ))}
+                    </td>
+                    <td class="p-2 text-center vcr">{scorecard.strokes}</td>
+                    <td class="p-2 text-center vcr">{scorecard.points}</td>
+                    <td class="p-2 font-bold text-center vcr">
+                      <ToPar toPar={scorecard.toPar || 0} />
+                    </td>
+                  </tr>
+
+                  <tr class="bg-slate-100 w-full" x-show={`scorecardId == ${scorecard.id}`} x-cloak>
+                    <td colspan="7" class="w-full overflow-x-scroll pb-8">
+                      <table class="w-full text-left text-slate-700 text-xs bg-white p-1">
+                        <tbody class="uppercase bg-white text-slate-500 text-xs align-bottom">
+                          <HoleNumberHeader holes={firstNineHoles} />
+                          <HoleInfo holes={firstNineHoles} />
+                          <ScoreCardDetailsStrokesRow
+                            scorecard={scorecard}
+                            course={scoringSession.course}
+                            firstNine
+                          />
+                          <ScorecarDetailRow
+                            holes={firstNineHoles}
+                            scorecard={scorecard}
+                            strokes
+                            firstNine
+                          />
+                          <ScorecarDetailRow holes={firstNineHoles} scorecard={scorecard} firstNine />
+
+                          <tr>
+                            <td colspan="10" class="p-1 bg-slate-300" />
+                          </tr>
+
+                          <HoleNumberHeader holes={secondNineHoles} />
+                          <HoleInfo holes={secondNineHoles} />
+                          <ScoreCardDetailsStrokesRow course={scoringSession.course} scorecard={scorecard} />
+                          <ScorecarDetailRow holes={secondNineHoles} strokes scorecard={scorecard} />
+                          <ScorecarDetailRow holes={secondNineHoles} scorecard={scorecard} />
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    )}
 
   {
     canCloseWeek && (

@@ -8,19 +8,19 @@ type Team = {
 document.addEventListener('alpine:init', () => {
   Alpine.data(
     'teamForm',
-    (courseId: number, specialWeek: number, teamEvent: number, strokes: number) => ({
+    (courseId: number, specialWeek: number, eventType: string, scoringType: string) => ({
       course: courseId,
       specialWeek: specialWeek === 1,
-      strokes: strokes === 1,
-      teamEvent: teamEvent === 1,
+      eventType: eventType || 'individual',
       selectedPlayers: [] as string[],
+      scoringType: scoringType || 'stableford',
       teams: [
         { players: [], strokes: 10 },
         { players: [], strokes: 10 }
       ] as Team[],
 
-      toggleSpecial() {
-        this.specialWeek = !this.specialWeek;
+      isTeamEvent() {
+        return this.eventType !== 'individual';
       },
 
       addTeam() {
@@ -35,7 +35,7 @@ document.addEventListener('alpine:init', () => {
         if (!this.course) {
           return true;
         }
-        if (this.teamEvent) {
+        if (this.isTeamEvent()) {
           if (this.teams.length === 0) {
             return true;
           }

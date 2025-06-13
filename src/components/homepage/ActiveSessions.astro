@@ -12,7 +12,7 @@ const scoringSessions = await getaActiveSessions(db);
 type SessionGroupKey = string;
 const groupedSessionsObj: Record<SessionGroupKey, ActiveSession[]> = {};
 for (const sesh of scoringSessions) {
-  const key: SessionGroupKey = `${sesh.strokes}|${sesh.special}|${sesh.teamEvent}|${sesh.courseId}`;
+  const key: SessionGroupKey = `${sesh.scoringType}|${sesh.special}|${sesh.eventType}|${sesh.courseId}`;
   if (!groupedSessionsObj[key]) {
     groupedSessionsObj[key] = [];
   }
@@ -39,13 +39,7 @@ const scoringSession = ownedScoringSession || scoringSessions[0];
 }
 {
   scoringSession && (
-    <EventCard
-      date={scoringSession.createdAt || ''}
-      special={!!scoringSession.special}
-      strokes={!!scoringSession.strokes}
-      teamEvent={!!scoringSession.teamEvent}
-      live
-    >
+    <EventCard date={scoringSession.createdAt || ''} live>
       <div id={`scoringSession.${scoringSession.id}`} class="flex justify-between">
         <a
           href={

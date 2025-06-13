@@ -10,7 +10,7 @@ export interface Props {
 const { allPlayers } = Astro.props;
 ---
 
-<div x-show="specialWeek && teamEvent" x-cloak>
+<div x-show="specialWeek && isTeamEvent()" x-cloak>
   <div class="flex items-center justify-between">
     <h2>Lag</h2>
     <Button intent="link" @click="addTeam()">+ Nytt lag</Button>
@@ -28,7 +28,7 @@ const { allPlayers } = Astro.props;
           </h3>
           <Button intent="inline" @click="removeTeam(index)" x-show="index>0">-</Button>
         </div>
-        <template x-if="teamEvent">
+        <template x-if="isTeamEvent()">
           <div>
             <input
               :name="`teams[${index}][strokes]`"
@@ -45,7 +45,7 @@ const { allPlayers } = Astro.props;
           </div>
         </template>
       </div>
-      <template x-if="teamEvent">
+      <template x-if="isTeamEvent()">
         <div class="flex flex-wrap gap-2">
           {
             allPlayers.map((player, index) => (

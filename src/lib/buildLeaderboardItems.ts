@@ -38,9 +38,15 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
   const specialSessions = sessions.filter((s) => s.special);
   const regularSessions = sessions.filter((s) => !s.special);
 
-  const scorecards = sessions.flatMap((session) => session.scorecards);
-  const specialScorecards = specialSessions.flatMap((session) => session.scorecards);
-  const regularScorecards = regularSessions.flatMap((session) => session.scorecards);
+  const scorecards = sessions
+    .flatMap((session) => session.scorecards)
+    .filter((s) => !s.individualForTeamWIndividual);
+  const specialScorecards = specialSessions
+    .flatMap((session) => session.scorecards)
+    .filter((s) => !s.individualForTeamWIndividual);
+  const regularScorecards = regularSessions
+    .flatMap((session) => session.scorecards)
+    .filter((s) => !s.individualForTeamWIndividual);
 
   for (const player of players) {
     const playerScorecards = scorecards.filter((s) =>

@@ -24,6 +24,9 @@ const scorecards = sqliteTable('scorecards', {
   toPar: integer('to_par', { mode: 'number' }).default(0),
   currentHole: integer('current_hole', { mode: 'number' }).default(1),
   partOfFinal: integer('part_of_final', { mode: 'boolean' }).default(false),
+  individualForTeamWIndividual: integer('individual_for_team_w_individual', {
+    mode: 'boolean'
+  }).default(false),
   createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`)
 });
 
