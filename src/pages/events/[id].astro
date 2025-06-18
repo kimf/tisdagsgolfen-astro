@@ -16,6 +16,7 @@ import HoleInfo from 'src/components/leaderboard/HoleInfo.astro';
 import HoleNumberHeader from 'src/components/leaderboard/HoleNumberHeader.astro';
 import ScoreCardDetailsStrokesRow from 'src/components/leaderboard/ScoreCardDetailsStrokesRow.astro';
 import ScorecarDetailRow from 'src/components/leaderboard/ScorecarDetailRow.astro';
+import Pill from 'src/components/ui/Pill.astro';
 const db = getDb(Astro.locals);
 
 const { id } = Astro.params;
@@ -90,7 +91,14 @@ const secondNineHoles = holes.filter((h) => h.number > 9);
                 <td class="px-2 py-1 flex flex-col vcr uppercase">
                   {scorecard.players.map((p) => (
                     <div class="font-bold text-black">
-                      {shortName(p.player.fullName)}
+                      <div class="flex items-center">
+                        {shortName(p.player.fullName)}
+                        {p.player.guest && (
+                          <Pill intent="guest" class="h-4 px-1 py-0 ml-2">
+                            GÄST
+                          </Pill>
+                        )}
+                      </div>
                       <div class="text-xs">
                         <Beers beers={p.beers || 0} />
                         <Ciders ciders={p.ciders || 0} />

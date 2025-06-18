@@ -27,6 +27,7 @@ export type LeaderboardItem = {
   rankSummary: string;
   specialSummary: string;
   scratchSummary: string;
+  guest: boolean;
 };
 
 type ScoringSessionItem = EventsWithLeaderboard['eventSessions'][number]['session'];
@@ -119,6 +120,7 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
       id: player.id,
       avatarUrl: player.avatarUrl,
       shortName: shortName(player.fullName),
+      guest: player.guest,
       points: [...playerRegularPointsArray, ...playerSpecialPointsArray]
         .filter((p): p is number => p !== null)
         .reduce((a, b) => a + b, 0),
