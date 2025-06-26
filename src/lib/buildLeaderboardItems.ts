@@ -77,7 +77,7 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
     const playerRegularPointsArray = playerRegularScorecards.map((s) => s.weekPoints);
     const playerSpecialPointsArray = playerSpecialScorecards.map((s) => s.weekPoints);
     const playerStrokesArray = [...playerRegularScorecardsAll]
-      .sort((a, b) => (b.strokes ?? 0) - (a.strokes ?? 0))
+      .sort((a, b) => (a.strokes ?? 0) - (b.strokes ?? 0))
       .map((s) => s.strokes);
 
     const events = playerScorecards.length;
