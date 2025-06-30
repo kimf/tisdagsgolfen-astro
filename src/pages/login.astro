@@ -8,8 +8,7 @@ import { shortName } from 'src/lib/formatters';
 const errors = { password: '' };
 
 if (Astro.request.method === 'GET') {
-  const userId = await Astro.session?.get('userId');
-  if (userId) {
+  if (Astro.cookies.has('userId')) {
     return Astro.redirect('/');
   }
 }
@@ -22,7 +21,7 @@ if (Astro.request.method === 'POST') {
 
     // Replace with your actual password check logic
     if (password === Astro.locals.runtime.env.USER_PASSWORD) {
-      await Astro.session?.set('userId', String(userId));
+      Astro.cookies.set('userId', String(userId));
       return Astro.redirect('/');
     } else {
       errors.password = 'Fel lösenord!';

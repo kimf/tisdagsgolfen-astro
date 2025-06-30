@@ -20,7 +20,7 @@ import getDb from 'src/db';
 import Pill from 'src/components/ui/Pill.astro';
 
 const { id } = Astro.params;
-const userId = await Astro.session?.get('userId');
+const userId = Astro.cookies.get('userId')?.value || undefined;
 if (!id) throw new Error('Id saknas för runda');
 
 const db = getDb(Astro.locals);
