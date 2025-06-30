@@ -12,7 +12,7 @@ import Button from 'src/components/ui/button.astro';
 import getDb from 'src/db';
 
 const { id, number } = Astro.params;
-const userId = await Astro.session?.get('userId');
+const userId = Astro.cookies.get('userId')?.value || undefined;
 
 if (!userId) throw new Error('Logga in för att föra score');
 if (!id) throw new Error('Id saknas för runda');

@@ -6,7 +6,7 @@ import EventCard from 'src/components/homepage/EventCard.astro';
 import Link from 'src/assets/icons/link.svg';
 import getDb from 'src/db';
 const db = getDb(Astro.locals);
-const userId = await Astro.session?.get('userId');
+const userId = Astro.cookies.get('userId')?.value || undefined;
 const scoringSessions = await getaActiveSessions(db);
 
 type SessionGroupKey = string;

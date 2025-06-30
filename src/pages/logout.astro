@@ -1,4 +1,4 @@
 ---
-Astro.session?.destroy();
+Astro.cookies.delete('userId');
 return Astro.redirect('/');
 ---

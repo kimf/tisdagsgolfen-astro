@@ -14,7 +14,7 @@ const db = getDb(Astro.locals);
 if (Astro.request.method === 'POST') {
   try {
     const formData = await Astro.request.formData();
-    const userId = await Astro.session?.get('userId');
+    const userId = Astro.cookies.get('userId')?.value || undefined;
 
     // console.log(formData);
 

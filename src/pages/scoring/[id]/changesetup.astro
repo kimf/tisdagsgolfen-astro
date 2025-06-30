@@ -8,7 +8,7 @@ import Quantity from 'src/components/ui/quantity.astro';
 import getDb from 'src/db';
 
 const { id } = Astro.params;
-const userId = await Astro.session?.get('userId');
+const userId = Astro.cookies.get('userId')?.value || undefined;
 
 if (!userId) throw new Error('Logga in för att föra score');
 if (!id) throw new Error('Id saknas för runda');
@@ -23,7 +23,7 @@ if (!scoringSession) {
 
 if (Astro.request.method === 'POST') {
   const formData = await Astro.request.formData();
-  const userId = await Astro.session?.get('userId');
+  const userId = Astro.cookies.get('userId')?.value || undefined;
 
   if (!userId) {
     throw new Error('Logga in för att ändra runda');
