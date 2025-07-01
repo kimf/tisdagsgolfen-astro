@@ -1,0 +1,122 @@
+
+scorecards.map((scorecard) => {
+  const playerIds = scorecard.players.map((p) => {
+    return p.player.id;
+  });
+
+  const points: number[] = []
+
+  const scorecardsForIndividuals = individualScorecards.filter((s) =>
+    s.players.some((p) => playerIds.includes(p.player.id))
+  );
+
+  // 8 vanliga hål den med bäst resultat
+  [1,2,3,4,5,6,7,8].forEach(hole => {
+    scorecardsForIndividuals.forEach((individualScorecard) => {
+      const scoreForHole = individualScorecard.scores.find(s => s.hole === hole);
+      if (!scoreForHole) {
+        throw new Error('Bajs')
+      }
+      if (points[hole-1] === undefined || points[hole-1] < scoreForHole.points) {
+        points[hole-1] = scoreForHole.points
+      }
+    });
+  });
+
+// 3 hål när bådas poäng räknas
+[9,10, 11].forEach(hole => {
+    scorecardsForIndividuals.forEach((individualScorecard) => {
+      const scoreForHole = individualScorecard.scores.find(s => s.hole === hole);
+      if (!scoreForHole) {
+        throw new Error('Bajs')
+      }
+      if (points[hole-1] === undefined) {
+        points[hole-1] = scoreForHole.points
+      } else {
+        points[hole-1] = points[hole-1] + scoreForHole.points
+      }
+    });
+  });
+
+// 3 hål när den med sämst resultat räknas
+  [12, 13, 14].forEach(hole => {
+    scorecardsForIndividuals.forEach((individualScorecard) => {
+      const scoreForHole = individualScorecard.scores.find(s => s.hole === hole);
+      if (!scoreForHole) {
+        throw new Error('Bajs')
+      }
+      if (points[hole-1] === undefined || points[hole-1] > scoreForHole.points) {
+        points[hole-1] = scoreForHole.points
+      }
+    });
+  });
+
+// 3 hål dubbel bådas poäng
+[15,16,17].forEach(hole => {
+    scorecardsForIndividuals.forEach((individualScorecard) => {
+      const scoreForHole = individualScorecard.scores.find(s => s.hole === hole);
+      if (!scoreForHole) {
+        throw new Error('Bajs')
+      }
+      if (points[hole-1] === undefined) {
+        points[hole-1] = scoreForHole.points * 2
+      } else {
+        points[hole-1] = points[hole-1] + (scoreForHole.points *2)
+      }
+    });
+  });
+
+// Sista hålet trippel bådas poäng för chans på comeback
+scorecardsForIndividuals.forEach((individualScorecard) => {
+      const scoreForHole = individualScorecard.scores.find(s => s.hole === 18);
+      if (!scoreForHole) {
+        throw new Error('Bajs')
+      }
+      if (points[17] === undefined) {
+        points[17] = scoreForHole.points * 3
+      } else {
+        points[17] = points[17] + (scoreForHole.points *3)
+      }
+    });
+
+
+
+  db
+        .update(scorecardsTable)
+        .set({ points: points.reduce((a, b) => a + b, 0),
+               toPar: (scorecard.through ?? 0) * 2 - (points.reduce((a, b) => a + b, 0) ?? 0)  })
+        .where(eq(scorecardsTable.id, scorecard.id));
+
+  points.forEach((points, index) => {
+  const hole = index + 1;
+  const toPar  = 2 - points;
+  const beers = 0;
+  const ciders = 0;
+  const strokes = 0;
+  const fines = 0;
+  db
+  .insert(scores)
+  .values({
+    scorecardId: scorecard.id,
+    hole,
+    strokes,
+    points,
+    toPar,
+    beers,
+    ciders,
+    fines
+  })
+  .onConflictDoUpdate({
+    target: [scores.hole, scores.scorecardId],
+    set: { points, toPar, beers, ciders, fines, strokes }
+  })
+  .returning()
+    .then(() => {
+      console.log(`Updated score for scorecard ${scorecard.id} hole ${hole} with points ${points}`);
+    })
+    .catch((error) => {
+      console.error(`Error updating score for scorecard ${scorecard.id} hole ${hole}:`, error);
+    });
+  });
+
+});

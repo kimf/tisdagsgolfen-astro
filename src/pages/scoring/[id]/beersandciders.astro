@@ -16,7 +16,6 @@ if (!id) throw new Error('Id saknas för runda');
 const formData = await Astro.request.formData();
 
 const players = extractBeersAndCidersForPlayers(formData);
-console.log(players);
 players?.forEach(async (player) => {
   const res = await db
     .update(scorecardPlayers)
@@ -30,7 +29,6 @@ players?.forEach(async (player) => {
         eq(scorecardPlayers.playerId, player.id)
       )
     );
-  console.log(res);
 });
 
 Astro.response.headers.set('HX-Trigger', 'score-updated');

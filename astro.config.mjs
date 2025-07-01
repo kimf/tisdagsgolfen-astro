@@ -8,6 +8,8 @@ import alpinejs from '@astrojs/alpinejs';
 import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
 
+import preact from '@astrojs/preact';
+
 const COLORS = {
   reset: '\x1b[0m',
   red: '\x1b[31m',
@@ -50,15 +52,9 @@ export default defineConfig({
     plugins: [tailwindcss()]
   },
 
-  integrations: [
-    alpinejs({
-      entrypoint: './src/assets/alpine/entrypoint'
-    }),
-    htmx(),
-    playformCompress(),
-    compressor({ gzip: false, brotli: true }),
-    copyLegacyContent()
-  ],
+  integrations: [alpinejs({
+    entrypoint: './src/assets/alpine/entrypoint'
+  }), htmx(), playformCompress(), compressor({ gzip: false, brotli: true }), copyLegacyContent(), preact()],
 
   image: {
     domains: []

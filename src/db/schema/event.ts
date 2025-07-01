@@ -3,6 +3,7 @@ import { text, integer, sqliteTable } from 'drizzle-orm/sqlite-core';
 import courses from './course';
 import seasons from './season';
 import eventSessions from './event_session';
+import type { EventType, ScoringType } from './scoring_sessions';
 
 const events = sqliteTable('events', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
@@ -13,9 +14,8 @@ const events = sqliteTable('events', {
     .references(() => courses.id)
     .notNull(),
   special: integer('special', { mode: 'boolean' }).default(false),
-  eventType: text('event_type').default('individual').notNull(),
-  scoringType: text('scoring_type').default('stableford').notNull(),
-
+  eventType: text('event_type').$type<EventType>().default('individual').notNull(),
+  scoringType: text('scoring_type').$type<ScoringType>().default('stableford').notNull(),
   createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`)
 });
 

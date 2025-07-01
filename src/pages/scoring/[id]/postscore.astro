@@ -86,6 +86,6 @@ const holeData = await db.query.holes.findFirst({
   name={scorecard.players.map((player) => shortName(player.player.fullName)).join(', ')}
   score={score}
   special={!!scorecard.scoringSession.special}
-  strokes={!!scorecard.scoringSession.strokes}
+  strokes={scorecard.scoringSession.scoringType === 'strokes'}
   oob
 />

@@ -5,6 +5,7 @@ import {
   getLeaderboardForScoringSession,
   getScoringSession
 } from 'src/db/queries/getScoringSession';
+import { scorecards as scorecardsTable, scores } from 'src/db/schema';
 import EventPillRow, { getScoringTypeString } from 'src/components/shared/EventPillRow.astro';
 import standardCompRank from 'src/lib/standardCompRank';
 import { shortName } from 'src/lib/formatters';
@@ -18,6 +19,7 @@ import ScoreCardDetailsStrokesRow from 'src/components/leaderboard/ScoreCardDeta
 import ScorecarDetailRow from 'src/components/leaderboard/ScorecarDetailRow.astro';
 import getDb from 'src/db';
 import Pill from 'src/components/ui/Pill.astro';
+import { eq } from 'drizzle-orm';
 
 const { id } = Astro.params;
 const userId = Astro.cookies.get('userId')?.value || undefined;
@@ -38,7 +40,6 @@ if (leaderboards.length === 0) {
 }
 
 const allScorecards = leaderboards.flatMap((session) => session.scorecards);
-
 const scorecards = allScorecards.filter((s) => !s.individualForTeamWIndividual);
 const individualScorecards = allScorecards.filter((s) => s.individualForTeamWIndividual);
 
@@ -146,11 +147,15 @@ const secondNineHoles = holes.filter((h) => h.number > 9);
                             </Pill>
                           )}
                         </div>
-                        <Beers beers={p.beers || 0} />
-                        <Ciders ciders={p.ciders || 0} />
+                        {scoringSession.eventType !== 'team_w_individual' && (
+                          <Beers beers={p.beers || 0} />
+                          <Ciders ciders={p.ciders || 0} />
+                        )}
                       </div>
                     ))}
-                    <small>{scorecard.givenStrokes} Slag</small>
+                    {scoringSession.eventType !== 'team_w_individual' && (
+                      <small>{scorecard.givenStrokes} Slag</small>
+                    )}
                   </td>
                   {!scoringSession.special && (
                     <td class="p-2 text-center vcr">
@@ -247,6 +252,7 @@ const secondNineHoles = holes.filter((h) => h.number > 9);
                           </div>
                         </div>
                       ))}
+                      <small>{scorecard.givenStrokes} Slag</small>
                     </td>
                     <td class="p-2 text-center vcr">{scorecard.strokes}</td>
                     <td class="p-2 text-center vcr">{scorecard.points}</td>

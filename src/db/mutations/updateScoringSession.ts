@@ -46,7 +46,7 @@ export async function updateScoringSession(
         : calculateEarnings(score.putts, score.strokes, hole.par);
       const adjustedStrokes = score.strokes - extraStrokes;
       const toPar = adjustedStrokes - hole.par;
-      console.log({ extraStrokes, points, toPar, fines });
+
       await db
         .update(scores)
         .set({ extraStrokes, points, toPar, fines })

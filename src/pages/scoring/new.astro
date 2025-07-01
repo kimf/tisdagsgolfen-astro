@@ -2,12 +2,9 @@
 import AppScreen from 'src/layouts/AppScreen.astro';
 import getDb from 'src/db';
 
-import Settings from 'src/components/newscoringsession/Settings.astro';
-import CourseSelector from 'src/components/newscoringsession/CourseSelector.astro';
-import TeamSetup from 'src/components/newscoringsession/TeamSetup.astro';
-import PlayerSetup from 'src/components/newscoringsession/PlayerSetup.astro';
-import Button from 'src/components/ui/button.astro';
+import NewScoringSession from 'src/components/newscoringsession/NewScoringSession.tsx';
 import { createScoringSession } from 'src/db/mutations/createScoringSession';
+import { shortName } from 'src/lib/formatters';
 
 const db = getDb(Astro.locals);
 
@@ -30,6 +27,10 @@ if (Astro.request.method === 'POST') {
   }
 }
 
+const dbCourses = await db.query.courses.findMany({
+  orderBy: (courses) => courses.eventsCount
+});
+
 const allPlayers = await db.query.profiles.findMany({
   where: (players, { eq }) => eq(players.active, true),
   orderBy: (players, { asc }) => [asc(players.fullName)]
@@ -46,19 +47,15 @@ if (joinId) {
 
 <AppScreen title="Ny Runda" back="/">
   <div class="max-w-screen-lg p-4 pb-40 mx-auto">
-    <form
-      class="flex flex-col gap-4"
-      method="POST"
-      x-data={`teamForm(${joinSession?.courseId}, ${joinSession?.special}, ${joinSession?.eventType}, ${joinSession?.scoringType})`}
-    >
-      <Settings />
-      <CourseSelector />
-      <TeamSetup allPlayers={allPlayers} />
-      <PlayerSetup allPlayers={allPlayers} />
-      <div class="fixed left-0 w-full p-4 backdrop-blur bottom-0 bottom-safe">
-        <Button type="submit" size="block" x-bind:disabled="disableSave">SPELA GOLF</Button>
-      </div>
-    </form>
+    <NewScoringSession
+      client:load
+      joinSession={joinSession}
+      courses={dbCourses}
+      players={allPlayers.map((player) => ({
+        id: player.id,
+        name: shortName(player.fullName),
+        strokes: 10
+      }))}
+    />
   </div>
 </AppScreen>
-<script src="src/assets/alpine/NewScoringSessionController.ts"></script>

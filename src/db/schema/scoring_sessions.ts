@@ -4,6 +4,10 @@ import courses from './course';
 import scorecards from './scorecard';
 import profiles from './profile';
 
+export type EventType = 'individual' | 'team' | 'team_w_individual';
+export type ScoringType = 'stableford' | 'strokes' | 'modified' | 'irish' | 'bolle' | 'snigel';
+export type ScoringSessionState = 'STARTED' | 'PENDING' | 'FINALPENDING' | 'CLOSED';
+
 const scoringSessions = sqliteTable('scoring_sessions', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   ownerId: integer('owner_id', { mode: 'number' }).notNull(),
@@ -11,9 +15,9 @@ const scoringSessions = sqliteTable('scoring_sessions', {
     .references(() => courses.id)
     .notNull(),
   special: integer('special', { mode: 'boolean' }).default(false),
-  eventType: text('event_type').default('individual').notNull(),
-  scoringType: text('scoring_type').default('stableford').notNull(),
-  state: text('state').default('STARTED'),
+  eventType: text('event_type').$type<EventType>().default('individual').notNull(),
+  scoringType: text('scoring_type').$type<ScoringType>().default('stableford').notNull(),
+  state: text('state').$type<ScoringSessionState>().default('STARTED'),
   currentHole: integer('current_hole', { mode: 'number' }).default(1),
   partOfFinal: integer('part_of_final', { mode: 'boolean' }).default(false),
   createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`)

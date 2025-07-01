@@ -1,11 +1,12 @@
 ---
 import Pill from 'src/components/ui/Pill.astro';
+import type { EventType, ScoringType } from 'src/db/schema/scoring_sessions';
 
 interface Props {
   live?: boolean;
   special: boolean;
-  eventType: string;
-  scoringType: string;
+  eventType: EventType;
+  scoringType: ScoringType;
 }
 const { live, special, eventType, scoringType } = Astro.props;
 
@@ -21,6 +22,8 @@ export const getScoringTypeString = (key: string) => {
       return 'IRISH';
     case 'bolle':
       return 'BOLLES SPECIAL';
+    case 'snigel':
+      return 'NIKLAS BÄSTBOLL';
     default:
       return 'OKÄNT';
   }

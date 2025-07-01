@@ -14,11 +14,13 @@ if (userId) {
 ---
 
 <AppScreen title="Ledartavla" back={back}>
-  <div
+  <!-- <div
     hx-get={`/partials/scoring/${id}/live-leaderboard`}
     hx-trigger="every 30s"
     hx-swap="innerHTML"
-  >
-    <LiveLeaderboard />
-  </div>
+  > -->
+  <LiveLeaderboard />
+
+  <!--
+  </div> -->
 </AppScreen>

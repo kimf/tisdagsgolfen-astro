@@ -97,9 +97,13 @@ const secondNineHoles = holes.filter((h) => h.number > 9);
           <tr>
             <th class="p-2 text-center vcr">#</th>
             <th class="p-2 vcr">Spelare</th>
-            <th class="p-2 text-center vcr">SLAG</th>
+            {event.eventType !== 'team_w_individual' && (
+              <th class="p-2 text-center vcr">SLAG</th>
+            )}
             <th class="p-2 text-center vcr">POÄNG</th>
-            <th class="p-2 text-center vcr">+/-</th>
+            {event.eventType !== 'team_w_individual' && (
+              <th class="p-2 text-center vcr">+/-</th>
+            )}
             {!event.special && <th class="p-2 text-center vcr">💸</th>}
             <th class="p-2 text-center vcr">P</th>
           </tr>
@@ -131,11 +135,15 @@ const secondNineHoles = holes.filter((h) => h.number > 9);
                       </div>
                     ))}
                   </td>
+                  {event.eventType !== 'team_w_individual' && (
                   <td class="p-2 text-center vcr">{scorecard.strokes}</td>
+                  )}
                   <td class="p-2 text-center vcr">{scorecard.points}</td>
-                  <td class="p-2 font-bold text-center vcr">
-                    <ToPar toPar={scorecard.toPar || 0} />
-                  </td>
+                  {event.eventType !== 'team_w_individual' && (
+                    <td class="p-2 font-bold text-center vcr">
+                      <ToPar toPar={scorecard.toPar || 0} />
+                    </td>
+                  )}
                   {!event.special && (
                     <td class="p-2 text-center vcr">
                       {scorecard.players.reduce((a, b) => a + (b.fines ?? 0), 0)}

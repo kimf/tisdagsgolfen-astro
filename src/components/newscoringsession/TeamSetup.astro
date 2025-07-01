@@ -1,13 +1,5 @@
 ---
-import type { Profile } from 'src/db/schema/profile';
-import { shortName } from 'src/lib/formatters';
-import Quantity from '../ui/quantity.astro';
 import Button from '../ui/button.astro';
-
-export interface Props {
-  allPlayers: Profile[];
-}
-const { allPlayers } = Astro.props;
 ---
 
 <div x-show="specialWeek && isTeamEvent()" x-cloak>
@@ -28,7 +20,7 @@ const { allPlayers } = Astro.props;
           </h3>
           <Button intent="inline" @click="removeTeam(index)" x-show="index>0">-</Button>
         </div>
-        <template x-if="isTeamEvent()">
+        <template x-if="teamsNeedStrokes()">
           <div>
             <input
               :name="`teams[${index}][strokes]`"
@@ -47,25 +39,39 @@ const { allPlayers } = Astro.props;
       </div>
       <template x-if="isTeamEvent()">
         <div class="flex flex-wrap gap-2">
-          {
-            allPlayers.map((player, index) => (
-              <div
-                x-data={`{playerId: ${player.id}}`}
-                x-show="!playerIsInAnotherTeam(playerId, index)"
+          <template x-for="(player, playerIndex) in players" :key="playerIndex">
+            <div x-show="!playerIsInAnotherTeam(player.id, index)">
+              <span
+                class="inline-flex items-center justify-between w-full px-4 py-1 bg-white border-2 border-gray-200 rounded-xs active:scale-9"
+                :class={`[
+                  playerIsInTeam(index, player.id) ? 'bg-cyan-50 border-cyan-600 text-cyan-600' : ''
+                ]`}
+                @click.prevent="toggleTeamPlayer(index, player.id)"
+                x-text="player.name"
               >
-                <label class="inline-flex items-center justify-between w-full px-4 py-1 bg-white border-2 border-gray-200 cursor-pointer rounded-xs active:scale-97 has-checked:bg-cyan-50 has-checked:active:scale-10 has-checked:border-cyan-600 has-checked:text-cyan-600">
-                  <input
-                    type="checkbox"
-                    value={player.id}
-                    x-model="teams[index].players"
-                    value="yes"
-                    class="sr-only"
-                  />
-                  {shortName(player.fullName)}
-                </label>
-              </div>
-            ))
-          }
+              </span>
+
+              <template x-if={`playerNeedStrokes() && playerIsInTeam(index, player.id)`}>
+                <input
+                  :name="`teams[${index}][players][player.id][strokes]`"
+                  x-bind:value="getSelectedPlayerStrokes(index, player.id)"
+                  class="sr-only"
+                />
+                <div class="flex items-center justify-between gap-0">
+                  <Button intent="inline" @click="setSelectedPlayerStrokes(index, player.id, '--')">
+                    &minus;
+                  </Button>
+
+                  <h2 x-text="getSelectedPlayerStrokes(index, player.id)" class="w-10 text-center">
+                  </h2>
+
+                  <Button intent="inline" @click="setSelectedPlayerStrokes(index, player.id, '++')">
+                    &plus;
+                  </Button>
+                </div>
+              </template>
+            </div>
+          </template>
         </div>
       </template>
 
