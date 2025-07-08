@@ -1,59 +1,63 @@
 import { scorecardPlayers, scorecards, scoringSessions } from 'src/db/schema';
-import { extractPlayers, extractTeams } from 'src/lib/formDataExtractors';
 import type { Database } from 'src/db';
+import type { z } from 'zod';
+import type { CreateScoringSessionInput } from 'src/components/newscoringsession/NewScoringSession';
 
-export async function createScoringSession(userId: number, formData: FormData, db: Database) {
-  const isSpecial = formData.get('specialweek') === 'on';
-  const eventType = formData.get('event_type') || 'individual';
-  const scoringType = formData.get('scoring_type') || 'stableford';
-  const courseId = Number(formData.get('course'));
+export async function createScoringSession(
+  userId: number,
+  formData: z.input<typeof CreateScoringSessionInput>,
+  db: Database
+) {
+  const { specialWeek, eventType, scoringType, courseId } = formData;
+  // Prepare all scorecards
 
   const scoringSesh = await db
     .insert(scoringSessions)
     .values({
       ownerId: userId,
       courseId,
-      special: isSpecial,
+      special: specialWeek,
       eventType,
       scoringType
     })
     .returning({ id: scoringSessions.id });
 
-  // Prepare all scorecards
-  let scorecardValues: {
+  const scorecardValues: {
     courseId: number;
     scoringSessionId: number;
     givenStrokes: number;
-    playerIds: string[];
+    playerIds: number[];
     teamIndex?: number;
-  }[];
+    individualForTeamWIndividual?: boolean;
+  }[] = [];
 
-  if (eventType === 'team_w_individual') {
-    // TODO: DO WE NEED SCORECARDS FOR ALL PLAYERS ??
-    scorecardValues = [];
-  } else if (eventType === 'team') {
-    const teams = extractTeams(formData);
+  if (eventType === 'team' || eventType === 'team_w_individual') {
+    const teams = formData.teams;
     if (!teams) {
       throw new Error('No teams');
     }
-    scorecardValues = teams.map((team, index) => ({
-      courseId: courseId,
-      scoringSessionId: scoringSesh[0].id,
-      givenStrokes: Number(team.strokes) || 0,
-      teamIndex: index,
-      playerIds: team.players
-    }));
+    teams.forEach((team, index) => {
+      scorecardValues.push({
+        courseId,
+        scoringSessionId: scoringSesh[0].id,
+        givenStrokes: Number(team.strokes) || 0,
+        teamIndex: index,
+        playerIds: team.players.map((p) => p.id)
+      });
+    });
   } else {
-    const players = extractPlayers(formData);
+    const players = formData.selectedPlayers;
     if (!players) {
       throw new Error('No players posted');
     }
-    scorecardValues = players.map((player) => ({
-      courseId: courseId,
-      scoringSessionId: scoringSesh[0].id,
-      givenStrokes: Number(player.strokes) || 0,
-      playerIds: [player.id]
-    }));
+    players.forEach((player) => {
+      scorecardValues.push({
+        courseId: courseId,
+        scoringSessionId: scoringSesh[0].id,
+        givenStrokes: Number(player.strokes) || 0,
+        playerIds: [player.id]
+      });
+    });
   }
 
   // Batch insert scorecards
@@ -71,6 +75,36 @@ export async function createScoringSession(userId: number, formData: FormData, d
       });
     }
   });
+
+  if (eventType === 'team_w_individual') {
+    const individualScorecards = formData.teams.flatMap((team) =>
+      team.players.map((player) => ({
+        courseId,
+        scoringSessionId: scoringSesh[0].id,
+        individualForTeamWIndividual: true,
+        givenStrokes: Number(player.strokes) || 0,
+        teamScorecardId:
+          scorecardsInserted[
+            formData.teams.findIndex((t) => t.players.some((p) => p.id === player.id))
+          ].id,
+        playerId: player.id
+      }))
+    );
+
+    // Batch insert individual scorecards
+    const individualScorecardsInserted = await db
+      .insert(scorecards)
+      .values(individualScorecards)
+      .returning({ id: scorecards.id });
+
+    // Create values in scorecard_players for those as well
+    individualScorecards.forEach((s, idx) => {
+      scorecardPlayerValues.push({
+        scorecardId: individualScorecardsInserted[idx].id,
+        playerId: s.playerId
+      });
+    });
+  }
 
   await db.insert(scorecardPlayers).values(scorecardPlayerValues);
 

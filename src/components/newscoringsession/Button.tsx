@@ -52,7 +52,7 @@ const buttonVariants = cva({
 
 interface Props extends HTMLButtonElement, VariantProps<typeof buttonVariants> {
   children: any;
-  class: any;
+  class?: any;
 }
 
 export default function Button(props: Props) {

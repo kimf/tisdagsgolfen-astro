@@ -6,8 +6,12 @@ const labelVariants = cva({
   base: 'inline-flex items-center justify-between w-full  bg-white border-2 border-gray-200 cursor-pointer rounded-xs active:scale-99 peer-checked:bg-cyan-50 peer-checked:active:scale-100 peer-checked:border-cyan-600 peer-checked:text-cyan-600',
   variants: {
     size: {
-      default: 'px-4 py-1',
+      default: 'px-4 py-2',
       lg: 'p-4'
+    },
+    disabled: {
+      false: null,
+      true: ['opacity-50 hover:opacity-100']
     }
   },
   defaultVariants: {
@@ -22,6 +26,7 @@ export interface LabelProps
   label: string;
   description?: string;
   class?: string;
+  disabled?: boolean;
   children?: preact.ComponentChildren;
 }
 
@@ -32,6 +37,7 @@ export default function Label({
   size,
   class: className,
   children,
+  disabled = false,
   ...props
 }: LabelProps) {
   return (

@@ -110,6 +110,7 @@ const players = scorecards
                         {scorecards.map((scorecard) => (
                           <ScoreRow
                             scorecardId={scorecard.id}
+                            teamScorecardId={scorecard.teamScorecardId}
                             holesCount={holesCount}
                             givenStrokes={scorecard.givenStrokes || 0}
                             name={scorecard.players
@@ -134,6 +135,8 @@ const players = scorecards
         special={!!scoringSession.special}
         id={scoringSession.id}
         teamEvent={scoringSession.eventType === 'team'}
+        scoringType={scoringSession.scoringType}
+        eventType={scoringSession.eventType}
       />
     </div>
 

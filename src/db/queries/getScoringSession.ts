@@ -27,7 +27,8 @@ export type ScoringSessionWithAllData = NonNullable<Awaited<ReturnType<typeof ge
 
 export async function getLeaderboardForScoringSession(
   scoringSession: MinimalScoringSession,
-  db: Database
+  db: Database,
+  includeScores?: boolean
 ) {
   return await db.query.scoringSessions.findMany({
     where: (ss, { and, eq, ne }) =>
@@ -43,9 +44,13 @@ export async function getLeaderboardForScoringSession(
       scorecards: {
         orderBy: (scorecards, { asc }) => [asc(scorecards.id)],
         with: {
-          scores: {
-            orderBy: (scores, { asc }) => [asc(scores.hole)]
-          },
+          ...(includeScores
+            ? {
+                scores: {
+                  orderBy: (scores, { asc }) => [asc(scores.hole)]
+                }
+              }
+            : {}),
           players: { with: { player: true } }
         }
       }

@@ -1,11 +1,10 @@
 import Button from './Button.tsx';
 interface Props {
   value: number;
-  name: string;
   updateValue: (value: number) => void;
 }
 
-export default function Quantity({ value, name, updateValue }: Props) {
+export default function Quantity({ value, updateValue }: Props) {
   const increment = () => {
     updateValue(value + 1);
   };
@@ -15,7 +14,6 @@ export default function Quantity({ value, name, updateValue }: Props) {
 
   return (
     <div class="flex items-center justify-between gap-0">
-      <input name={name} value={value} class="sr-only" />
       <Button intent="inline" onClick={decrement}>
         &minus;
       </Button>

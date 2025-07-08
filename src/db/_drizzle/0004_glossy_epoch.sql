@@ -1,0 +1,1 @@
+ALTER TABLE `scorecards` ADD `team_scorecard_id` integer;

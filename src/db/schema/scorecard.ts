@@ -2,8 +2,7 @@ import { relations, sql, type InferSelectModel } from 'drizzle-orm';
 import { text, integer, sqliteTable } from 'drizzle-orm/sqlite-core';
 import courses from './course';
 import scoringSessions from './scoring_sessions';
-import scorecardPlayers, { type ScorecardPlayer } from './scorecard_player';
-import type { Profile } from './profile';
+import scorecardPlayers from './scorecard_player';
 import scores from './score';
 
 const scorecards = sqliteTable('scorecards', {
@@ -11,6 +10,7 @@ const scorecards = sqliteTable('scorecards', {
   scoringSessionId: integer('scoring_session_id', { mode: 'number' })
     .references(() => scoringSessions.id, { onDelete: 'cascade' })
     .notNull(),
+  teamScorecardId: integer('team_scorecard_id', { mode: 'number' }),
   courseId: integer('course_id', { mode: 'number' })
     .references(() => courses.id)
     .notNull(),

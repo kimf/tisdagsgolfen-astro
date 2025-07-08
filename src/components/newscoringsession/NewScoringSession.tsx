@@ -1,5 +1,4 @@
-import { useComputed } from '@preact/signals';
-import { useReducer } from 'preact/hooks';
+import { useReducer, useState } from 'preact/hooks';
 import type { EventType, ScoringSession, ScoringType } from 'src/db/schema/scoring_sessions';
 import TeamSetup from './TeamSetup.tsx';
 import Settings from './Settings.tsx';
@@ -7,6 +6,10 @@ import CourseSelector from './CourseSelector.tsx';
 import type { Course } from 'src/db/schema/course.ts';
 import Button from './Button.tsx';
 import PlayerSetup from './PlayerSetup.tsx';
+import Radio from './Radio.tsx';
+import { ActionError, actions } from 'astro:actions';
+import { navigate } from 'astro:transitions/client';
+import { z } from 'astro:schema';
 
 export type Team = {
   players: Player[];
@@ -18,6 +21,26 @@ export type Player = {
   name: string;
   strokes?: number;
 };
+
+const playerZod = z.object({
+  id: z.number(),
+  name: z.string(),
+  strokes: z.number().optional()
+});
+
+const teamZod = z.object({
+  players: z.array(playerZod),
+  strokes: z.number()
+});
+
+export const CreateScoringSessionInput = z.object({
+  courseId: z.number(),
+  specialWeek: z.boolean(),
+  eventType: z.enum(['individual', 'team', 'team_w_individual']),
+  scoringType: z.enum(['stableford', 'strokes', 'modified', 'irish', 'bolle', 'snigel']),
+  teams: z.array(teamZod),
+  selectedPlayers: z.array(playerZod)
+});
 
 type Props = {
   players: Player[];
@@ -32,6 +55,7 @@ export type NewScoringSessionState = {
   scoringType: ScoringType;
   teams: Team[];
   selectedPlayers: Player[];
+  readyForSetup: boolean;
 };
 
 export type NewScoringSessionAction = {
@@ -51,16 +75,9 @@ const initialState = {
     { players: [], strokes: 10 },
     { players: [], strokes: 10 }
   ],
-  selectedPlayers: []
+  selectedPlayers: [],
+  readyForSetup: false
 };
-
-// const addTeam = () => {
-//   teams.push({ players: [], strokes: 10 });
-// };
-
-// const removeTeam = (index: number) => {
-//   teams.splice(index, 1);
-// };
 
 const reducer = (
   state: NewScoringSessionState,
@@ -76,6 +93,17 @@ const reducer = (
           scoringType: 'stableford'
         };
       }
+
+      if (action.payload.key === 'eventType' && state.eventType === 'team_w_individual') {
+        return {
+          ...state,
+          scoringType: !['stableford', 'strokes', 'modififed'].includes(state.scoringType)
+            ? 'stableford'
+            : state.scoringType,
+          eventType: action.payload.value as EventType
+        };
+      }
+
       return {
         ...state,
         [action.payload.key]: action.payload.value
@@ -94,7 +122,22 @@ export default function NewScoringSession({ players, joinSession, courses }: Pro
     eventType: joinSession?.eventType || 'individual',
     scoringType: joinSession?.scoringType || 'stableford'
   });
-  const { courseId, specialWeek, eventType, scoringType, teams, selectedPlayers } = state;
+  const [error, setError] = useState<undefined | ActionError<NewScoringSessionState>>(undefined);
+  const { courseId, specialWeek, eventType, scoringType, teams, selectedPlayers, readyForSetup } =
+    state;
+
+  const save = async () => {
+    const input = CreateScoringSessionInput.parse(state);
+    const { data, error } = await actions.createScoringSession(input);
+
+    if (error) {
+      setError(error);
+      return;
+    } else {
+      setError(undefined);
+      navigate(`/scoring/${data}`);
+    }
+  };
 
   // Derived valued based on state
   const isTeamEvent = eventType === 'team' || eventType === 'team_w_individual';
@@ -105,36 +148,93 @@ export default function NewScoringSession({ players, joinSession, courses }: Pro
       ? teams.length === 0 || !teams.some((t) => t.players.length > 0)
       : selectedPlayers.length === 0);
 
+  const showTeamSetup = isTeamEvent && readyForSetup;
+  const showPlayerSetup = !isTeamEvent && readyForSetup;
+  const showSettings = !readyForSetup;
+
+  const doneWithSettings = courseId && eventType && scoringType;
   return (
     <div>
-      <Settings
-        specialWeek={specialWeek}
-        eventType={eventType}
-        scoringType={scoringType}
-        updateValue={(key, value) => {
-          dispatch({ type: 'updateAttribute', payload: { key, value } });
-        }}
-      />
+      {error && <pre class="text-red-600 bg-cyan-950">{JSON.stringify(error, null, 2)}</pre>}
+      {showSettings && (
+        <>
+          <h2>Veckotyp</h2>
+          <div class="flex gap-2 flex-wrap mb-4">
+            <Radio
+              checked={!specialWeek.valueOf()}
+              label="Normal vecka"
+              onChange={() =>
+                dispatch({
+                  type: 'updateAttribute',
+                  payload: { key: 'specialWeek', value: !specialWeek }
+                })
+              }
+            />
+            <Radio
+              checked={specialWeek.valueOf()}
+              label="Specialvecka"
+              onChange={() =>
+                dispatch({
+                  type: 'updateAttribute',
+                  payload: { key: 'specialWeek', value: !specialWeek }
+                })
+              }
+            />
+          </div>
 
-      <CourseSelector
-        courseId={courseId}
-        courses={courses}
-        onChange={(courseId: number) => {
-          dispatch({ type: 'updateAttribute', payload: { key: 'courseId', value: courseId } });
-        }}
-      />
+          <CourseSelector
+            courseId={courseId}
+            courses={courses}
+            onChange={(courseId: number) => {
+              dispatch({
+                type: 'updateAttribute',
+                payload: { key: 'courseId', value: courseId }
+              });
+            }}
+          />
 
-      {isTeamEvent && (
-        <TeamSetup
-          players={players}
-          state={state}
-          updateValue={(key, value) => {
-            dispatch({ type: 'updateAttribute', payload: { key, value } });
-          }}
-        />
+          <Settings
+            specialWeek={specialWeek}
+            eventType={eventType}
+            scoringType={scoringType}
+            updateValue={(key, value) => {
+              dispatch({ type: 'updateAttribute', payload: { key, value } });
+            }}
+          />
+        </>
       )}
 
-      {!isTeamEvent && (
+      {readyForSetup && (
+        <>
+          <a
+            href="#"
+            onClick={() =>
+              dispatch({
+                type: 'updateAttribute',
+                payload: { key: 'readyForSetup', value: false }
+              })
+            }
+          >
+            &larr; Tillbaka till inställningarna
+          </a>
+          <hr class="mb-12" />
+        </>
+      )}
+
+      {showTeamSetup && (
+        <>
+          <h2>Sätt upp lagen</h2>
+          <TeamSetup
+            players={players}
+            state={state}
+            updateValue={(key, value) => {
+              dispatch({ type: 'updateAttribute', payload: { key, value } });
+            }}
+          />
+        </>
+      )}
+
+      {showPlayerSetup && (
         <PlayerSetup
           players={players}
           state={state}
@@ -145,9 +245,26 @@ export default function NewScoringSession({ players, joinSession, courses }: Pro
       )}
 
       <div class="fixed left-0 w-full p-4 backdrop-blur bottom-0 bottom-safe">
-        <Button type="submit" size="block" disabled={saveDisabled}>
-          SPELA GOLF
-        </Button>
+        {!readyForSetup && (
+          <Button
+            size="block"
+            onClick={() =>
+              dispatch({
+                type: 'updateAttribute',
+                payload: { key: 'readyForSetup', value: true }
+              })
+            }
+            disabled={!doneWithSettings}
+          >
+            VÄLJ SPELARE
+          </Button>
+        )}
+
+        {readyForSetup && (
+          <Button size="block" disabled={saveDisabled} onClick={save}>
+            SPELA GOLF
+          </Button>
+        )}
       </div>
     </div>
   );

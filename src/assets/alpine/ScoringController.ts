@@ -15,6 +15,8 @@ document.addEventListener('alpine:init', () => {
     number: 0,
     givenStrokes: 0,
     scorecardId: 0,
+    scoringSessionId,
+    teamScorecardId: 0,
     strokes: 0,
     putts: 0,
     beers: 0,
@@ -67,6 +69,7 @@ document.addEventListener('alpine:init', () => {
       playerName: string,
       givenStrokes: number,
       scorecardId: number,
+      teamScorecardId: number,
       strokes: number,
       putts: number,
       beers: number,
@@ -78,7 +81,7 @@ document.addEventListener('alpine:init', () => {
       this.playerName = playerName;
       this.givenStrokes = givenStrokes;
       this.scorecardId = scorecardId;
-
+      this.teamScorecardId = teamScorecardId;
       this.strokes = strokes ?? par;
       this.putts = putts ?? 2;
       this.beers = beers ?? 0;

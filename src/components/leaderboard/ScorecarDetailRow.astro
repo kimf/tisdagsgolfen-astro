@@ -28,9 +28,11 @@ const sum = strokes
       return (
         <Fragment>
           <td class="p-2 text-center vcr font-extrabold text-black border-l-2 border-slate-200 bg-gray-100">
-            {(strokes
+            {strokes
               ? hole.par + (scorecard.scores?.find((s) => s.hole === hole.number)?.toPar || 0)
-              : scorecard.scores?.find((s) => s.hole === hole.number)?.points) || '-'}
+              : scorecard.scores?.find((s) => s.hole === hole.number)
+                ? Number(scorecard.scores!.find((s) => s.hole === hole.number)!.points)
+                : '-'}
           </td>
           {(hole.number === 9 || hole.number === 18) && (
             <td class="p-2 text-center vcr font-extrabold text-black border-l-2 border-slate-200 bg-gray-100">

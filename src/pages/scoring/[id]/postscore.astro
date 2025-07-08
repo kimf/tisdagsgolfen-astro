@@ -3,8 +3,10 @@ export const partial = true;
 import ScoreRow from 'src/components/scoring/ScoreRow.astro';
 import getDb from 'src/db';
 import { scores } from 'src/db/schema';
+import type { Score } from 'src/db/schema/score';
+import type { EventType, ScoringType } from 'src/db/schema/scoring_sessions';
 import { calculateEarnings } from 'src/lib/calculateEarnings';
-import { calculatePoints } from 'src/lib/calculatePoints';
+import { calculatePoints, calculateTeamPoints } from 'src/lib/calculatePoints';
 import { shortName } from 'src/lib/formatters';
 
 const db = getDb(Astro.locals);
@@ -17,8 +19,13 @@ if (!id) throw new Error('Id saknas för runda');
 
 const formData = await Astro.request.formData();
 const scorecardId = Number(formData.get('scorecard_id'));
+const scoringSessionId = Number(formData.get('scoring_session_id'));
+const teamScorecardId = Number(formData.get('team_scorecard_id'));
 
-const teamEvent = formData.get('teamEvent');
+const scoringType = formData.get('scoringType') as ScoringType;
+const eventType = formData.get('eventType') as EventType;
+// const teamEvent = eventType === 'team' || eventType === 'team_w_individual';
+
 const special = formData.get('special');
 const hole = Number(formData.get('hole'));
 const par = Number(formData.get('par'));
@@ -29,7 +36,7 @@ const putts = Number(formData.get('putts'));
 const beers = Number(formData.get('beers'));
 const ciders = Number(formData.get('ciders'));
 
-const points = calculatePoints(strokes, extraStrokes, par);
+const points = calculatePoints(strokes, extraStrokes, par, scoringType === 'modified');
 const fines = Number(special) === 1 ? 0 : calculateEarnings(putts, strokes, par);
 const adjustedStrokes = strokes - extraStrokes;
 const toPar = adjustedStrokes - par;
@@ -53,6 +60,49 @@ const scoreResult = await db
     set: { strokes, putts, beers, extraStrokes, points, toPar, fines, ciders }
   })
   .returning();
+
+// TODO: Should this maybe me moved to a trigger instead ??
+if (eventType === 'team_w_individual') {
+  const individualScorecards = await db.query.scorecards.findMany({
+    where: (s, { eq, and }) =>
+      and(eq(s.individualForTeamWIndividual, true), eq(s.teamScorecardId, teamScorecardId)),
+    with: {
+      scores: {
+        where: (s, { eq }) => eq(s.hole, hole)
+      }
+    }
+  });
+
+  if (individualScorecards) {
+    const individualScores = individualScorecards.flatMap((s) => s.scores);
+    // calculate team score and update/create the score for this hole for that scorecard
+    // now that it has scores for all players.
+    if (individualScores.length === individualScorecards.length) {
+      const { teamToPar, teamPoints, teamStrokes } = calculateTeamPoints(
+        individualScores,
+        scoringType,
+        hole,
+        par
+      );
+
+      console.log(teamToPar, teamPoints, teamStrokes);
+      await db
+        .insert(scores)
+        .values({
+          scorecardId: teamScorecardId,
+          hole,
+          toPar: teamToPar,
+          points: teamPoints,
+          strokes: teamStrokes
+        })
+        .onConflictDoUpdate({
+          target: [scores.hole, scores.scorecardId],
+          set: { points: teamPoints, toPar: teamToPar, strokes: teamStrokes }
+        })
+        .returning();
+    }
+  }
+}
 
 const score = scoreResult[0];
 
@@ -81,6 +131,7 @@ const holeData = await db.query.holes.findFirst({
 <ScoreRow
   hole={holeData!}
   scorecardId={scorecard.id}
+  teamScorecardId={scorecard.teamScorecardId}
   holesCount={scorecard.course.holesCount}
   givenStrokes={scorecard.givenStrokes || 0}
   name={scorecard.players.map((player) => shortName(player.player.fullName)).join(', ')}

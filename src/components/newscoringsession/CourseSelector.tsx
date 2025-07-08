@@ -11,14 +11,12 @@ export default function Label({ courseId, courses, onChange }: Props) {
   return (
     <>
       <h2>Bana</h2>
-      <div class="flex gap-4 flex-wrap">
+      <div class="flex flex-col gap-1 flex-wrap mb-4">
         {courses.map((course) => (
           <Radio
             checked={courseId === course.id}
-            onChange={onChange}
-            name="course"
+            onChange={() => onChange(course.id)}
             label={course.name}
-            value={course.id}
           />
         ))}
       </div>

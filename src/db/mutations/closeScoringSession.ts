@@ -33,8 +33,8 @@ export async function closeScoringSession(scoringSessionId: number, db: Database
     .values({
       courseId: scoringSession.courseId,
       special: scoringSession.special,
-      strokes: scoringSession.scoringType === 'strokes',
-      teamEvent: scoringSession.eventType !== 'individual',
+      eventType: scoringSession.eventType,
+      scoringType: scoringSession.scoringType,
       seasonId: 1
     })
     .returning({ id: events.id });

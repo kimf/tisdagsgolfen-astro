@@ -7,6 +7,7 @@ import { calculateExtraStrokes } from 'src/lib/calculateExtraStrokes';
 interface Props {
   score?: ScoringSessionWithAllData['scorecards'][number]['scores'][number];
   scorecardId: number;
+  teamScorecardId: number | null;
   name: string;
   hole: Hole;
   holesCount: number;
@@ -19,6 +20,7 @@ interface Props {
 const {
   score,
   scorecardId,
+  teamScorecardId,
   name,
   givenStrokes,
   hole,
@@ -62,7 +64,7 @@ const props = oob ? { 'hx-swap-oob': 'true' } : {};
     <div
     class="w-full min-h-20 content-center"
     x-on:click={`openScoring(
-      ${hole.par}, ${hole.hcp}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecardId}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
+      ${hole.par}, ${hole.hcp}, ${hole.number}, "${name}", ${extraStrokes}, ${scorecardId}, ${teamScorecardId ?? 0}, ${score?.strokes || hole.par}, ${score?.putts || 2}, ${score?.beers || 0}, ${score?.ciders || 0})`}
   >
     {
       score && (

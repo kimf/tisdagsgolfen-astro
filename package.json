@@ -59,7 +59,7 @@
     "prettier-plugin-astro": "^0.14.1",
     "tw-animate-css": "^1.3.4",
     "typescript": "^5.8.3",
-    "wrangler": "^4.22.0"
+    "wrangler": "^4.23.0"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.42.0"

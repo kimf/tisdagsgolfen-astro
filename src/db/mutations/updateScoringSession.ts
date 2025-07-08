@@ -40,7 +40,12 @@ export async function updateScoringSession(
         scorecard.strokes || 0,
         scoringSession.course.holesCount
       );
-      const points = calculatePoints(score.strokes, extraStrokes, hole.par);
+      const points = calculatePoints(
+        score.strokes,
+        extraStrokes,
+        hole.par,
+        scoringSession.scoringType === 'modified'
+      );
       const fines = scoringSession.special
         ? 0
         : calculateEarnings(score.putts, score.strokes, hole.par);
