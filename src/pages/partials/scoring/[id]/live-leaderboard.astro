@@ -167,7 +167,7 @@ const secondNineHoles = holes.filter((h) => h.number > 9);
                 <tr class="bg-slate-100 w-full" x-show={`scorecardId == ${scorecard.id}`} x-cloak>
                   <td colspan="7" class="w-full overflow-x-scroll pb-8">
                     <table class="w-full text-left text-slate-700 text-xs bg-white p-1">
-                      <tbody class="uppercase bg-white text-slate-500 text-xs align-bottom">
+                      <tbody class="uppercase bg-white text-slate-500 text-[10px] align-bottom">
                         <HoleNumberHeader holes={firstNineHoles} />
                         <HoleInfo holes={firstNineHoles} />
                         <ScoreCardDetailsStrokesRow
