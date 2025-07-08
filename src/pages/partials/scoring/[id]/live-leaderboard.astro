@@ -64,14 +64,9 @@ const canCloseWeek =
 
 // Astro.response.headers.set('HX-Trigger', 'score-updated');
 
-const strokes = scoringSession.scoringType === 'strokes';
-
 const holes = scoringSession.course.holes.sort((a, b) => a.number - b.number);
 const firstNineHoles = holes.filter((h) => h.number <= 9);
 const secondNineHoles = holes.filter((h) => h.number > 9);
-
-const showToPar = ['strokes', 'stableford'].includes(scoringSession.scoringType);
-const showPoints = scoringSession.special && !strokes
 ---
 
 <main class="p-4" x-data=`{currentTab: 'regular', scorecardId: null}`>
@@ -104,7 +99,7 @@ const showPoints = scoringSession.special && !strokes
           id="`tab-teams"
           class="cursor-pointer flex-1 uppercase vcr h-8 px-4 rounded font-bold whitespace-nowrap transition-all duration-150 ease-in-out active:text-slate-500 active:bg-gray-200"
           :class={`currentTab === 'regular' ? 'text-slate-900 bg-black  text-white border-blue-100 box-border' : 'text-slate-600 hover:text-slate-900 '`}
-          @click={`currentTab = 'regular'`}>{getScoringTypeString(scoringSession.scoringType)}</button>
+          @click={`currentTab = 'regular'`}>BÄSTBOLL</button>
 
         <button
           id="`tab-teams"
@@ -122,12 +117,9 @@ const showPoints = scoringSession.special && !strokes
             <th class="p-2 text-center vcr">#</th>
             <th class="p-2 vcr">Spelare</th>
             {!scoringSession.special && <th class="p-2 text-center vcr">💸</th>}
-            <th class="p-2 text-center vcr">Hål</th>
             <th class="p-2 text-center vcr">Slag</th>
-            {showPoints && <th class="p-2 text-center vcr">Poäng</th>}
-            {showToPar && (
-              <th class="p-2 text-center vcr">+/-</th>
-            )}
+            <th class="p-2 text-center vcr">+/-</th>
+            <th class="p-2 text-center vcr">Hål</th>
           </tr>
         </thead>
         <tbody x-auto-animate.linear>
@@ -142,7 +134,7 @@ const showPoints = scoringSession.special && !strokes
                   <td class="p-2 flex flex-col vcr uppercase">
                     {scorecard.players.map((p) => (
                       <div class="text-black font-bold flex gap-2">
-                        <div class="flex items-center">
+                        <div class="flex items-center text-[13px]">
                           {shortName(p.player.fullName)}
                           {p.player.guest && (
                             <Pill intent="guest" class="h-4 px-1 py-0 ml-2">
@@ -165,16 +157,12 @@ const showPoints = scoringSession.special && !strokes
                       {scorecard.players.reduce((a, b) => a + (b.fines ?? 0), 0)}
                     </td>
                   )}
-                  <td class="p-2 text-center vcr">{scorecard.through}</td>
+
                   <td class="p-2 text-center vcr">{scorecard.strokes}</td>
-                  {showPoints && (
-                    <td class="p-2 text-center vcr text-black font-bold">{scorecard.points}</td>
-                  )}
-                  {showToPar && (
-                    <td class="p-2 font-extrabold text-center vcr">
-                      <ToPar toPar={scorecard.toPar || 0} />
-                    </td>
-                  )}
+                  <td class="p-2 font-extrabold text-center vcr">
+                    <ToPar toPar={scorecard.toPar || 0} />
+                  </td>
+                  <td class="p-2 text-center vcr">{scorecard.through}</td>
                 </tr>
                 <tr class="bg-slate-100 w-full" x-show={`scorecardId == ${scorecard.id}`} x-cloak>
                   <td colspan="7" class="w-full overflow-x-scroll pb-8">
