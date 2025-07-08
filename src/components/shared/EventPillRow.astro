@@ -10,20 +10,20 @@ interface Props {
 }
 const { live, special, eventType, scoringType } = Astro.props;
 
-export const getScoringTypeString = (key: string) => {
+export const getScoringTypeString = (key: ScoringType) => {
   switch (key) {
     case 'strokes':
       return 'SLAG';
     case 'stableford':
       return 'POÄNG';
     case 'modified':
-      return 'MODIFIERAD';
+      return 'MOD.';
     case 'irish':
       return 'IRISH';
     case 'bolle':
-      return 'BOLLES SPECIAL';
+      return 'BOLLES';
     case 'snigel':
-      return 'NIKLAS BÄSTBOLL';
+      return 'SNIGELS';
     default:
       return 'OKÄNT';
   }
@@ -31,15 +31,11 @@ export const getScoringTypeString = (key: string) => {
 ---
 
 <div class="flex gap-0.5 mb-2">
-  {
-    special && (
-      <Fragment>
-        <Pill intent="special">SPECIAL</Pill>
-        {eventType === 'team' && <Pill intent="teamEvent">LAG</Pill>}
-        {eventType === 'team_w_individual' && <Pill intent="teamEvent">LAG (MED IND.)</Pill>}
-      </Fragment>
-    )
-  }
+  {special && <Pill intent="special">SPECIAL</Pill>}
+  {eventType === 'individual' && <Pill intent="default">IND.</Pill>}
+  {eventType === 'team' && <Pill intent="teamEvent">LAG</Pill>}
+  {eventType === 'team_w_individual' && <Pill intent="teamEvent">BÄSTBOLL</Pill>}
+
   <Pill>{getScoringTypeString(scoringType)}</Pill>
   {live && <Pill intent="live">LIVE</Pill>}
 </div>

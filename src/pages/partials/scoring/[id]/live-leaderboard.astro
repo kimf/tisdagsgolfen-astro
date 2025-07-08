@@ -71,6 +71,7 @@ const firstNineHoles = holes.filter((h) => h.number <= 9);
 const secondNineHoles = holes.filter((h) => h.number > 9);
 
 const showToPar = ['strokes', 'stableford'].includes(scoringSession.scoringType);
+const showPoints = scoringSession.special && !strokes
 ---
 
 <main class="p-4" x-data=`{currentTab: 'regular', scorecardId: null}`>
@@ -123,7 +124,7 @@ const showToPar = ['strokes', 'stableford'].includes(scoringSession.scoringType)
             {!scoringSession.special && <th class="p-2 text-center vcr">💸</th>}
             <th class="p-2 text-center vcr">Hål</th>
             <th class="p-2 text-center vcr">Slag</th>
-            {!strokes && <th class="p-2 text-center vcr">Poäng</th>}
+            {showPoints && <th class="p-2 text-center vcr">Poäng</th>}
             {showToPar && (
               <th class="p-2 text-center vcr">+/-</th>
             )}
@@ -166,7 +167,7 @@ const showToPar = ['strokes', 'stableford'].includes(scoringSession.scoringType)
                   )}
                   <td class="p-2 text-center vcr">{scorecard.through}</td>
                   <td class="p-2 text-center vcr">{scorecard.strokes}</td>
-                  {!strokes && (
+                  {showPoints && (
                     <td class="p-2 text-center vcr text-black font-bold">{scorecard.points}</td>
                   )}
                   {showToPar && (
