@@ -55,6 +55,7 @@
     "drizzle-kit": "^0.31.2",
     "fs-extra": "^11.3.0",
     "knip": "^5.61.2",
+    "picomatch": "^4.0.2",
     "prettier": "^3.6.1",
     "prettier-plugin-astro": "^0.14.1",
     "tw-animate-css": "^1.3.4",
