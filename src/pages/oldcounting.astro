@@ -3,76 +3,48 @@ import {getScoringSession } from 'src/db/queries/getScoringSession';
 import AppScreen from 'src/layouts/AppScreen.astro';
 import getDb, { type Database } from 'src/db';
 import { setEventPointsOldStyle } from 'src/lib/setEventPointsOldStyle';
-import buildLeaderboardItems from 'src/lib/buildLeaderboardItems';
+import buildLeaderboardItems from 'src/lib/oldStyleLeaderboardItems';
 import { getPlayers } from 'src/db/queries/getPlayers';
 
 const db = getDb(Astro.locals);
-const sessions = await getScoringSessions(db);
 const players = await getPlayers(db);
-
+const events = await getEventsWithLeaderboardData(1, db);
 
 const scoringSessions: any[] = []
 
-for (const session of sessions) {
-
-  if (scoringSessions.some(s => new Date(s.createdAt).getDay() === new Date(session.createdAt!).getDay() && s.courseId === session.courseId && s.special === session.special)) {
-    continue;
-  }
-
-  const scoringSession = await getScoringSession(session.id, db);
-  if (!scoringSession) {
-    throw new Error('Hittade ingen scoring session');
-  }
-  const leaderboards = await getLeaderboardForScoringSession(scoringSession, db);
-  if (leaderboards.length === 0) {
-    throw new Error('Hittade ingen data att visa');
-  }
-
-  const leaderBoardFlattened = leaderboards.flatMap((session) => session.scorecards);
+for (const event of events) {
+  const sessions = event.eventSessions.map(es => es.session);
+  const leaderBoardFlattened = sessions.flatMap((session) => session.scorecards).filter(s => !s.individualForTeamWIndividual);
 
   const withEventPoints = setEventPointsOldStyle(
-    scoringSession.special === true,
-    scoringSession.scoringType === 'strokes',
+    event.special === true,
+    event.scoringType === 'strokes',
     leaderBoardFlattened
   );
 
   scoringSessions.push({
-    ...scoringSession,
+    ...sessions[0],
     scorecards: withEventPoints
   });
 }
-
-async function getScoringSessions(db: Database) {
-  return await db.query.scoringSessions.findMany();
-}
-
-
-async function getLeaderboardForScoringSession(
-  scoringSession:any,
-  db: Database,
-  includeScores?: boolean
-) {
-  return await db.query.scoringSessions.findMany({
-    where: (ss, { and, eq, ne }) =>
-      and(
-        eq(ss.courseId, scoringSession.courseId),
-        eq(ss.special, !!scoringSession.special),
-        eq(ss.eventType, scoringSession.eventType ?? 'individual'),
-        eq(ss.scoringType, scoringSession.scoringType ?? 'stableford'),
-        eq(ss.partOfFinal, !!scoringSession.partOfFinal),
-      ),
+async function getEventsWithLeaderboardData(seasonId: number, db: Database) {
+  return await db.query.events.findMany({
+    where: (events, { eq }) => eq(events.seasonId, seasonId),
     with: {
-      scorecards: {
-        orderBy: (scorecards, { asc }) => [asc(scorecards.id)],
+      course: true,
+      eventSessions: {
+        orderBy: (eventSessions, { asc }) => [asc(eventSessions.id)],
         with: {
-          ...(includeScores
-            ? {
-                scores: {
-                  orderBy: (scores, { asc }) => [asc(scores.hole)]
+          session: {
+            with: {
+              scorecards: {
+                with: {
+                  players: { with: { player: true } },
+                  scores: true,
                 }
               }
-            : {}),
-          players: { with: { player: true } }
+            }
+          }
         }
       }
     }
