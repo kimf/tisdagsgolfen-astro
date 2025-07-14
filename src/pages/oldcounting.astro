@@ -1,0 +1,248 @@
+---
+import {getScoringSession } from 'src/db/queries/getScoringSession';
+import AppScreen from 'src/layouts/AppScreen.astro';
+import getDb, { type Database } from 'src/db';
+import { setEventPointsOldStyle } from 'src/lib/setEventPointsOldStyle';
+import buildLeaderboardItems from 'src/lib/buildLeaderboardItems';
+import { getPlayers } from 'src/db/queries/getPlayers';
+
+const db = getDb(Astro.locals);
+const sessions = await getScoringSessions(db);
+const players = await getPlayers(db);
+
+
+const scoringSessions: any[] = []
+
+for (const session of sessions) {
+
+  if (scoringSessions.some(s => new Date(s.createdAt).getDay() === new Date(session.createdAt!).getDay() && s.courseId === session.courseId && s.special === session.special)) {
+    continue;
+  }
+
+  const scoringSession = await getScoringSession(session.id, db);
+  if (!scoringSession) {
+    throw new Error('Hittade ingen scoring session');
+  }
+  const leaderboards = await getLeaderboardForScoringSession(scoringSession, db);
+  if (leaderboards.length === 0) {
+    throw new Error('Hittade ingen data att visa');
+  }
+
+  const leaderBoardFlattened = leaderboards.flatMap((session) => session.scorecards);
+
+  const withEventPoints = setEventPointsOldStyle(
+    scoringSession.special === true,
+    scoringSession.scoringType === 'strokes',
+    leaderBoardFlattened
+  );
+
+  scoringSessions.push({
+    ...scoringSession,
+    scorecards: withEventPoints
+  });
+}
+
+async function getScoringSessions(db: Database) {
+  return await db.query.scoringSessions.findMany();
+}
+
+
+async function getLeaderboardForScoringSession(
+  scoringSession:any,
+  db: Database,
+  includeScores?: boolean
+) {
+  return await db.query.scoringSessions.findMany({
+    where: (ss, { and, eq, ne }) =>
+      and(
+        eq(ss.courseId, scoringSession.courseId),
+        eq(ss.special, !!scoringSession.special),
+        eq(ss.eventType, scoringSession.eventType ?? 'individual'),
+        eq(ss.scoringType, scoringSession.scoringType ?? 'stableford'),
+        eq(ss.partOfFinal, !!scoringSession.partOfFinal),
+      ),
+    with: {
+      scorecards: {
+        orderBy: (scorecards, { asc }) => [asc(scorecards.id)],
+        with: {
+          ...(includeScores
+            ? {
+                scores: {
+                  orderBy: (scores, { asc }) => [asc(scores.hole)]
+                }
+              }
+            : {}),
+          players: { with: { player: true } }
+        }
+      }
+    }
+  });
+}
+
+
+const leaderboardItems = buildLeaderboardItems(scoringSessions, players)
+---
+
+<AppScreen title="Gamla sättet">
+  <div x-data={`fruitList(${JSON.stringify(leaderboardItems)})`}>
+    <div class="flex flex-col">
+
+      <table class="w-full text-left text-slate-700">
+        <tbody x-ref="list" x-auto-animate.linear>
+          <template x-for="item in sortedItems" :key="item.id">
+            <tr
+              class="border-b border-gray-200 odd:bg-white even:bg-gray-50 ranked "
+              :data-rank="item.rank"
+            >
+              <td class="px-1 text-center content-center vcr" x-text="item.rank"></td>
+              <td class="py-2 uppercase text-sm">
+                <div class="flex gap-2">
+                  <img
+                    :src="item.avatarUrl ? `/images/avatars/${item.id}.png` : '/images/avatars/default.png'"
+                    class="size-12"
+                  />
+                  <div class="flex gap-1 flex-col justify-between">
+                    <div class="flex items-center">
+                      <div class="uppercase font-bold text-lg tracking-tight text-black" x-text="item.shortName"></div>
+                    </div>
+                    <div class="flex text-xs tracking-tighter">
+                      <span x-text="`${item.events} ${item.events === 1 ? 'runda' : 'rundor'}`"
+                      ></span>
+                      <div class="pl-1">
+                        <span x-show={`currentTab != 'scratch'`}>&bull; ∅</span>
+                        <span x-text="item.average" x-show={`currentTab == 'rank'`}></span>
+                        <span x-text="item.averageFines" x-show={`currentTab == 'kr'`}></span>
+                        <small x-show={`currentTab == 'kr'`}>kr</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <td class="uppercase text-xs tracking-tighter">
+                <div class="flex gap-2 flex-col justify-between">
+                  <div>
+                    <span x-text="item.rankSummary" x-show={`currentTab == 'rank'`}></span>
+                    <span x-text="item.scratchSummary" x-show={`currentTab == 'scratch'`}></span>
+                    <span x-text="item.finesSummary" x-show={`currentTab == 'kr'`}></span>
+                  </div>
+                  <div>
+                    <span x-text="item.beersAndCidersSummary" x-show={`currentTab == 'kr'`}></span>
+                    <span x-text="item.specialSummary" x-show={`currentTab == 'rank'`}></span>
+                  </div>
+                </div>
+              </td>
+
+
+              <td class="text-right vcr text-lg font-extrabold text-black ml-auto pr-2 uppercase">
+                <span x-text="item.points" x-show={`currentTab == 'rank'`}></span>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="module" define:vars={{ leaderboardItems }}>
+    // import type { LeaderboardItem } from 'src/lib/buildLeaderboardItems';
+    function standardCompRank(scorecards, attribute, reverse, dealbreaker) {
+      // Sort scorecards first by attribute, then by dealbreaker if provided
+      scorecards.sort((a, b) => {
+        const primaryComparison = !reverse
+          ? Number(b[attribute] ?? 0) - Number(a[attribute] ?? 0) // Descending order if reverse is true
+          : Number(a[attribute] ?? 0) - Number(b[attribute] ?? 0); // Ascending order if reverse is false
+
+        if (primaryComparison !== 0 || !dealbreaker) {
+          return primaryComparison;
+        }
+
+        // If primaryComparison is a tie and dealbreaker is provided, compare by dealbreaker
+        return !reverse
+          ? Number(b[dealbreaker] ?? 0) - Number(a[dealbreaker] ?? 0) // Descending order if reverse is true
+          : Number(a[dealbreaker] ?? 0) - Number(b[dealbreaker] ?? 0); // Ascending order if reverse is false
+      });
+
+      // Assign ranks with handling of ties
+      const ranked = [];
+      const rank = { next: 1, current: [] };
+
+      scorecards.forEach((item, i) => {
+        let currentRank;
+        if (i > 0 && scorecards[i][attribute] === scorecards[i - 1][attribute]) {
+          // Check for dealbreaker tie as well
+          if (!dealbreaker || scorecards[i][dealbreaker] === scorecards[i - 1][dealbreaker]) {
+            currentRank = ranked[i - 1].rank;
+          } else {
+            currentRank = rank.next;
+          }
+        } else {
+          currentRank = rank.next;
+        }
+
+        ranked.push({ ...item, rank: currentRank });
+        rank.next++;
+      });
+
+      return ranked;
+    }
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('fruitList', () => ({
+        tabs: [
+          { name: 'rank', title: 'Poäng' },
+          { name: 'kr', title: 'Böter' },
+          { name: 'scratch', title: 'Scratch' }
+        ],
+        currentTab: 'rank',
+        finesPlayers: [], // as LeaderboardItem[],
+        sortedPlayers: [], // as LeaderboardItem[],
+        scratchPlayers: [], // as LeaderboardItem[],
+        items: [], // as LeaderboardItem[],
+        sortedItems: [], // as LeaderboardItem[],
+
+        init() {
+          const items = leaderboardItems;
+          const filteredItems = items.filter((item) => item.events > 0); // item: LeaderboardItem
+          this.items = filteredItems;
+          this.sortedItems = standardCompRank(filteredItems, 'points', false, 'average');
+        },
+
+        rankColor(rank) {
+          // : number
+          if (rank > 4) return 'oklch(55.2% 0.016 285.938)';
+          if (rank === 1) return 'oklch(82.8% 0.189 84.429)';
+          if (rank === 2) return 'oklch(44.4% 0.011 73.639)';
+          if (rank === 3) return 'oklch(55.4% 0.135 66.442)';
+          return 'oklch(55.2% 0.016 285.938)';
+        },
+
+        changeTab(newTab) {
+          // : 'rank' | 'kr' | 'scratch'
+          if (newTab === 'kr') {
+            this.sortedItems = standardCompRank(this.items, 'totalFines', true, null);
+          } else if (newTab === 'scratch') {
+            const items = this.items.filter(item => Number(item.averageStrokes) > 0);
+            this.sortedItems = standardCompRank(items, 'averageStrokes', true, null);
+          } else {
+            this.sortedItems = standardCompRank(this.items, 'points', false, 'average');
+          }
+          this.currentTab = newTab;
+        }
+      }));
+    });
+  </script>
+
+  <style>
+    .ranked {
+      border-left-width: 8px;
+    }
+    .ranked[data-rank='1'] {
+      border-left-color: oklch(82.8% 0.189 84.429);
+    }
+    .ranked[data-rank='2'] {
+      border-left-color: oklch(44.4% 0.011 73.639);
+    .ranked[data-rank='3'] {
+      border-left-color: oklch(55.4% 0.135 66.442);
+    }
+  </style>
+</AppScreen>
