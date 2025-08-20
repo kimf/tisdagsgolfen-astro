@@ -13,6 +13,11 @@ export async function updateScoringSession(
   db: Database
 ) {
   const cards = extractScorecards(formData);
+  console.log(cards);
+  console.log(scoringSessionId);
+  if (!cards || cards.length === 0) {
+    throw new Error('No scorecards provided');
+  }
 
   const scoringSession = await getScoringSession(scoringSessionId, db);
   if (!scoringSession) {
