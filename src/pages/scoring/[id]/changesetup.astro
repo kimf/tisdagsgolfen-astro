@@ -21,8 +21,6 @@ if (!scoringSession) {
   throw new Error('Hittade ingen scoring session');
 }
 
-console.log(Astro.request.method);
-
 if (Astro.request.method === 'POST') {
   const formData = await Astro.request.formData();
   const userId = Astro.cookies.get('userId')?.value || undefined;
@@ -34,13 +32,8 @@ if (Astro.request.method === 'POST') {
     throw new Error('Du kan bara ändra din egen runda');
   }
 
-  try {
-    await updateScoringSession(Number(id), formData, db);
-    return Astro.redirect(`/scoring/${id}`);
-  } catch (error) {
-    console.error('Error updating scoring session:', error);
-    throw new Error('Kunde inte uppdatera runda');
-  }
+  await updateScoringSession(Number(id), formData, db);
+  return Astro.redirect(`/scoring/${id}`);
 }
 ---
 

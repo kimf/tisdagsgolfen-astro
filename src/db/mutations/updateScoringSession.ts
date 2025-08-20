@@ -13,45 +13,32 @@ export async function updateScoringSession(
   db: Database
 ) {
   const cards = extractScorecards(formData);
-  console.log('CARDS', cards);
   if (!cards || cards.length === 0) {
-    console.error('No scorecards provided');
     throw new Error('No scorecards provided');
   }
 
   const scoringSession = await getScoringSession(scoringSessionId, db);
   if (!scoringSession) {
-    console.error('No such scoring session');
     throw new Error('No such scoring session');
   }
-  console.log('Scoring session:', scoringSession);
 
   for (const scorecard of cards) {
-    console.log('Updating scorecard:', scorecard.id);
-    try {
-      await db
-        .update(scorecards)
-        .set({ givenStrokes: Number(scorecard.strokes), toPar: 100 })
-        .where(eq(scorecards.id, scorecard.id));
-    } catch (error) {
-      console.error('Error updating scorecard:', error);
-      throw new Error('Error updating scorecard');
-    }
+    await db
+      .update(scorecards)
+      .set({ givenStrokes: scorecard.strokes })
+      .where(eq(scorecards.id, scorecard.id));
 
     const scoreItems = await db.query.scores.findMany({
       where: (s, { eq }) => eq(s.scorecardId, scorecard.id)
     });
 
-    console.log('Score items:', scoreItems);
-
     for (const score of scoreItems) {
-      console.log('Updating score:', score.id);
       const hole = scoringSession.course.holes.find((h) => h.number === score.hole);
 
       if (!hole) {
-        console.error('No such hole:', score.hole);
         throw new Error('No such hole');
       }
+
       const extraStrokes = calculateExtraStrokes(
         hole.hcp,
         scorecard.strokes || 0,
@@ -69,11 +56,10 @@ export async function updateScoringSession(
       const adjustedStrokes = score.strokes - extraStrokes;
       const toPar = adjustedStrokes - hole.par;
 
-      const res = await db
+      await db
         .update(scores)
         .set({ extraStrokes, points, toPar, fines })
         .where(eq(scores.id, score.id));
-      console.log('Score updated:', res);
     }
   }
 }
