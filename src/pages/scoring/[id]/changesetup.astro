@@ -34,8 +34,13 @@ if (Astro.request.method === 'POST') {
     throw new Error('Du kan bara ändra din egen runda');
   }
 
-  await updateScoringSession(Number(id), formData, db);
-  return Astro.redirect(`/scoring/${id}`);
+  try {
+    await updateScoringSession(Number(id), formData, db);
+    return Astro.redirect(`/scoring/${id}`);
+  } catch (error) {
+    console.error('Error updating scoring session:', error);
+    throw new Error('Kunde inte uppdatera runda');
+  }
 }
 ---
 

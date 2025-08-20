@@ -13,33 +13,40 @@ export async function updateScoringSession(
   db: Database
 ) {
   const cards = extractScorecards(formData);
-  console.log(cards);
-  console.log(scoringSessionId);
+  console.log('CARDS', cards);
   if (!cards || cards.length === 0) {
+    console.error('No scorecards provided');
     throw new Error('No scorecards provided');
   }
 
   const scoringSession = await getScoringSession(scoringSessionId, db);
   if (!scoringSession) {
+    console.error('No such scoring session');
     throw new Error('No such scoring session');
   }
+  console.log('Scoring session:', scoringSession);
 
-  return cards?.forEach(async (scorecard) => {
+  cards?.forEach(async (scorecard) => {
+    console.log('Updating scorecard:', scorecard.id);
     const response = await db
       .update(scorecards)
       .set({ givenStrokes: scorecard.strokes })
       .where(eq(scorecards.id, scorecard.id));
 
-    console.log(response);
+    console.log('RESPONSE', response);
 
     const scoreItems = await db.query.scores.findMany({
       where: (s, { eq }) => eq(s.scorecardId, scorecard.id)
     });
 
+    console.log('Score items:', scoreItems);
+
     scoreItems.forEach(async (score) => {
+      console.log('Updating score:', score.id);
       const hole = scoringSession.course.holes.find((h) => h.number === score.hole);
 
       if (!hole) {
+        console.error('No such hole:', score.hole);
         throw new Error('No such hole');
       }
       const extraStrokes = calculateExtraStrokes(
@@ -59,10 +66,11 @@ export async function updateScoringSession(
       const adjustedStrokes = score.strokes - extraStrokes;
       const toPar = adjustedStrokes - hole.par;
 
-      await db
+      const res = await db
         .update(scores)
         .set({ extraStrokes, points, toPar, fines })
         .where(eq(scores.id, score.id));
+      console.log('Score updated:', res);
     });
   });
 }
