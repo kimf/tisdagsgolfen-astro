@@ -31,7 +31,7 @@ export async function updateScoringSession(
     try {
       await db
         .update(scorecards)
-        .set({ givenStrokes: scorecard.strokes })
+        .set({ givenStrokes: Number(scorecard.strokes), toPar: 100 })
         .where(eq(scorecards.id, scorecard.id));
     } catch (error) {
       console.error('Error updating scorecard:', error);
