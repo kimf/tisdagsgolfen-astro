@@ -36,10 +36,10 @@ export type LeaderboardItem = {
 type ScoringSessionItem = EventsWithLeaderboard['eventSessions'][number]['session'];
 
 function sumPlayerStat(
-  scorecards: ScorecardWithPlayersAndScores[],
+  scorecards: (ScorecardWithPlayersAndScores[][number]['players'][number] | undefined)[],
   stat: 'beers' | 'fines' | 'ciders'
 ) {
-  return scorecards.reduce((a, b) => a + b.players.reduce((a, b) => a + (b[stat] ?? 0), 0), 0);
+  return scorecards.reduce((a, b) => a + (b?.[stat] ?? 0), 0);
 }
 
 function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[]) {
@@ -82,9 +82,13 @@ function buildLeaderboardItems(sessions: ScoringSessionItem[], players: Profile[
 
     const events = playerScorecards.length;
 
-    const beers = sumPlayerStat(playerScorecards, 'beers');
-    const ciders = sumPlayerStat(playerScorecards, 'ciders');
-    const fines = sumPlayerStat(playerScorecards, 'fines');
+    const playerScorecardsPlayerScorecards = playerScorecards.map((p) =>
+      p.players.find((pl) => pl.player.id === player.id)
+    );
+
+    const beers = sumPlayerStat(playerScorecardsPlayerScorecards, 'beers');
+    const ciders = sumPlayerStat(playerScorecardsPlayerScorecards, 'ciders');
+    const fines = sumPlayerStat(playerScorecardsPlayerScorecards, 'fines');
 
     const totalFines = fines - beers * 50 - ciders * 25;
     const averageFines = events ? Math.abs(totalFines / events).toFixed(2) : '0.00';
