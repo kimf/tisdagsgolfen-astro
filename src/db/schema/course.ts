@@ -14,6 +14,7 @@ const courses = sqliteTable(
     par: integer('par', { mode: 'number' }).notNull(),
     holesCount: integer('holes_count', { mode: 'number' }).notNull().default(0),
     eventsCount: integer('events_count', { mode: 'number' }).notNull().default(0),
+    finalCourse: integer('final_course', { mode: 'boolean' }).default(false),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`)
   },
   (t) => [unique('course_club_name').on(t.club, t.name)]

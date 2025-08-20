@@ -10,6 +10,7 @@ import Radio from './Radio.tsx';
 import { ActionError, actions } from 'astro:actions';
 import { navigate } from 'astro:transitions/client';
 import { z } from 'astro:schema';
+import type { SeasonState } from 'src/db/schema/season.ts';
 
 export type Team = {
   players: Player[];
@@ -46,6 +47,7 @@ type Props = {
   players: Player[];
   joinSession: ScoringSession | null | undefined;
   courses: Course[];
+  seasonState: SeasonState;
 };
 
 export type NewScoringSessionState = {
@@ -114,13 +116,18 @@ const reducer = (
   }
 };
 
-export default function NewScoringSession({ players, joinSession, courses }: Props) {
+export default function NewScoringSession({ players, joinSession, courses, seasonState }: Props) {
+  const seasonIsInFinalState = seasonState === 'FINAL';
+  const skipSetup = seasonIsInFinalState && courses.length === 1;
+  const initialCourseId = joinSession?.courseId || skipSetup ? courses[0].id : undefined;
+
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
-    courseId: joinSession?.courseId,
+    courseId: initialCourseId,
     specialWeek: joinSession?.special || false,
     eventType: joinSession?.eventType || 'individual',
-    scoringType: joinSession?.scoringType || 'stableford'
+    scoringType: joinSession?.scoringType || 'stableford',
+    readyForSetup: skipSetup && initialCourseId !== undefined
   });
   const [error, setError] = useState<undefined | ActionError<NewScoringSessionState>>(undefined);
   const { courseId, specialWeek, eventType, scoringType, teams, selectedPlayers, readyForSetup } =
@@ -158,29 +165,33 @@ export default function NewScoringSession({ players, joinSession, courses }: Pro
       {error && <pre class="text-red-600 bg-cyan-950">{JSON.stringify(error, null, 2)}</pre>}
       {showSettings && (
         <>
-          <h2>Veckotyp</h2>
-          <div class="flex gap-2 flex-wrap mb-4">
-            <Radio
-              checked={!specialWeek.valueOf()}
-              label="Normal vecka"
-              onChange={() =>
-                dispatch({
-                  type: 'updateAttribute',
-                  payload: { key: 'specialWeek', value: !specialWeek }
-                })
-              }
-            />
-            <Radio
-              checked={specialWeek.valueOf()}
-              label="Specialvecka"
-              onChange={() =>
-                dispatch({
-                  type: 'updateAttribute',
-                  payload: { key: 'specialWeek', value: !specialWeek }
-                })
-              }
-            />
-          </div>
+          {!seasonIsInFinalState && (
+            <>
+              <h2>Veckotyp</h2>
+              <div class="flex gap-2 flex-wrap mb-4">
+                <Radio
+                  checked={!specialWeek.valueOf()}
+                  label="Normal vecka"
+                  onChange={() =>
+                    dispatch({
+                      type: 'updateAttribute',
+                      payload: { key: 'specialWeek', value: !specialWeek }
+                    })
+                  }
+                />
+                <Radio
+                  checked={specialWeek.valueOf()}
+                  label="Specialvecka"
+                  onChange={() =>
+                    dispatch({
+                      type: 'updateAttribute',
+                      payload: { key: 'specialWeek', value: !specialWeek }
+                    })
+                  }
+                />
+              </div>
+            </>
+          )}
 
           <CourseSelector
             courseId={courseId}
@@ -193,18 +204,20 @@ export default function NewScoringSession({ players, joinSession, courses }: Pro
             }}
           />
 
-          <Settings
-            specialWeek={specialWeek}
-            eventType={eventType}
-            scoringType={scoringType}
-            updateValue={(key, value) => {
-              dispatch({ type: 'updateAttribute', payload: { key, value } });
-            }}
-          />
+          {!seasonIsInFinalState && (
+            <Settings
+              specialWeek={specialWeek}
+              eventType={eventType}
+              scoringType={scoringType}
+              updateValue={(key, value) => {
+                dispatch({ type: 'updateAttribute', payload: { key, value } });
+              }}
+            />
+          )}
         </>
       )}
 
-      {readyForSetup && (
+      {readyForSetup && !skipSetup && (
         <>
           <a
             href="#"

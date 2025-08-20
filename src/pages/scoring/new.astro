@@ -27,6 +27,10 @@ if (Astro.request.method === 'POST') {
   }
 }
 
+const season = await db.query.seasons.findFirst({
+  where: (seasons, { eq }) => eq(seasons.name, `${new Date().getFullYear()}`)
+});
+
 const dbCourses = await db.query.courses.findMany({
   orderBy: (courses) => courses.eventsCount
 });
@@ -43,14 +47,21 @@ if (joinId) {
     where: (sessions, { eq }) => eq(sessions.id, Number(joinId))
   });
 }
+const seasonInFinalState = season?.state === 'FINAL';
+const coursesToShow = seasonInFinalState
+  ? dbCourses.filter((course) => course.finalCourse)
+  : dbCourses;
+
+console.log('coursesToShow', coursesToShow);
 ---
 
-<AppScreen title="Ny Runda" back="/">
+<AppScreen title={seasonInFinalState ? 'NY FINALRUNDA' : 'NY RUNDA'} back="/">
   <div class="max-w-screen-lg p-4 pb-40 mx-auto">
     <NewScoringSession
       client:load
       joinSession={joinSession}
-      courses={dbCourses}
+      courses={coursesToShow}
+      seasonState={season?.state || 'REGULAR'}
       players={allPlayers.map((player) => ({
         id: player.id,
         name: shortName(player.fullName),

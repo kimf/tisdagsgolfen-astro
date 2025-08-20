@@ -8,6 +8,7 @@ import HeaderTitle from 'src/components/shared/HeaderTitle.astro';
 import AppScreen from 'src/layouts/AppScreen.astro';
 import Events from 'src/components/homepage/Events.astro';
 import SeasonLeaderboard from 'src/components/homepage/SeasonLeaderboard.astro';
+import FinalLeaderboardButton from 'src/components/homepage/FinalLeaderboardButton.astro';
 
 Astro.response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
 Astro.response.headers.set('Pragma', 'no-cache');
@@ -32,6 +33,8 @@ Astro.response.headers.set('Expires', '0');
       </Button>
     </div>
   </UserButton>
+
+  <FinalLeaderboardButton />
 
   <div class="w-full main-section min-h-26 relative p-4">
     <HeaderTitle title="RUNDOR" />

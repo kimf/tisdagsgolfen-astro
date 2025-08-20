@@ -1,0 +1,45 @@
+---
+import { getaActiveSessions } from 'src/db/queries/getActiveSessions';
+import type { ActiveSession } from 'src/db/queries/getActiveSessions';
+import Button from 'src/components/ui/button.astro';
+import EventCard from 'src/components/homepage/EventCard.astro';
+import Link from 'src/assets/icons/link.svg';
+import getDb from 'src/db';
+const db = getDb(Astro.locals);
+const userId = Astro.cookies.get('userId')?.value || undefined;
+const scoringSessions = await getaActiveSessions(db);
+const season = await db.query.seasons.findFirst({
+  where: (seasons, { eq }) => eq(seasons.name, `${new Date().getFullYear()}`)
+});
+
+type SessionGroupKey = string;
+const groupedSessionsObj: Record<SessionGroupKey, ActiveSession[]> = {};
+for (const sesh of scoringSessions) {
+  const key: SessionGroupKey = `${sesh.scoringType}|${sesh.special}|${sesh.eventType}|${sesh.courseId}`;
+  if (!groupedSessionsObj[key]) {
+    groupedSessionsObj[key] = [];
+  }
+  groupedSessionsObj[key].push(sesh);
+}
+const groupedSessions: ActiveSession[][] = Object.values(groupedSessionsObj);
+
+const ownedScoringSession = userId
+  ? scoringSessions.find((sesh) => sesh.ownerId === Number(userId))
+  : null;
+
+const hasFinishedSession = ownedScoringSession && ownedScoringSession.state === 'PENDING';
+const scoringSession = ownedScoringSession || scoringSessions[0];
+const isInFinalState = season?.state === 'FINAL';
+---
+
+{
+  isInFinalState && (
+    <div class="p-4">
+      <Button size="block" intent="success">
+        <a href="/scoring/new?joinId=1" data-astro-prefetch="true">
+          LEDARTAVLA FINAL
+        </a>
+      </Button>
+    </div>
+  )
+}
