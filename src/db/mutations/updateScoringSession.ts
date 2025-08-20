@@ -28,12 +28,15 @@ export async function updateScoringSession(
 
   cards?.forEach(async (scorecard) => {
     console.log('Updating scorecard:', scorecard.id);
-    const response = await db
-      .update(scorecards)
-      .set({ givenStrokes: scorecard.strokes })
-      .where(eq(scorecards.id, scorecard.id));
-
-    console.log('RESPONSE', response);
+    try {
+      await db
+        .update(scorecards)
+        .set({ givenStrokes: scorecard.strokes })
+        .where(eq(scorecards.id, scorecard.id));
+    } catch (error) {
+      console.error('Error updating scorecard:', error);
+      throw new Error('Error updating scorecard');
+    }
 
     const scoreItems = await db.query.scores.findMany({
       where: (s, { eq }) => eq(s.scorecardId, scorecard.id)
