@@ -20,10 +20,12 @@ export async function updateScoringSession(
   }
 
   return cards?.forEach(async (scorecard) => {
-    await db
+    const response = await db
       .update(scorecards)
       .set({ givenStrokes: scorecard.strokes })
       .where(eq(scorecards.id, scorecard.id));
+
+    console.log(response);
 
     const scoreItems = await db.query.scores.findMany({
       where: (s, { eq }) => eq(s.scorecardId, scorecard.id)

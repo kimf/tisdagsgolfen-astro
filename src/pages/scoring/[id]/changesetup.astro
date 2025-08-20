@@ -21,6 +21,8 @@ if (!scoringSession) {
   throw new Error('Hittade ingen scoring session');
 }
 
+console.log(Astro.request.method);
+
 if (Astro.request.method === 'POST') {
   const formData = await Astro.request.formData();
   const userId = Astro.cookies.get('userId')?.value || undefined;
