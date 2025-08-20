@@ -16,20 +16,22 @@ if (!id) throw new Error('Id saknas för runda');
 const formData = await Astro.request.formData();
 
 const players = extractBeersAndCidersForPlayers(formData);
-players?.forEach(async (player) => {
-  const res = await db
-    .update(scorecardPlayers)
-    .set({
-      beers: player.beers,
-      ciders: player.ciders
-    })
-    .where(
-      and(
-        eq(scorecardPlayers.scorecardId, player.scorecardId),
-        eq(scorecardPlayers.playerId, player.id)
-      )
-    );
-});
+if (players) {
+  for (const player of players) {
+    await db
+      .update(scorecardPlayers)
+      .set({
+        beers: player.beers,
+        ciders: player.ciders
+      })
+      .where(
+        and(
+          eq(scorecardPlayers.scorecardId, player.scorecardId),
+          eq(scorecardPlayers.playerId, player.id)
+        )
+      );
+  }
+}
 
 Astro.response.headers.set('HX-Trigger', 'score-updated');
 ---

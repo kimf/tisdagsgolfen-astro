@@ -26,7 +26,7 @@ export async function updateScoringSession(
   }
   console.log('Scoring session:', scoringSession);
 
-  cards?.forEach(async (scorecard) => {
+  for (const scorecard of cards) {
     console.log('Updating scorecard:', scorecard.id);
     try {
       await db
@@ -44,7 +44,7 @@ export async function updateScoringSession(
 
     console.log('Score items:', scoreItems);
 
-    scoreItems.forEach(async (score) => {
+    for (const score of scoreItems) {
       console.log('Updating score:', score.id);
       const hole = scoringSession.course.holes.find((h) => h.number === score.hole);
 
@@ -74,6 +74,6 @@ export async function updateScoringSession(
         .set({ extraStrokes, points, toPar, fines })
         .where(eq(scores.id, score.id));
       console.log('Score updated:', res);
-    });
-  });
+    }
+  }
 }
