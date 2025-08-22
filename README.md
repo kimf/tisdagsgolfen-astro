@@ -10,6 +10,8 @@ There are some assets etc under the public folder as well.
 - Öl & Cider funkar inte så bra när det är team w individual, fixa till nästa år!
 - Tänka om datastruktur kanske?
 
+- Course stats + Eclectic, season + historical
+
 1.  Prestationsbaserade Badges:
     • Breaking 80, 75, 70 för första gången: Utmärkelser för att uppnå personliga rekord över 18 hål ￼.
     • Consecutive Birdies: För att belöna spelare som gör flera birdies i rad.

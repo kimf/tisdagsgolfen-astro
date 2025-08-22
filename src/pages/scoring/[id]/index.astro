@@ -10,6 +10,7 @@ import { shortName } from 'src/lib/formatters';
 import AppScreen from 'src/layouts/AppScreen.astro';
 import Button from 'src/components/ui/button.astro';
 import getDb from 'src/db';
+import Pill from 'src/components/ui/Pill.astro';
 
 const { id, number } = Astro.params;
 const userId = Astro.cookies.get('userId')?.value || undefined;
@@ -69,11 +70,17 @@ const players = scorecards
 
 <AppScreen title={title}>
   <div slot="header">
-    <EventPillRow
-      special={!!scoringSession.special}
-      eventType={scoringSession.eventType}
-      scoringType={scoringSession.scoringType}
-    />
+    {
+      scoringSession.partOfFinal ? (
+        <Pill intent="final">FINAL</Pill>
+      ) : (
+        <EventPillRow
+          special={!!scoringSession.special}
+          eventType={scoringSession.eventType}
+          scoringType={scoringSession.scoringType}
+        />
+      )
+    }
   </div>
 
   <div x-data={`scoring(${currentHole?.number - 1}, ${id})`}>
@@ -99,8 +106,12 @@ const players = scorecards
                           >
                             Slag
                           </th>
-                          {!scoringSession.special && <th class="p-2 text-center vcr">Puttar</th>}
-                          {!scoringSession.special && <th class="p-2 text-center vcr">💸</th>}
+                          {!(scoringSession.partOfFinal || scoringSession.special) && (
+                            <>
+                              <th class="p-2 text-center vcr">Puttar</th>
+                              <th class="p-2 text-center vcr">💸</th>
+                            </>
+                          )}
                           {scoringSession.scoringType !== 'strokes' && (
                             <th class="p-2 text-center vcr rounded-tr-md">Poäng</th>
                           )}
@@ -120,6 +131,7 @@ const players = scorecards
                             score={scorecard.scores.find((s) => s.hole === hole.number)}
                             special={!!scoringSession.special}
                             strokes={scoringSession.scoringType === 'strokes'}
+                            partOfFinal={!!scoringSession.partOfFinal}
                           />
                         ))}
                       </tbody>
@@ -137,6 +149,7 @@ const players = scorecards
         teamEvent={scoringSession.eventType === 'team'}
         scoringType={scoringSession.scoringType}
         eventType={scoringSession.eventType}
+        partOfFinal={!!scoringSession.partOfFinal}
       />
     </div>
 
@@ -270,7 +283,9 @@ const players = scorecards
   </Fragment>
   <Fragment slot="footer-right">
     <Button intent="link" size="sm">
-      <a href={`/scoring/${id}/leaderboard`}>LEDARTAVLA</a>
+      <a href={scoringSession.partOfFinal ? `/finalleaderboard` : `/scoring/${id}/leaderboard`}
+        >LEDARTAVLA</a
+      >
     </Button>
   </Fragment>
 </AppScreen>

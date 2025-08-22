@@ -14,6 +14,7 @@ interface Props {
   givenStrokes: number;
   special: boolean | null;
   strokes: boolean | null;
+  partOfFinal: boolean;
   oob?: boolean;
 }
 
@@ -27,6 +28,7 @@ const {
   holesCount,
   special,
   strokes,
+  partOfFinal,
   oob = false
 } = Astro.props;
 const extraStrokes = calculateExtraStrokes(hole.hcp, givenStrokes || 0, holesCount);
@@ -92,15 +94,16 @@ const props = oob ? { 'hx-swap-oob': 'true' } : {};
 
     {!score && <span>✏️</span>}
   </td>
-  {!special && <td class="w-[16%] p-2 text-center vcr border-r border-gray-500">{score?.putts}</td>}
-
   {
-    !special && (
-      <td
-        class={`w-[16%] p-2 text-center vcr border-r border-gray-500 ${score?.fines ? '' : 'text-foreground/60'}`}
-      >
-        {score ? (score.fines ? score.fines : 0) : ''}
-      </td>
+    !(partOfFinal || special) && (
+      <>
+        <td class="w-[16%] p-2 text-center vcr border-r border-gray-500">{score?.putts}</td>
+        <td
+          class={`w-[16%] p-2 text-center vcr border-r border-gray-500 ${score?.fines ? '' : 'text-foreground/60'}`}
+        >
+          {score ? (score.fines ? score.fines : 0) : ''}
+        </td>
+      </>
     )
   }
 

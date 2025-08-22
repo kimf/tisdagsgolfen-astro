@@ -2,8 +2,7 @@ import { type Database } from 'src/db';
 
 export async function getaActiveSessions(db: Database) {
   return await db.query.scoringSessions.findMany({
-    where: (sessions, { ne, and }) =>
-      and(ne(sessions.state, 'CLOSED'), ne(sessions.state, 'FINALPENDING')),
+    where: (sessions, { ne }) => ne(sessions.state, 'CLOSED'),
     with: {
       course: true,
       scorecards: {

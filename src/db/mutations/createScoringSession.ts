@@ -8,7 +8,7 @@ export async function createScoringSession(
   formData: z.input<typeof CreateScoringSessionInput>,
   db: Database
 ) {
-  const { specialWeek, eventType, scoringType, courseId } = formData;
+  const { specialWeek, eventType, scoringType, courseId, partOfFinal } = formData;
   // Prepare all scorecards
 
   const scoringSesh = await db
@@ -18,7 +18,8 @@ export async function createScoringSession(
       courseId,
       special: specialWeek,
       eventType,
-      scoringType
+      scoringType,
+      partOfFinal
     })
     .returning({ id: scoringSessions.id });
 

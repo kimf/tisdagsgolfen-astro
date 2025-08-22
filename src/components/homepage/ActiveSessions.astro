@@ -39,7 +39,7 @@ const scoringSession = ownedScoringSession || scoringSessions[0];
 }
 {
   scoringSession && (
-    <EventCard date={scoringSession.createdAt || ''} live>
+    <EventCard date={scoringSession.createdAt || ''} final={!!scoringSession.partOfFinal} live>
       <div id={`scoringSession.${scoringSession.id}`} class="flex justify-between">
         <a
           href={
@@ -48,13 +48,22 @@ const scoringSession = ownedScoringSession || scoringSessions[0];
               : `/scoring/${scoringSession.id}`
           }
         >
-          <Button size="xs" intent="default" class="absolute bottom-2 left-2">
-            {hasFinishedSession ? 'REDIGERA' : ownedScoringSession ? 'FORTSÄTT' : 'FÖR SCORE'}
-          </Button>
+          {userId && (
+            <Button size="xs" intent="default" class="absolute bottom-2 left-2">
+              {hasFinishedSession ? 'REDIGERA' : ownedScoringSession ? 'FORTSÄTT' : 'FÖR SCORE'}
+            </Button>
+          )}
         </a>
       </div>
 
-      <a href={`/scoring/${scoringSession.id}/leaderboard`} class="absolute bottom-2 right-2">
+      <a
+        href={
+          scoringSession.partOfFinal
+            ? `/finalleaderboard`
+            : `/scoring/${scoringSession.id}/leaderboard`
+        }
+        class="absolute bottom-2 right-2"
+      >
         <Link class="size-5" />
       </a>
     </EventCard>

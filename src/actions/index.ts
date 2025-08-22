@@ -21,6 +21,7 @@ export const server = {
   createScoringSession: defineAction({
     input: CreateScoringSessionInput,
     handler: async (input, context) => {
+      console.log('Creating scoring session with input:', input);
       const db = getDb(context.locals);
       const userId = context.cookies.get('userId')?.value;
       if (!userId) {

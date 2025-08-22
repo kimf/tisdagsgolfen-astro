@@ -40,7 +40,8 @@ export const CreateScoringSessionInput = z.object({
   eventType: z.enum(['individual', 'team', 'team_w_individual']),
   scoringType: z.enum(['stableford', 'strokes', 'modified', 'irish', 'bolle', 'snigel']),
   teams: z.array(teamZod),
-  selectedPlayers: z.array(playerZod)
+  selectedPlayers: z.array(playerZod),
+  partOfFinal: z.boolean()
 });
 
 type Props = {
@@ -58,6 +59,7 @@ export type NewScoringSessionState = {
   teams: Team[];
   selectedPlayers: Player[];
   readyForSetup: boolean;
+  partOfFinal: boolean;
 };
 
 export type NewScoringSessionAction = {
@@ -78,7 +80,8 @@ const initialState = {
     { players: [], strokes: 10 }
   ],
   selectedPlayers: [],
-  readyForSetup: false
+  readyForSetup: false,
+  partOfFinal: false
 };
 
 const reducer = (
@@ -127,7 +130,8 @@ export default function NewScoringSession({ players, joinSession, courses, seaso
     specialWeek: joinSession?.special || false,
     eventType: joinSession?.eventType || 'individual',
     scoringType: joinSession?.scoringType || 'stableford',
-    readyForSetup: skipSetup && initialCourseId !== undefined
+    readyForSetup: skipSetup && initialCourseId !== undefined,
+    partOfFinal: seasonIsInFinalState || !!joinSession?.partOfFinal
   });
   const [error, setError] = useState<undefined | ActionError<NewScoringSessionState>>(undefined);
   const { courseId, specialWeek, eventType, scoringType, teams, selectedPlayers, readyForSetup } =

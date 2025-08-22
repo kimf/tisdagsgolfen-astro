@@ -1,0 +1,226 @@
+---
+export const partial = true;
+
+import { getFinalScoringSessions } from 'src/db/queries/getScoringSession';
+import { shortName } from 'src/lib/formatters';
+import ToPar from 'src/components/shared/ToPar.astro';
+import Button from 'src/components/ui/button.astro';
+import getDb from 'src/db';
+import buildFinalLeaderboardItems from 'src/lib/buildFinalLeaderboardItems';
+
+export interface Props {
+  seasonYear: number;
+  seasonWinners: string[];
+}
+const userId = Astro.cookies.get('userId')?.value || undefined;
+const { seasonYear, seasonWinners } = Astro.props;
+
+const db = getDb(Astro.locals);
+
+const scoringSessions = await getFinalScoringSessions(Number(seasonYear), db);
+
+// const course =
+//   scoringSessions?.length > 0
+//     ? await db.query.courses.findFirst({
+//         where: (courses, { eq }) => eq(courses.id, scoringSessions[0]?.courseId),
+//         with: {
+//           holes: true
+//         }
+//       })
+//     : undefined;
+
+// // Group scoringSessions by day in createdAt
+// const groupedSessions = scoringSessions.reduce(
+//   (acc, session) => {
+//     if (!session.createdAt) return acc; // Skip if createdAt is not defined
+//     const date = new Date(session.createdAt).toISOString().split('T')[0];
+//     if (!acc[date]) {
+//       acc[date] = [];
+//     }
+//     acc[date].push(session);
+//     return acc;
+//   },
+//   {} as Record<string, typeof scoringSessions>
+// );
+
+// // Puth grouped sessions into an array, with an object with date and sessions, and state
+// const rounds = Object.entries(groupedSessions)
+//   .map(([date, sessions]) => ({
+//     date,
+//     scorecards: sessions.flatMap((s) => s.scorecards),
+//     state: sessions[0]?.state ?? 'CLOSED',
+//     _ts: Date.parse(date)
+//   }))
+//   .sort((a, b) => a._ts - b._ts)
+//   .map(({ _ts, ...rest }) => rest);
+
+const players = Array.from(
+  scoringSessions
+    .flatMap((s) => s.scorecards.flatMap((sc) => sc.players.map((p) => p.player)))
+    .reduce((map, player) => {
+      if (player?.id && !map.has(player.id)) map.set(player.id, player);
+      return map;
+    }, new Map())
+    .values()
+);
+
+const totalLeaderboard = buildFinalLeaderboardItems(
+  scoringSessions.flatMap((s) => s.scorecards.map((sc) => ({ ...sc, state: s.state }))),
+  players,
+  seasonWinners
+);
+
+const hasActiveRounds = totalLeaderboard[0]?.rounds.some((r) => r.active) || false;
+
+const canCloseRound =
+  userId === '2' && scoringSessions.length > 0
+    ? scoringSessions.every((l) => l.state === 'PENDING')
+    : false;
+---
+
+<main class="p-4" x-data="sort()">
+  {hasActiveRounds && (
+    <div
+      role="tablist"
+      class="inline-flex flex-wrap justify-center bg-stone-200 rounded p-1 w-full mb-4 sticky top-16 backdrop-blur-sm z-100"
+      x-auto-animate
+    >
+      <button
+        id="`tab-today"
+        class="cursor-pointer flex-1 uppercase vcr h-8 px-4 rounded font-bold whitespace-nowrap transition-all duration-150 ease-in-out active:text-slate-500 active:bg-gray-200"
+        :class={`sorting === 'today' ? 'text-slate-900 bg-black  text-white border-blue-100 box-border' : 'text-slate-600 hover:text-slate-900 '`}
+        @click="sortBy('today')">IDAG</button
+      >
+
+      <button
+        id="`tab-total"
+        class="cursor-pointer flex-1 uppercase vcr h-8 px-4 rounded font-bold whitespace-nowrap transition-all duration-150 ease-in-out active:text-slate-500 active:bg-gray-200"
+        :class={`sorting === 'total' ? 'text-slate-900 bg-black  text-white border-blue-100 box-border' : 'text-slate-600 hover:text-slate-900 '`}
+        @click="sortBy('total')">TOTALT</button
+      >
+    </div>
+    )}
+
+  {
+    scoringSessions.length === 0 ? (
+      <div class="p-4">
+        <h3 class="mb-2">Inga finalrundor</h3>
+        <p>Det finns inga finalrundor för {seasonYear} än.</p>
+      </div>
+    ) : (
+      <div>
+        <table class="w-full text-left text-slate-700 mt-4">
+          <thead class="uppercase bg-stone-800 text-white">
+            <tr>
+              <th class="p-2 text-center vcr">#</th>
+              <th class="p-2 vcr">Spelare</th>
+              <th class="p-2 text-center vcr">🔰</th>
+              {hasActiveRounds && (
+                <>
+                  <th class="p-2 text-center vcr text-sm">Hål</th>
+                  <th class="p-2 text-center vcr text-sm">Idag</th>
+                </>
+              )}
+              <th class="p-2 text-center vcr">TOT</th>
+              {totalLeaderboard[0].rounds
+                .filter((r) => !r.active)
+                .map((_round, index) => (
+                  <th class="p-2 text-center vcr text-sm">R{index + 1}</th>
+                ))}
+            </tr>
+          </thead>
+          <tbody x-auto-animate.linear x-ref="tbody">
+            {totalLeaderboard.map((scorecard) => (
+              <>
+                <tr class="border-b border-gray-200 odd:bg-white even:bg-gray-50">
+                  <td class="p-2 text-center vcr">{scorecard.rank}</td>
+                  <td class="p-2 flex flex-col vcr uppercase">
+                    <div class="text-black font-bold flex gap-2">
+                      <div class="flex items-center text-[13px]">
+                        {shortName(scorecard.player.fullName)}
+                      </div>
+                    </div>
+                    {hasActiveRounds && (
+                      <small class="text-xs text-gray-500">
+                        {scorecard.rounds.find((r) => r.active)?.givenStrokes} Slag
+                      </small>
+                    )}
+                  </td>
+                  <td class="p-2 text-center vcr text-gray-400">{0 - scorecard.bonus}</td>
+                  {hasActiveRounds && (
+                    <>
+                      <td class="p-2 text-center vcr text-sm text-gray-600">
+                        {scorecard.rounds.find((r) => r.active)?.through || '-'}
+                      </td>
+                      <td class="p-2 text-center vcr text-sm opacity-75">
+                        <ToPar toPar={scorecard.rounds.find((r) => r.active)?.toPar || 0} />
+                      </td>
+                    </>
+                  )}
+                  <td class="p-2 font-extrabold text-center vcr">
+                    <ToPar toPar={scorecard.toPar || 0} />
+                  </td>
+
+                  {scorecard.rounds
+                    .filter((r) => !r.active)
+                    .map((round) => (
+                      <td class="p-2 text-center vcr">
+                        <ToPar toPar={round.toPar} small />
+                      </td>
+                    ))}
+                </tr>
+              </>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
+  {
+    canCloseRound && (
+      <div class="mt-40">
+        <Button
+          size="sm"
+          intent="destructive"
+          hx-post={`/finalleaderboard/closeround`}
+          hx-confirm="Helt säker?"
+        >
+          KIM - STÄNG FINALDAG
+        </Button>
+      </div>
+    )
+  }
+</main>
+
+<script type="module">
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('sort', () => ({
+      sorting: 'total',
+      sortBy(sorting) {
+        this.sorting = sorting;
+        const cellIndex = sorting === 'today' ? 4 : 5; // Adjust index based on sorting type
+
+        this.getTableRows()
+          .sort(this.sortCallback(cellIndex))
+          .forEach((tr) => {
+            this.$refs.tbody.appendChild(tr);
+          });
+      },
+      getTableRows() {
+        return Array.from(this.$refs.tbody.querySelectorAll('tr'));
+      },
+      getCellValue(row, index) {
+        return row.children[index].innerText;
+      },
+      sortCallback(index) {
+        return (a, b) =>
+          ((row1, row2) => {
+            return row1 !== '' && row2 !== '' && !isNaN(row1) && !isNaN(row2)
+              ? row1 - row2
+              : row1.toString().localeCompare(row2);
+          })(this.getCellValue(a, index), this.getCellValue(b, index));
+      }
+    }));
+  });
+</script>

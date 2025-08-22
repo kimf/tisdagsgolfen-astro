@@ -73,3 +73,22 @@ export async function getMinimalScoringSession(id: number, db: Database) {
 export type MinimalScoringSession = NonNullable<
   Awaited<ReturnType<typeof getMinimalScoringSession>>
 >;
+
+export async function getFinalScoringSessions(seasonYear: number, db: Database) {
+  return await db.query.scoringSessions.findMany({
+    where: (ss, { and, eq, like }) =>
+      and(eq(ss.partOfFinal, true), like(ss.createdAt, seasonYear + '%')),
+    orderBy: (ss, { desc }) => [desc(ss.createdAt)],
+    with: {
+      scorecards: {
+        orderBy: (scorecards, { asc }) => [asc(scorecards.id)],
+        with: {
+          scores: {
+            orderBy: (scores, { asc }) => [asc(scores.hole)]
+          },
+          players: { with: { player: true } }
+        }
+      }
+    }
+  });
+}

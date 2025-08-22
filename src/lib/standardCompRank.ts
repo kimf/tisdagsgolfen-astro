@@ -5,10 +5,13 @@
 
 import type { LeaderboardScorecard } from 'src/db/queries/getScoringSession';
 import type { LeaderboardItem } from './buildLeaderboardItems';
+import type { FinalLeaderboardItem } from './buildFinalLeaderboardItems';
 
 export type RankedScorecard = LeaderboardScorecard & { rank: number };
 
-export default function standardCompRank<T extends LeaderboardScorecard | LeaderboardItem>(
+export default function standardCompRank<
+  T extends LeaderboardScorecard | LeaderboardItem | FinalLeaderboardItem
+>(
   scorecards: T[],
   attribute: keyof T,
   reverse: boolean,

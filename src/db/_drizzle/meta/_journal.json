@@ -50,6 +50,13 @@
       "when": 1755253610752,
       "tag": "0006_dapper_zuras",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1755774411493,
+      "tag": "0007_quiet_silver_sable",
+      "breakpoints": true
     }
   ]
 }

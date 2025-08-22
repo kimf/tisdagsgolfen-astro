@@ -3,33 +3,14 @@ import AppScreen from 'src/layouts/AppScreen.astro';
 import getDb from 'src/db';
 
 import NewScoringSession from 'src/components/newscoringsession/NewScoringSession.tsx';
-import { createScoringSession } from 'src/db/mutations/createScoringSession';
 import { shortName } from 'src/lib/formatters';
 
 const db = getDb(Astro.locals);
 
-if (Astro.request.method === 'POST') {
-  try {
-    const formData = await Astro.request.formData();
-    const userId = Astro.cookies.get('userId')?.value || undefined;
-
-    // console.log(formData);
-
-    if (!userId) {
-      throw new Error('Logga in för att skapa scoringSession');
-    }
-
-    const createdId = await createScoringSession(Number(userId), formData, db);
-
-    return Astro.redirect(`/scoring/${createdId}`);
-  } catch (e) {
-    console.warn(e);
-  }
-}
-
 const season = await db.query.seasons.findFirst({
   where: (seasons, { eq }) => eq(seasons.name, `${new Date().getFullYear()}`)
 });
+const seasonInFinalState = season?.state === 'FINAL';
 
 const dbCourses = await db.query.courses.findMany({
   orderBy: (courses) => courses.eventsCount
@@ -47,12 +28,10 @@ if (joinId) {
     where: (sessions, { eq }) => eq(sessions.id, Number(joinId))
   });
 }
-const seasonInFinalState = season?.state === 'FINAL';
+
 const coursesToShow = seasonInFinalState
   ? dbCourses.filter((course) => course.finalCourse)
   : dbCourses;
-
-console.log('coursesToShow', coursesToShow);
 ---
 
 <AppScreen title={seasonInFinalState ? 'NY FINALRUNDA' : 'NY RUNDA'} back="/">

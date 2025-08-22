@@ -138,5 +138,6 @@ const holeData = await db.query.holes.findFirst({
   score={score}
   special={!!scorecard.scoringSession.special}
   strokes={scorecard.scoringSession.scoringType === 'strokes'}
+  partOfFinal={!!scorecard.scoringSession.partOfFinal}
   oob
 />

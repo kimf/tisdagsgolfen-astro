@@ -1,0 +1,35 @@
+---
+import FinalLeaderboard from 'src/components/final/FinalLeaderboard.astro';
+import getDb from 'src/db';
+const db = getDb(Astro.locals);
+import AppScreen from 'src/layouts/AppScreen.astro';
+
+const userId = Astro.cookies.get('userId')?.value || undefined;
+const season = await db.query.seasons.findFirst({
+  where: (seasons, { eq }) => eq(seasons.name, `${new Date().getFullYear()}`)
+});
+
+let back = '/';
+if (userId) {
+  const referer = Astro.request.headers?.get('referer');
+  back = referer && !referer.includes('leaderboard') ? referer : `/`;
+}
+if (!season) {
+  throw new Error('Ingen säsong hittades');
+}
+---
+
+<AppScreen title="Ledartavla Final" back={back}>
+  {
+    season?.state !== 'FINAL' && (
+      <div class="p-4">
+        <h2 class="text-center">Ingen finalrunda spelad än</h2>
+      </div>
+    )
+  }
+
+  <FinalLeaderboard
+    seasonYear={parseInt(season.name, 10)}
+    seasonWinners={season.winnersArray?.split(',') || []}
+  />
+</AppScreen>

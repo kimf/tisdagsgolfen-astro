@@ -5,15 +5,19 @@ import { getPlayers } from 'src/db/queries/getPlayers';
 import buildLeaderboardItems from 'src/lib/buildLeaderboardItems';
 import getDb from 'src/db';
 import Pill from '../ui/Pill.astro';
-export interface Props {
-  seasonId: number;
-}
 
 const db = getDb(Astro.locals)
 
-const { seasonId } = Astro.props;
+const season = await db.query.seasons.findFirst({
+  where: (seasons, { eq }) => eq(seasons.name, `${new Date().getFullYear()}`)
+});
+
+if (!season) {
+  throw new Error('Säsong saknas');
+}
+
 const players = await getPlayers(db);
-const events = await getEventsWithLeaderboardData(Number(seasonId), db);
+const events = await getEventsWithLeaderboardData(Number(season.id), db);
 
 const scoringSessions = events.flatMap((event) => event.eventSessions.flatMap((es) => es.session));
 // Explicitly cast scoringSessions to the expected type to resolve type mismatch

@@ -6,7 +6,7 @@ import profiles from './profile';
 
 export type EventType = 'individual' | 'team' | 'team_w_individual';
 export type ScoringType = 'stableford' | 'strokes' | 'modified' | 'irish' | 'bolle' | 'snigel';
-export type ScoringSessionState = 'STARTED' | 'PENDING' | 'FINALPENDING' | 'CLOSED';
+export type ScoringSessionState = 'STARTED' | 'PENDING' | 'CLOSED';
 
 const scoringSessions = sqliteTable('scoring_sessions', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),

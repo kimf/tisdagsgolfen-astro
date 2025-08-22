@@ -23,9 +23,10 @@ const eventCardVariants = cva({
 interface Props extends HTMLAttributes<'div'>, VariantProps<typeof eventCardVariants> {
   date: string;
   live?: boolean;
+  final?: boolean;
 }
 
-const { class: className, intent, live = false, ...props } = Astro.props;
+const { class: className, intent, live = false, final = false, ...props } = Astro.props;
 ---
 
 <div class={cx(eventCardVariants({ intent, live }), className)} {...props}>
@@ -40,6 +41,7 @@ const { class: className, intent, live = false, ...props } = Astro.props;
     </h4>
 
     {live && <Pill intent="live">LIVE</Pill>}
+    {final && <Pill intent="final">FINAL</Pill>}
   </div>
 
   <div class="text-gray-800 font-light">

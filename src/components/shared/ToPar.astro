@@ -2,12 +2,14 @@
 interface Props {
   toPar: number;
   color?: string;
+  small?: boolean;
 }
-const { toPar, color } = Astro.props;
+const { toPar, color, small } = Astro.props;
 const textColor = color || 'black';
 const toParColor = toPar === 0 ? textColor : toPar > 0 ? 'black' : 'red';
+const className = small ? 'text-[14px] opacity-75' : 'text-[16px]';
 ---
 
-<span style={{ color: toParColor }} class="text-[16px] vcr">
+<span style={{ color: toParColor }} class={`vcr ${className}`}>
   {toPar === 0 ? 'E' : toPar > 0 ? `+${toPar}` : toPar}
 </span>
