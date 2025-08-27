@@ -6,11 +6,12 @@
 import type { LeaderboardScorecard } from 'src/db/queries/getScoringSession';
 import type { LeaderboardItem } from './buildLeaderboardItems';
 import type { FinalLeaderboardItem } from './buildFinalLeaderboardItems';
+import type { HoleWithStats } from 'src/components/stats/CourseStats.astro';
 
 export type RankedScorecard = LeaderboardScorecard & { rank: number };
 
 export default function standardCompRank<
-  T extends LeaderboardScorecard | LeaderboardItem | FinalLeaderboardItem
+  T extends LeaderboardScorecard | LeaderboardItem | FinalLeaderboardItem | HoleWithStats
 >(
   scorecards: T[],
   attribute: keyof T,

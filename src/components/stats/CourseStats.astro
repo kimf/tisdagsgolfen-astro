@@ -1,0 +1,190 @@
+---
+import standardCompRank from 'src/lib/standardCompRank';
+
+type ScoreWithMeta = {
+  holeId: number;
+  holeNumber: number;
+  par: number;
+  toPar: number;
+  strokes: number;
+  beers: number;
+  ciders: number;
+  fines: number;
+};
+
+export type HoleWithStats = {
+  avgStrokes: string;
+  holeId: number;
+  holeNumber: number;
+  par: number;
+  totalBeers: number;
+  totalCiders: number;
+  totalFines: number;
+  totalStrokes: number;
+  totalBirdies: number;
+  totalEagles: number;
+  rank?: number;
+};
+
+export interface Props {
+  course: string;
+  scores: ScoreWithMeta[];
+}
+const { course, scores } = Astro.props;
+
+const scoresWithCorrectedHoleNumbers = scores.map((score: ScoreWithMeta) => {
+  return {
+    ...score,
+    holeNumber: score.holeNumber > 9 ? score.holeNumber - 9 : score.holeNumber
+  };
+});
+
+const groupedByHole = scoresWithCorrectedHoleNumbers.reduce(
+  (acc, curr) => {
+    if (!acc[curr.holeNumber]) {
+      acc[curr.holeNumber] = [];
+    }
+    acc[curr.holeNumber].push(curr);
+    console.log(acc);
+    return acc;
+  },
+  {} as Record<number, ScoreWithMeta[]>
+);
+
+const holeMap = new Map<
+  number,
+  {
+    holeId: number;
+    par: number;
+    count: number;
+    totalStrokes: number;
+    totalBeers: number;
+    totalCiders: number;
+    totalFines: number;
+    totalBirdies: number;
+    totalEagles: number;
+  }
+>();
+
+for (const s of scoresWithCorrectedHoleNumbers) {
+  const hn = s.holeNumber;
+  const cur = holeMap.get(hn);
+  if (cur) {
+    cur.count += 1;
+    cur.totalStrokes += s.strokes;
+    cur.totalBeers += s.beers;
+    cur.totalCiders += s.ciders;
+    cur.totalFines += Math.min(s.fines, 0);
+    cur.totalBirdies += s.toPar === -1 ? 1 : 0;
+    cur.totalEagles += s.toPar === -2 ? 1 : 0;
+  } else {
+    holeMap.set(hn, {
+      holeId: s.holeId,
+      par: s.par ?? 0,
+      count: 1,
+      totalStrokes: s.strokes,
+      totalBeers: s.beers,
+      totalCiders: s.ciders,
+      totalFines: Math.min(s.fines, 0),
+      totalBirdies: s.toPar === -1 ? 1 : 0,
+      totalEagles: s.toPar === -2 ? 1 : 0
+    });
+  }
+}
+
+const holesWithStats: HoleWithStats[] = Array.from(holeMap.entries())
+  .map(([holeNumber, agg]) => {
+    const {
+      count,
+      totalStrokes,
+      totalBeers,
+      totalCiders,
+      totalFines,
+      holeId,
+      par,
+      totalBirdies,
+      totalEagles
+    } = agg;
+    return {
+      holeNumber,
+      holeId,
+      par,
+      rank: 0,
+      avgStrokes: (totalStrokes / count).toFixed(2),
+      totalStrokes,
+      totalBeers,
+      totalCiders,
+      totalFines,
+      totalBirdies,
+      totalEagles
+    };
+  })
+  .sort((a, b) => a.holeNumber - b.holeNumber);
+
+// Compute dense rank by avgStrokes (lower is better)
+const rankedHoles = standardCompRank(holesWithStats, 'avgStrokes', true, null).sort(
+  (a, b) => a.holeNumber - b.holeNumber
+);
+
+const numberOfRounds = scores.length / holesWithStats.length;
+const totalPar = holesWithStats.reduce((acc, curr) => acc + curr.par, 0);
+const totalBeers = holesWithStats.reduce((acc, curr) => acc + curr.totalBeers, 0).toFixed(1);
+const totalCiders = holesWithStats.reduce((acc, curr) => acc + curr.totalCiders, 0).toFixed(1);
+const totalFines = holesWithStats.reduce((acc, curr) => acc + curr.totalFines, 0).toFixed(1);
+const totalBirdies = holesWithStats.reduce((acc, curr) => acc + curr.totalBirdies, 0);
+const totalEagles = holesWithStats.reduce((acc, curr) => acc + curr.totalEagles, 0);
+const totalStrokes = (
+  holesWithStats.reduce((acc, curr) => acc + curr.totalStrokes, 0) / numberOfRounds
+).toFixed(1);
+---
+
+<div class="border border-gray-300 p-2 bg-white">
+  <h2>{course} - {numberOfRounds} rundor</h2>
+  <table class="w-full border border-gray-300 mb-4">
+    <thead>
+      <tr class="bg-gray-200">
+        <th class="text-left p-2">Hål</th>
+        <th class="text-right p-2">Par</th>
+        <th class="text-right p-2">Rank</th>
+        <th class="text-right p-2">Avg</th>
+        <th class="text-right p-2">🍺</th>
+        <th class="text-right p-2">🥤</th>
+        <th class="text-right p-2">💸</th>
+        <th class="text-right p-2">🐦</th>
+        <th class="text-right p-2">🦅</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-300">
+      {
+        rankedHoles.map((hole) => {
+          return (
+            <tr>
+              <td class="p-2 border-r border-gray-300">{hole.holeNumber}</td>
+              <td class="p-2 border-r border-gray-300">{hole.par}</td>
+              <td class="p-2 border-r border-gray-300">{hole.rank}</td>
+              <td class="p-2 border-r border-gray-300 text-right">{hole.avgStrokes}</td>
+              <td class="p-2 border-r border-gray-300 text-right">{hole.totalBeers}</td>
+              <td class="p-2 border-r border-gray-300 text-right">{hole.totalCiders}</td>
+              <td class="p-2 border-r border-gray-300 text-right ">{hole.totalFines}</td>
+              <td class="p-2 border-r border-gray-300 text-right ">{hole.totalBirdies}</td>
+              <td class="p-2 text-right ">{hole.totalEagles}</td>
+            </tr>
+          );
+        })
+      }
+    </tbody>
+    <tfoot class="bg-gray-100 font-bold">
+      <tr>
+        <td class="p-2 border-t border-r border-gray-300">Totalt</td>
+        <td class="p-2 border-t border-r border-gray-300">{totalPar}</td>
+        <td class="p-2 border-t border-r border-gray-300 text-right"></td>
+        <td class="p-2 border-t border-r border-gray-300 text-right">{totalStrokes}</td>
+        <td class="p-2 border-t border-r border-gray-300 text-right">{totalBeers}</td>
+        <td class="p-2 border-t border-r border-gray-300 text-right">{totalCiders}</td>
+        <td class="p-2 border-t border-r border-gray-300 text-right">{totalFines}</td>
+        <td class="p-2 border-t border-r border-gray-300 text-right">{totalBirdies}</td>
+        <td class="p-2 border-t border-gray-300 text-right">{totalEagles}</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>

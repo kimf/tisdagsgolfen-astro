@@ -9,8 +9,6 @@ export interface Props {
 }
 const { course, scores } = Astro.props;
 
-console.log('Eclectic scores:', scores);
-
 const scoresWithCorrectedHoleNumbers = scores.map((score) => {
   return {
     ...score,
@@ -31,7 +29,6 @@ const groupedByHole = scoresWithCorrectedHoleNumbers.reduce(
 
 const holesWithStats = Object.entries(groupedByHole)
   .map(([holeNumberStr, scores]) => {
-    console.log('Hole number:', holeNumberStr, scores);
     const holeNumber = Number(holeNumberStr);
     const par = scores[0]?.par ?? 0;
     const best = Math.min(...scores.map((s) => s.strokes));

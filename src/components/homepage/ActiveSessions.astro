@@ -1,42 +1,21 @@
 ---
-import { getaActiveSessions } from 'src/db/queries/getActiveSessions';
-import type { ActiveSession } from 'src/db/queries/getActiveSessions';
 import Button from 'src/components/ui/button.astro';
 import EventCard from 'src/components/homepage/EventCard.astro';
 import Link from 'src/assets/icons/link.svg';
-import getDb from 'src/db';
-const db = getDb(Astro.locals);
+import type { ScoringSession } from 'src/db/schema/scoring_sessions';
 const userId = Astro.cookies.get('userId')?.value || undefined;
-const scoringSessions = await getaActiveSessions(db);
 
-type SessionGroupKey = string;
-const groupedSessionsObj: Record<SessionGroupKey, ActiveSession[]> = {};
-for (const sesh of scoringSessions) {
-  const key: SessionGroupKey = `${sesh.scoringType}|${sesh.special}|${sesh.eventType}|${sesh.courseId}`;
-  if (!groupedSessionsObj[key]) {
-    groupedSessionsObj[key] = [];
-  }
-  groupedSessionsObj[key].push(sesh);
+export interface Props {
+  firstScoringSession: ScoringSession | null;
+  ownedScoringSession: ScoringSession | null;
 }
-const groupedSessions: ActiveSession[][] = Object.values(groupedSessionsObj);
 
-const ownedScoringSession = userId
-  ? scoringSessions.find((sesh) => sesh.ownerId === Number(userId))
-  : null;
+const { firstScoringSession, ownedScoringSession } = Astro.props;
 
 const hasFinishedSession = ownedScoringSession && ownedScoringSession.state === 'PENDING';
-const scoringSession = ownedScoringSession || scoringSessions[0];
+const scoringSession = ownedScoringSession || firstScoringSession;
 ---
 
-{
-  userId && !ownedScoringSession && groupedSessions.length === 0 && (
-    <Button class="absolute right-4 top-2" size="sm">
-      <a href="/scoring/new" data-astro-prefetch="true">
-        NY RUNDA
-      </a>
-    </Button>
-  )
-}
 {
   scoringSession && (
     <EventCard date={scoringSession.createdAt || ''} final={!!scoringSession.partOfFinal} live>

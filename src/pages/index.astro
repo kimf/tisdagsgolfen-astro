@@ -1,14 +1,12 @@
 ---
 import 'src/styles/global.css';
-import ActiveSessions from 'src/components/homepage/ActiveSessions.astro';
 import UserButton from 'src/components/homepage/UserButton.astro';
 import Button from 'src/components/ui/button.astro';
 import Link from 'src/assets/icons/link.svg';
-import HeaderTitle from 'src/components/shared/HeaderTitle.astro';
 import AppScreen from 'src/layouts/AppScreen.astro';
-import Events from 'src/components/homepage/Events.astro';
 import SeasonLeaderboard from 'src/components/homepage/SeasonLeaderboard.astro';
 import FinalLeaderboardButton from 'src/components/homepage/FinalLeaderboardButton.astro';
+import EventsCarousel from 'src/components/homepage/EventsCarousel.astro';
 
 Astro.response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
 Astro.response.headers.set('Pragma', 'no-cache');
@@ -21,6 +19,13 @@ Astro.response.headers.set('Expires', '0');
       <link rel="preload" as="image" href={`/images/avatars/${img}.png`} slot="head" />
     ))
   }
+
+  <a
+    slot="header"
+    href="/stats"
+    class="hover:text-cyan-950 text-cyan-700 duration-100 active:scale-97 opacity-50 uppercase"
+    >Statistik</a
+  >
 
   <UserButton slot="header">
     <div
@@ -35,16 +40,7 @@ Astro.response.headers.set('Expires', '0');
   </UserButton>
 
   <FinalLeaderboardButton />
-
-  <div class="w-full main-section min-h-26 relative p-4">
-    <HeaderTitle title="RUNDOR" />
-    <div class="flex overflow-x-scroll">
-      <div class="flex flex-nowrap h-26 gap-2">
-        <ActiveSessions />
-        <Events />
-      </div>
-    </div>
-  </div>
+  <EventsCarousel />
   <div class="w-full main-section p-4">
     <SeasonLeaderboard />
   </div>

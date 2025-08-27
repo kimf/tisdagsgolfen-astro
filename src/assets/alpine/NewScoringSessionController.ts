@@ -76,7 +76,6 @@ document.addEventListener('alpine:init', () => {
       },
 
       toggleTeamPlayer(teamIndex: number, playerId: number) {
-        console.log(`Toggling player ${playerId} in team ${teamIndex}`);
         const team = this.teams[teamIndex];
         const playerIndex = team.players.findIndex((p) => p.id === playerId);
         if (playerIndex > -1) {

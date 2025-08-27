@@ -14,8 +14,6 @@ if (Astro.request.method === 'POST' && userId === '2') {
     where: (sessions, { eq }) => eq(sessions.state, 'PENDING')
   });
 
-  console.log('Closing round for sessions:', activeSessions);
-
   const promises = [];
   for (const session of activeSessions) {
     promises.push(
@@ -24,7 +22,6 @@ if (Astro.request.method === 'POST' && userId === '2') {
   }
 
   const res = await Promise.all(promises);
-  console.log('Closed sessions:', res);
 
   return new Response(null, {
     status: 204,

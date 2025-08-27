@@ -1,15 +1,23 @@
 ---
 import AppScreen from 'src/layouts/AppScreen.astro';
 import getDb from 'src/db';
-import { getPlayerWithScores } from 'src/db/queries/getPlayers';
-import Eclectic from 'src/components/profile/Eclectic.astro';
-
-const { id, number } = Astro.params;
-if (!id) throw new Error('Id saknas för spelare');
+import CourseStats from 'src/components/stats/CourseStats.astro';
 
 const db = getDb(Astro.locals);
 
-const player = await getPlayerWithScores(parseInt(id, 10), db);
+const scoringSessions = await db.query.scoringSessions.findMany({
+  where: (scoringSessions, { eq }) => eq(scoringSessions.special, false),
+  with: {
+    scorecards: {
+      orderBy: (scorecards, { asc }) => [asc(scorecards.id)],
+      with: {
+        scores: {
+          orderBy: (scores, { asc }) => [asc(scores.hole)]
+        }
+      }
+    }
+  }
+});
 
 const dbCourses = await db.query.courses.findMany({
   where: (courses, { eq }) => eq(courses.finalCourse, false),
@@ -22,7 +30,6 @@ const sjoBerg = dbCourses.find((c) => c.id === 1010); // Sjö-Berg
 const bergDal = dbCourses.find((c) => c.id === 1006); // Berg-Dal
 const dalSjo = dbCourses.find((c) => c.id === 1008); // Dal-Sjö
 
-// Take the ids of the sjo holes from sjoBerg and dalSjo (first 9 holes and last 9 holes)
 let sjoHoleIds: number[] = [];
 let bergHoleIds: number[] = [];
 let dalHoleIds: number[] = [];
@@ -44,17 +51,28 @@ if (sjoBerg && dalSjo && bergDal && sjoBerg.holes && dalSjo.holes && bergDal.hol
   ];
 }
 
-type ScoreWithMeta = { holeId: number; holeNumber: number; par: number; strokes: number };
+type ScoreWithMeta = {
+  holeId: number;
+  holeNumber: number;
+  par: number;
+  toPar: number;
+  holeHcp: number;
+  strokes: number;
+  beers: number;
+  ciders: number;
+  fines: number;
+};
 
-const playerScores: ScoreWithMeta[] =
-  player?.scorecards
-    .filter((sc) => sc.scorecard.scoringSession.eventType === 'individual')
+const scores: ScoreWithMeta[] =
+  scoringSessions
     .map((sc) => {
-      const course = dbCourses.find((c) => c.id === sc.scorecard.courseId);
+      const course = dbCourses.find((c) => c.id === sc.courseId);
       if (!course) {
         return [];
       }
-      return sc.scorecard.scores
+
+      return sc.scorecards
+        .flatMap((s) => s.scores)
         .filter((s) => s.strokes !== 0)
         .map((s) => {
           const hole = course.holes.find((h) => h.number === s.hole);
@@ -65,30 +83,30 @@ const playerScores: ScoreWithMeta[] =
             strokes: s.strokes,
             holeId: hole.id,
             holeNumber: hole.number,
+            holeHcp: hole.hcp,
             par: hole.par,
-            toPar: s.strokes - hole.par
+            toPar: s.strokes - hole.par,
+            beers: s.beers,
+            ciders: s.ciders,
+            fines: s.fines
           };
         });
     })
     .flat() || [];
 
-const sjoScores = playerScores.filter((s) => sjoHoleIds.includes(s.holeId));
-const bergScores = playerScores.filter((s) => bergHoleIds.includes(s.holeId));
-const dalScores = playerScores.filter((s) => dalHoleIds.includes(s.holeId));
-
-if (!player) {
-  throw new Error('Hittade ingen spelare med id: ' + id);
-}
+const sjoScores = scores.filter((s) => sjoHoleIds.includes(s.holeId));
+const bergScores = scores.filter((s) => bergHoleIds.includes(s.holeId));
+const dalScores = scores.filter((s) => dalHoleIds.includes(s.holeId));
 ---
 
-<AppScreen title={player.fullName} back="/">
+<AppScreen title="Statistik" back="/">
   <main class="p-4">
     <section class="mb-4">
-      <h1 class="text-2xl font-bold mb-2">ECLECTIC</h1>
+      <h2>Snitt</h2>
       <div class="flex flex-col gap-4 mb-4 md:flex-row flex-wrap">
-        <Eclectic scores={sjoScores} course="Sjö" />
-        <Eclectic scores={bergScores} course="Berg" />
-        <Eclectic scores={dalScores} course="Dal" />
+        <CourseStats course="Sjö" scores={sjoScores} />
+        <CourseStats course="Berg" scores={bergScores} />
+        <CourseStats course="Dal" scores={dalScores} />
       </div>
     </section>
   </main>

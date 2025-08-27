@@ -85,7 +85,6 @@ if (eventType === 'team_w_individual') {
         par
       );
 
-      console.log(teamToPar, teamPoints, teamStrokes);
       await db
         .insert(scores)
         .values({

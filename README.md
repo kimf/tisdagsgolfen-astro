@@ -16,7 +16,6 @@ There are some assets etc under the public folder as well.
 1.  Prestationsbaserade Badges:
     • Breaking 80, 75, 70 för första gången: Utmärkelser för att uppnå personliga rekord över 18 hål ￼.
     • Consecutive Birdies: För att belöna spelare som gör flera birdies i rad.
-    • Hole in One: Ett särskilt erkännande för den sällsynta bedriften att göra en hole in one.
 2.  Spelbeteendebaserade Badges:
     • Bogey Free, Double Bogey Free: För rundor spelade utan några bogeys eller double bogeys ￼.
     • Bötes-free Round: För rundor spelade utan böter.

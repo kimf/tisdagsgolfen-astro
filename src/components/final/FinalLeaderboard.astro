@@ -196,7 +196,7 @@ const canCloseRound =
 <script type="module">
   document.addEventListener('alpine:init', () => {
     Alpine.data('sort', () => ({
-      sorting: 'total',
+      sorting: 'today',
       sortBy(sorting) {
         this.sorting = sorting;
         const cellIndex = sorting === 'today' ? 4 : 5; // Adjust index based on sorting type

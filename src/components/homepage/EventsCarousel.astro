@@ -1,0 +1,55 @@
+---
+import { getaActiveSessions } from 'src/db/queries/getActiveSessions';
+import type { ActiveSession } from 'src/db/queries/getActiveSessions';
+import Button from 'src/components/ui/button.astro';
+import getDb from 'src/db';
+import HeaderTitle from '../shared/HeaderTitle.astro';
+import ActiveSessions from './ActiveSessions.astro';
+import Events from './Events.astro';
+
+const db = getDb(Astro.locals);
+const userId = Astro.cookies.get('userId')?.value || undefined;
+const scoringSessions = await getaActiveSessions(db);
+
+type SessionGroupKey = string;
+const groupedSessionsObj: Record<SessionGroupKey, ActiveSession[]> = {};
+for (const sesh of scoringSessions) {
+  const key: SessionGroupKey = `${sesh.scoringType}|${sesh.special}|${sesh.eventType}|${sesh.courseId}`;
+  if (!groupedSessionsObj[key]) {
+    groupedSessionsObj[key] = [];
+  }
+  groupedSessionsObj[key].push(sesh);
+}
+const groupedSessions: ActiveSession[][] = Object.values(groupedSessionsObj);
+
+const ownedScoringSession = userId
+  ? scoringSessions.find((sesh) => sesh.ownerId === Number(userId))
+  : null;
+
+const scoringSession = ownedScoringSession || scoringSessions[0];
+---
+
+<div class="w-full main-section min-h-26 p-4">
+  <div class="flex justify-between items-baseline">
+    <HeaderTitle title="RUNDOR" />
+
+    {
+      userId && !ownedScoringSession && groupedSessions.length === 0 && (
+        <Button size="sm">
+          <a href="/scoring/new" data-astro-prefetch="true">
+            NY RUNDA
+          </a>
+        </Button>
+      )
+    }
+  </div>
+  <div class="flex overflow-x-scroll">
+    <div class="flex flex-nowrap h-26 gap-2">
+      <ActiveSessions
+        ownedScoringSession={ownedScoringSession || null}
+        firstScoringSession={scoringSession}
+      />
+      <Events />
+    </div>
+  </div>
+</div>
