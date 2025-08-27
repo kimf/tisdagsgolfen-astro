@@ -14,6 +14,7 @@ type ScoreWithMeta = {
 
 export type HoleWithStats = {
   avgStrokes: string;
+  avgToPar: string;
   holeId: number;
   holeNumber: number;
   par: number;
@@ -21,6 +22,7 @@ export type HoleWithStats = {
   totalCiders: number;
   totalFines: number;
   totalStrokes: number;
+  totalToPar: number;
   totalBirdies: number;
   totalEagles: number;
   rank?: number;
@@ -58,6 +60,7 @@ const holeMap = new Map<
     par: number;
     count: number;
     totalStrokes: number;
+    totalToPar: number;
     totalBeers: number;
     totalCiders: number;
     totalFines: number;
@@ -72,6 +75,7 @@ for (const s of scoresWithCorrectedHoleNumbers) {
   if (cur) {
     cur.count += 1;
     cur.totalStrokes += s.strokes;
+    cur.totalToPar += s.toPar;
     cur.totalBeers += s.beers;
     cur.totalCiders += s.ciders;
     cur.totalFines += Math.min(s.fines, 0);
@@ -83,6 +87,7 @@ for (const s of scoresWithCorrectedHoleNumbers) {
       par: s.par ?? 0,
       count: 1,
       totalStrokes: s.strokes,
+      totalToPar: s.toPar,
       totalBeers: s.beers,
       totalCiders: s.ciders,
       totalFines: Math.min(s.fines, 0),
@@ -97,6 +102,7 @@ const holesWithStats: HoleWithStats[] = Array.from(holeMap.entries())
     const {
       count,
       totalStrokes,
+      totalToPar,
       totalBeers,
       totalCiders,
       totalFines,
@@ -111,6 +117,8 @@ const holesWithStats: HoleWithStats[] = Array.from(holeMap.entries())
       par,
       rank: 0,
       avgStrokes: (totalStrokes / count).toFixed(2),
+      avgToPar: (totalToPar / count).toFixed(2),
+      totalToPar,
       totalStrokes,
       totalBeers,
       totalCiders,
@@ -122,7 +130,7 @@ const holesWithStats: HoleWithStats[] = Array.from(holeMap.entries())
   .sort((a, b) => a.holeNumber - b.holeNumber);
 
 // Compute dense rank by avgStrokes (lower is better)
-const rankedHoles = standardCompRank(holesWithStats, 'avgStrokes', true, null).sort(
+const rankedHoles = standardCompRank(holesWithStats, 'avgToPar', true, null).sort(
   (a, b) => a.holeNumber - b.holeNumber
 );
 
