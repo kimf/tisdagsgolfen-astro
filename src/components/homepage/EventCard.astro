@@ -24,9 +24,17 @@ interface Props extends HTMLAttributes<'div'>, VariantProps<typeof eventCardVari
   date: string;
   live?: boolean;
   final?: boolean;
+  special?: boolean;
 }
 
-const { class: className, intent, live = false, final = false, ...props } = Astro.props;
+const {
+  class: className,
+  intent,
+  live = false,
+  final = false,
+  special = false,
+  ...props
+} = Astro.props;
 ---
 
 <div class={cx(eventCardVariants({ intent, live }), className)} {...props}>
@@ -39,7 +47,7 @@ const { class: className, intent, live = false, final = false, ...props } = Astr
         })
       }
     </h4>
-
+    {special && <Pill intent="special">SPECIAL</Pill>}
     {live && <Pill intent="live">LIVE</Pill>}
     {final && <Pill intent="final">FINAL</Pill>}
   </div>

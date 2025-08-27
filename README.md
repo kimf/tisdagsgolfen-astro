@@ -9,6 +9,7 @@ There are some assets etc under the public folder as well.
 
 - Öl & Cider funkar inte så bra när det är team w individual, fixa till nästa år!
 - Tänka om datastruktur kanske?
+- Bara mata in böter, 3-4 puttar etc, om 0-1-2 = inte behöva fylla i?
 
 - Course stats + Eclectic, season + historical
 
@@ -19,23 +20,3 @@ There are some assets etc under the public folder as well.
 2.  Spelbeteendebaserade Badges:
     • Bogey Free, Double Bogey Free: För rundor spelade utan några bogeys eller double bogeys ￼.
     • Bötes-free Round: För rundor spelade utan böter.
-
----
-
-## Game formats - Finally?
-
-## Lag men individuell score (typ bästboll)
-
-The Best Ball format, also known as Four Ball, is a popular choice in both friendly matches and competitive tournaments, involving teams of two players each. Throughout the game, each player plays their own ball from tee to green on every hole, independently managing their own game. The team's score for each hole is determined by the lower of the two scores recorded by the team members.
-In regular Best Ball, for example, if Player A scores a 4 and Player B scores a 5, the team’s score is 4.
-
-## Lag men individuell score - poäng (typ bästboll etc)
-
-Regular points or modified: Eagle 5p, Birdie 2p, Par 0p, Bogey -1p, DB+ -3p
-
-## Tisdagsgolfens Irish Rumble (2-man teams)
-
-Första 9 (1-9), Vanlig bästboll
-Andra 9 (7-18), båda spelarnas pong slås ihop
-
----

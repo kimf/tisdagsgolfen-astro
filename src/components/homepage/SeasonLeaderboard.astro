@@ -50,33 +50,36 @@ const totalFines = leaderboardItems.map((player) => player.totalFines).reduce((a
       <tbody x-ref="list" x-auto-animate.linear>
         <template x-for="item in sortedItems" :key="item.id">
           <tr
-            class="border-b border-gray-200 odd:bg-white even:bg-gray-50 ranked "
+            class="border-b border-gray-200 odd:bg-white even:bg-gray-50 ranked"
             :data-rank="item.rank"
           >
             <td class="px-1 text-center content-center vcr" x-text="item.rank"></td>
             <td class="py-2 uppercase text-sm">
-              <div class="flex gap-2">
-                <img
-                  :src="item.avatarUrl ? `/images/avatars/${item.id}.png` : '/images/avatars/default.png'"
-                  class="size-12"
-                />
-                <div class="flex gap-1 flex-col justify-between">
-                  <div class="flex items-center">
-                    <div class="uppercase font-bold text-lg tracking-tight text-black" x-text="item.shortName"></div>
-                    <Pill intent='guest' class="h-4 px-1 py-0 ml-2" x-show="item.guest">GÄST</Pill>
-                  </div>
-                  <div class="flex text-xs tracking-tighter">
-                    <span x-text="`${item.events} ${item.events === 1 ? 'runda' : 'rundor'}`"
-                    ></span>
-                    <div class="pl-1">
-                      <span x-show={`currentTab != 'scratch'`}>&bull; ∅</span>
-                      <span x-text="item.average" x-show={`currentTab == 'rank'`}></span>
-                      <span x-text="item.averageFines" x-show={`currentTab == 'kr'`}></span>
-                      <small x-show={`currentTab == 'kr'`}>kr</small>
+              <a :href="item.id ? `/profile/${item.id}` : '#'">
+                <div class="flex gap-2">
+                  <img
+                    :src="item.avatarUrl ? `/images/avatars/${item.id}.png` : '/images/avatars/default.png'"
+                    class="size-12"
+                  />
+                  <div class="flex gap-1 flex-col justify-between">
+                    <div class="flex items-center">
+
+                      <div class="uppercase font-bold text-lg tracking-tight text-black" x-text="item.shortName"></div>
+                      <Pill intent='guest' class="h-4 px-1 py-0 ml-2" x-show="item.guest">GÄST</Pill>
+                    </div>
+                    <div class="flex text-xs tracking-tighter">
+                      <span x-text="`${item.events} ${item.events === 1 ? 'runda' : 'rundor'}`"
+                      ></span>
+                      <div class="pl-1">
+                        <span x-show={`currentTab != 'scratch'`}>&bull; ∅</span>
+                        <span x-text="item.average" x-show={`currentTab == 'rank'`}></span>
+                        <span x-text="item.averageFines" x-show={`currentTab == 'kr'`}></span>
+                        <small x-show={`currentTab == 'kr'`}>kr</small>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </a>
             </td>
 
             <td class="uppercase text-xs tracking-tighter">

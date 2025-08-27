@@ -1,0 +1,100 @@
+---
+import AppScreen from 'src/layouts/AppScreen.astro';
+import getDb from 'src/db';
+import { getPlayerWithScores } from 'src/db/queries/getPlayers';
+import Eclectic from 'src/components/profile/Eclectic.astro';
+
+const { id, number } = Astro.params;
+if (!id) throw new Error('Id saknas för spelare');
+
+const db = getDb(Astro.locals);
+
+const player = await getPlayerWithScores(parseInt(id, 10), db);
+
+const dbCourses = await db.query.courses.findMany({
+  where: (courses, { eq }) => eq(courses.finalCourse, false),
+  with: {
+    holes: true
+  }
+});
+
+const sjoBerg = dbCourses.find((c) => c.id === 1010); // Sjö-Berg
+const bergDal = dbCourses.find((c) => c.id === 1006); // Berg-Dal
+const dalSjo = dbCourses.find((c) => c.id === 1008); // Dal-Sjö
+
+// Take the ids of the sjo holes from sjoBerg and dalSjo (first 9 holes and last 9 holes)
+let sjoHoleIds: number[] = [];
+let bergHoleIds: number[] = [];
+let dalHoleIds: number[] = [];
+
+if (sjoBerg && dalSjo && bergDal && sjoBerg.holes && dalSjo.holes && bergDal.holes) {
+  sjoHoleIds = [
+    ...sjoBerg.holes.filter((h) => h.number < 10).map((h) => h.id),
+    ...dalSjo.holes.filter((h) => h.number > 9).map((h) => h.id)
+  ];
+
+  dalHoleIds = [
+    ...dalSjo.holes.filter((h) => h.number < 10).map((h) => h.id),
+    ...bergDal.holes.filter((h) => h.number > 9).map((h) => h.id)
+  ];
+
+  bergHoleIds = [
+    ...bergDal.holes.filter((h) => h.number < 10).map((h) => h.id),
+    ...sjoBerg.holes.filter((h) => h.number > 9).map((h) => h.id)
+  ];
+}
+
+type ScoreWithMeta = { holeId: number; holeNumber: number; par: number; strokes: number };
+
+const playerScores: ScoreWithMeta[] =
+  player?.scorecards
+    .filter((sc) => sc.scorecard.scoringSession.eventType === 'individual')
+    .map((sc) => {
+      const course = dbCourses.find((c) => c.id === sc.scorecard.courseId);
+      if (!course) {
+        return [];
+      }
+      return sc.scorecard.scores
+        .filter((s) => s.strokes !== 0)
+        .map((s) => {
+          const hole = course.holes.find((h) => h.number === s.hole);
+          if (!hole) {
+            throw new Error('Kunde inte hitta hål ' + s.hole + ' för bana ' + course.name);
+          }
+          return {
+            strokes: s.strokes,
+            holeId: hole.id,
+            holeNumber: hole.number,
+            par: hole.par,
+            toPar: s.strokes - hole.par
+          };
+        });
+    })
+    .flat() || [];
+
+const sjoScores = playerScores.filter((s) => sjoHoleIds.includes(s.holeId));
+const bergScores = playerScores.filter((s) => bergHoleIds.includes(s.holeId));
+const dalScores = playerScores.filter((s) => dalHoleIds.includes(s.holeId));
+
+if (!player) {
+  throw new Error('Hittade ingen spelare med id: ' + id);
+}
+---
+
+<AppScreen title={player.fullName} back="/">
+  <main class="p-4">
+    <section class="mb-4">
+      <h3>Säsong vs historiskt</h3>
+      <h1 class="text-2xl font-bold mb-2">ECLECTIC</h1>
+      <div class="flex flex-col gap-4 mb-4 md:flex-row flex-wrap">
+        <Eclectic scores={sjoScores} course="Sjö" />
+        <Eclectic scores={bergScores} course="Berg" />
+        <Eclectic scores={dalScores} course="Dal" />
+      </div>
+
+      <h4>Banstatistik, snitt per hål, svårast hål etc (för alla)</h4>
+      <h4>Totalt + Snitt 3-puttar?</h4>
+      <h4>Totalt + Snitt böter</h4>
+    </section>
+  </main>
+</AppScreen>

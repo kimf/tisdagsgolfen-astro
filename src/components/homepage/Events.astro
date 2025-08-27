@@ -10,7 +10,7 @@ const events = await getEvents(1, getDb(Astro.locals));
 {
   events.map((event) => (
     <a href={`/events/${event.id}`} data-astro-prefetch="true">
-      <EventCard date={event.createdAt || ''}>
+      <EventCard date={event.createdAt || ''} special={!!event.special}>
         <div class="uppercase text-sm flex justify-between">
           {event.course.name}
           <Link class="size-5 absolute bottom-2 right-2" />

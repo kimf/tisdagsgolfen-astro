@@ -1,0 +1,108 @@
+---
+import type { Hole } from 'src/db/schema/hole';
+
+type ScoreWithMeta = { holeId: number; holeNumber: number; par: number; strokes: number };
+
+export interface Props {
+  course: string;
+  scores: ScoreWithMeta[];
+}
+const { course, scores } = Astro.props;
+
+console.log('Eclectic scores:', scores);
+
+const scoresWithCorrectedHoleNumbers = scores.map((score) => {
+  return {
+    ...score,
+    holeNumber: score.holeNumber > 9 ? score.holeNumber - 9 : score.holeNumber
+  };
+});
+
+const groupedByHole = scoresWithCorrectedHoleNumbers.reduce(
+  (acc, curr) => {
+    if (!acc[curr.holeNumber]) {
+      acc[curr.holeNumber] = [];
+    }
+    acc[curr.holeNumber].push(curr);
+    return acc;
+  },
+  {} as Record<number, ScoreWithMeta[]>
+);
+
+const holesWithStats = Object.entries(groupedByHole)
+  .map(([holeNumberStr, scores]) => {
+    console.log('Hole number:', holeNumberStr, scores);
+    const holeNumber = Number(holeNumberStr);
+    const par = scores[0]?.par ?? 0;
+    const best = Math.min(...scores.map((s) => s.strokes));
+    const avg = scores.reduce((sum, s) => sum + s.strokes, 0) / scores.length;
+    const playedRounds = scores.length;
+    return { holeNumber, par, best, avg, playedRounds };
+  })
+  .sort((a, b) => a.holeNumber - b.holeNumber);
+
+const totalPar = holesWithStats.reduce((acc, curr) => acc + curr.par, 0);
+const totalBest = holesWithStats.reduce((acc, curr) => acc + curr.best, 0);
+const totalAvg = holesWithStats.reduce((acc, curr) => acc + curr.avg, 0).toFixed(1);
+---
+
+<div class="border border-gray-300 p-4 bg-white">
+  <h2>{course}</h2>
+  <table class="w-full border border-gray-300 mb-4">
+    <thead>
+      <tr class="bg-gray-200">
+        <th class="text-left p-2">Hål</th>
+        <th class="text-right p-2">Par</th>
+        <th class="text-right p-2">Bästa</th>
+        <th class="text-right p-2">Snitt</th>
+        <th class="text-right p-2">Rundor</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-300">
+      {
+        holesWithStats
+          .sort((a, b) => a.holeNumber - b.holeNumber)
+          .map(({ holeNumber, best, avg, par, playedRounds }) => {
+            return (
+              <tr>
+                <td class="p-2 border-r border-gray-300">{holeNumber}</td>
+                <td class="p-2 border-r border-gray-300">{par}</td>
+                <td class="p-2 border-r border-gray-300 text-right">
+                  <span
+                    class={`inline-block w-[30px] h-[30px] text-center ${
+                      best === par - 1
+                        ? // birdie
+                          'border border-foreground/20 pt-0.5 rounded-full text-red-500'
+                        : // eagle
+                          best === par - 2
+                          ? 'border-4 border-double border-foreground/20 rounded-full text-yellow-800'
+                          : // bogey
+                            best === par + 1
+                            ? 'border border-foreground/20 pt-0.5'
+                            : // double or more
+                              best > par + 1
+                              ? 'border-4 border-double border-foreground/20'
+                              : ''
+                    }`}
+                  >
+                    {best}
+                  </span>
+                </td>
+                <td class="p-2 text-right border-r border-gray-300">{avg.toFixed(1)}</td>
+                <td class="p-2 text-right">{playedRounds}</td>
+              </tr>
+            );
+          })
+      }
+    </tbody>
+    <tfoot class="bg-gray-100 font-bold">
+      <tr>
+        <td class="p-2 border-t border-r border-gray-300">Totalt</td>
+        <td class="p-2 border-t border-r border-gray-300">{totalPar}</td>
+        <td class="p-2 border-t border-r border-gray-300 text-right">{totalBest}</td>
+        <td class="p-2 border-t border-r border-gray-300 text-right">{totalAvg}</td>
+        <td class="p-2 border-t border-gray-300 text-right">-</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>

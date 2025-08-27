@@ -30,6 +30,7 @@ export async function createScoringSession(
     playerIds: number[];
     teamIndex?: number;
     individualForTeamWIndividual?: boolean;
+    partOfFinal?: boolean;
   }[] = [];
 
   if (eventType === 'team' || eventType === 'team_w_individual') {
@@ -43,7 +44,8 @@ export async function createScoringSession(
         scoringSessionId: scoringSesh[0].id,
         givenStrokes: Number(team.strokes) || 0,
         teamIndex: index,
-        playerIds: team.players.map((p) => p.id)
+        playerIds: team.players.map((p) => p.id),
+        partOfFinal
       });
     });
   } else {
@@ -56,7 +58,8 @@ export async function createScoringSession(
         courseId: courseId,
         scoringSessionId: scoringSesh[0].id,
         givenStrokes: Number(player.strokes) || 0,
-        playerIds: [player.id]
+        playerIds: [player.id],
+        partOfFinal
       });
     });
   }
