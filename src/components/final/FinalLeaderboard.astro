@@ -72,10 +72,7 @@ const totalLeaderboard = buildFinalLeaderboardItems(
 
 const hasActiveRounds = totalLeaderboard[0]?.rounds.some((r) => r.active) || false;
 
-const canCloseRound =
-  userId === '2' && scoringSessions.length > 0
-    ? scoringSessions.every((l) => l.state === 'PENDING')
-    : false;
+const canCloseRound = userId === '2';
 ---
 
 <main class="p-4" x-data="sort()">
